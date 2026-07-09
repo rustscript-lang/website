@@ -62,7 +62,7 @@ a {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  max-width: 1040px;
+  width: min(1180px, calc(100% - 2rem));
   margin: 0 auto;
   padding: 1rem 1.25rem;
   backdrop-filter: blur(18px);
