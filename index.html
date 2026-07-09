@@ -83,15 +83,23 @@ fn allow(region: string, load: int) -&gt; bool {
           </article>
           <article class="feature-card">
             <h3>Portable VM core</h3>
-            <p>Compile to bytecode or AOT artifacts that can be embedded in services, UI apps, games, and edge agents.</p>
+            <p>Compile to compact bytecode that can be embedded in services, UI apps, games, and edge agents.</p>
           </article>
           <article class="feature-card">
             <h3>Host-controlled power</h3>
             <p>Expose only the functions the host chooses. Scripts remain focused on policy, glue, and automation.</p>
           </article>
           <article class="feature-card">
-            <h3>Plugin frontends</h3>
-            <p>Compatibility languages can be added through source plugins while the VM stays centered on RustScript.</p>
+            <h3>Cooperative scheduling and yielding</h3>
+            <p>Fuel bounds VM work, Epoch gives hosts wall-clock deadlines, and async host calls can yield or wait at explicit boundaries.</p>
+          </article>
+          <article class="feature-card">
+            <h3>JIT and AOT</h3>
+            <p>Start quickly in the interpreter, trace hot paths through the JIT, or lower whole programs through SSA and Cranelift for AOT artifacts.</p>
+          </article>
+          <article class="feature-card">
+            <h3>No garbage collector</h3>
+            <p>Rust-style ownership, borrows, and moves keep lifetimes visible to the compiler; shared values release through normal Drop without tracing GC.</p>
           </article>
         </div>
       </section>
