@@ -49,15 +49,17 @@
           </div>
         </div>
         <div class="hero-card" aria-label="RustScript example">
-          <div class="window-bar"><span></span><span></span><span></span><strong>policy.rsc</strong></div>
-          <pre><code>fn score(route: string, latency_ms: i32) -&gt; i32 {
-  let base = if route == "edge" { 80 } else { 40 };
-  let penalty = latency_ms / 10;
-  return base - penalty;
+          <div class="window-bar"><span></span><span></span><span></span><strong>policy.rss</strong></div>
+          <pre><code>fn score(route: string, latency_ms: int) -&gt; int {
+  let mut base = 40;
+  if route == "edge" {
+    base = 80;
+  }
+  base - latency_ms / 10
 }
 
-fn allow(region: string, load: i32) -&gt; bool {
-  return region != "blocked" &amp;&amp; load &lt; 90;
+fn allow(region: string, load: int) -&gt; bool {
+  region != "blocked" &amp;&amp; load &lt; 90
 }</code></pre>
           <p>
             Compile once, embed the VM, expose typed host functions, and run the same policy across targets.
