@@ -229,7 +229,8 @@ function renderMarkdown(markdown) {
   return blocks.join("\n");
 }
 
-function layout({ title, description = "RustScript documentation", body, section = "Docs" }) {
+function layout({ title, description = "RustScript documentation", body, section = "Docs", pageClass = "" }) {
+  const shellClass = ["doc-shell", pageClass].filter(Boolean).join(" ");
   return `<!doctype html>
 <html lang="en">
   <head>
@@ -255,7 +256,7 @@ function layout({ title, description = "RustScript documentation", body, section
       <a class="header-action" href="https://github.com/rustscript-lang/rustscript" target="_blank" rel="noopener noreferrer">GitHub</a>
     </header>
     <main class="doc-page">
-      <article class="doc-shell">
+      <article class="${shellClass}">
         <p class="eyebrow">${escapeHtml(section)}</p>
         ${body}
       </article>
@@ -316,6 +317,7 @@ for (const file of files) {
     title,
     description: `${title} · RustScript`,
     section: isBlog ? "Blog" : "Docs",
+    pageClass: isBlog ? "blog-post" : "",
     body: `<nav class="doc-breadcrumb"><a href="/docs/">Docs</a>${isBlog ? ` / <a href="/docs/blog/">Blog</a>` : ""}</nav>${renderMarkdown(markdown)}`,
   });
   await mkdir(outDir, { recursive: true });
