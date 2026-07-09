@@ -50,16 +50,21 @@
         </div>
         <div class="hero-card" aria-label="RustScript example">
           <div class="window-bar"><span></span><span></span><span></span><strong>policy.rss</strong></div>
-          <pre><code>fn score(route: string, latency_ms: int) -&gt; int {
-  let mut base = 40;
-  if route == "edge" {
-    base = 80;
+          <pre class="rss-code"><code><span class="tok-kw">fn</span> <span class="tok-fn">first_or</span>&lt;<span class="tok-type">T</span>&gt;(items: [<span class="tok-type">T</span>], fallback: <span class="tok-type">T</span>) -&gt; <span class="tok-type">T</span> {
+  <span class="tok-kw">if</span> items.length &gt; <span class="tok-num">0</span> =&gt; {
+    items[<span class="tok-num">0</span>]
+  } <span class="tok-kw">else</span> =&gt; {
+    fallback
   }
-  base - latency_ms / 10
 }
 
-fn allow(region: string, load: int) -&gt; bool {
-  region != "blocked" &amp;&amp; load &lt; 90
+<span class="tok-kw">fn</span> <span class="tok-fn">score</span>(route: <span class="tok-type">string</span>, samples: [<span class="tok-type">int</span>]) -&gt; <span class="tok-type">int</span> {
+  <span class="tok-kw">let mut</span> base = <span class="tok-num">40</span>;
+  <span class="tok-kw">let</span> latency = <span class="tok-fn">first_or</span>::&lt;<span class="tok-type">int</span>&gt;(samples, <span class="tok-num">120</span>);
+  <span class="tok-kw">if</span> route == <span class="tok-str">"edge"</span> {
+    base = <span class="tok-num">80</span>;
+  }
+  base - latency / <span class="tok-num">10</span>
 }</code></pre>
           <p>
             Compile once, embed the VM, expose typed host functions, and run the same policy across targets.

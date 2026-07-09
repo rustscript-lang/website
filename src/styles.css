@@ -134,11 +134,12 @@ main {
 }
 
 .hero {
+  width: min(1180px, calc(100% - 2rem));
   min-height: calc(100vh - 7rem);
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(320px, 0.82fr);
+  grid-template-columns: minmax(0, 0.9fr) minmax(500px, 1.1fr);
   align-items: center;
-  gap: 2.25rem;
+  gap: 2rem;
   padding: 3rem 0 2.5rem;
 }
 
@@ -286,9 +287,42 @@ h1 {
 pre {
   position: relative;
   margin: 0;
-  padding: 1.45rem;
-  overflow-x: auto;
-  font: 500 0.95rem/1.72 "IBM Plex Mono", monospace;
+  padding: 1.45rem 1.7rem;
+  overflow: hidden;
+  white-space: pre-wrap;
+  font: 500 0.92rem/1.68 "IBM Plex Mono", monospace;
+}
+
+.rss-code code {
+  display: block;
+}
+
+.tok-kw {
+  color: #ffb38f;
+}
+
+.tok-fn {
+  color: #ffd37a;
+}
+
+.tok-type {
+  color: #9fd3ff;
+}
+
+.tok-str {
+  color: #b8e08d;
+}
+
+.tok-num {
+  color: #d9b8ff;
+}
+
+.tok-kw,
+.tok-fn,
+.tok-type,
+.tok-str,
+.tok-num {
+  font-weight: 600;
 }
 
 .hero-card p {
