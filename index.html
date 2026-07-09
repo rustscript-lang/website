@@ -10,7 +10,7 @@
     <meta property="og:url" content="https://rustscript.org/" />
     <meta property="og:image" content="https://rustscript.org/assets/rustscript-logo-crabstick.png" />
     <link rel="icon" href="/assets/rustscript-logo-crabstick.png" />
-    <link rel="stylesheet" href="/src/styles.css" />
+    <link rel="stylesheet" href="/assets/site.css" />
     <title>RustScript</title>
   </head>
   <body>
@@ -22,7 +22,9 @@
       <nav aria-label="Main navigation">
         <a href="#design">Design</a>
         <a href="#uses">Uses</a>
-        <a href="#ecosystem">Ecosystem</a>
+        <a href="/docs/">Docs</a>
+        <a href="/docs/blog/">Blog</a>
+        <a href="#ecosystem">Links</a>
         <a href="#start">Start</a>
       </nav>
       <a class="header-action" href="https://github.com/rustscript-lang/rustscript">GitHub</a>
@@ -44,6 +46,8 @@
           </div>
           <div class="link-row" aria-label="Project links">
             <a href="https://github.com/rustscript-lang/spec">Specification</a>
+            <a href="/docs/">Docs</a>
+            <a href="/docs/blog/">Blog</a>
             <a href="https://github.com/rustscript-lang/rustscript-compat-frontends">Compatibility plugins</a>
             <a href="https://github.com/rustscript-lang/playground">Playground repo</a>
           </div>
@@ -63,14 +67,6 @@ fn allow(region: string, load: i32) -&gt; bool {
             Compile once, embed the VM, expose typed host functions, and run the same policy across targets.
           </p>
         </div>
-      </section>
-
-      <section class="trust-strip" aria-label="Website references">
-        <span>Inspired by direct language homepages like Rust, Go, and Zig:</span>
-        <strong>clear pitch</strong>
-        <strong>docs links</strong>
-        <strong>playground first</strong>
-        <strong>example-led adoption</strong>
       </section>
 
       <section id="design" class="section-shell split-section">
@@ -139,6 +135,8 @@ fn allow(region: string, load: i32) -&gt; bool {
         <div class="repo-list">
           <a href="https://github.com/rustscript-lang/rustscript"><strong>rustscript</strong><span>Compiler, VM, tooling, and WASM package</span></a>
           <a href="https://github.com/rustscript-lang/spec"><strong>spec</strong><span>Language specification and shared assets</span></a>
+          <a href="/docs/"><strong>docs</strong><span>Design notes, performance reports, and runtime references</span></a>
+          <a href="/docs/blog/"><strong>blog</strong><span>Long-form design rationale and implementation notes</span></a>
           <a href="https://playground.rustscript.org/"><strong>playground</strong><span>Try RustScript in the browser</span></a>
           <a href="https://github.com/rustscript-lang/playground"><strong>playground repo</strong><span>Source for the browser playground</span></a>
           <a href="https://github.com/rustscript-lang/rustscript-compat-frontends"><strong>compat frontends</strong><span>JavaScript and Lua frontend plugins</span></a>
@@ -191,6 +189,8 @@ fn allow(region: string, load: i32) -&gt; bool {
       <nav aria-label="Footer links">
         <a href="https://github.com/rustscript-lang">GitHub org</a>
         <a href="https://github.com/rustscript-lang/website">Website repo</a>
+        <a href="/docs/">Docs</a>
+        <a href="/docs/blog/">Blog</a>
         <a href="https://playground.rustscript.org/">Playground</a>
       </nav>
     </footer>
