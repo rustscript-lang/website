@@ -317,6 +317,10 @@ pre {
   color: #d9b8ff;
 }
 
+.tok-comment {
+  color: rgba(248, 238, 232, 0.48);
+}
+
 .tok-kw,
 .tok-fn,
 .tok-type,

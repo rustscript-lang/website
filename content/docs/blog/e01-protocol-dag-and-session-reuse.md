@@ -36,7 +36,7 @@ If a script only reads and rewrites HTTP-layer state, it never pays to materiali
 
 Consider a script that sets an upstream target and forwards whether the downstream connection is using TLS:
 
-```rust
+```rustscript
 use http;
 use tcp;
 use tls;
@@ -78,7 +78,7 @@ Scripts can create additional upstream exchanges. Each new exchange becomes its 
 
 For example:
 
-```rust
+```rustscript
 use http;
 
 let auth = http::exchange::new();

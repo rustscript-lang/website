@@ -26,7 +26,7 @@ When the compiler decides a value should move rather than copy, it emits the pat
 
 RustScript makes this compiler decision explicit in the source:
 
-```rust
+```rustscript
 let a = [1, 2, 3];
 let b = a;           // move: `a` is consumed, slot is cleared
 // a is no longer available here
@@ -47,7 +47,7 @@ Both programs compile to valid bytecode on the same VM. The difference is what t
 
 When a RustScript user wants to keep the source alive, they say so:
 
-```rust
+```rustscript
 let a = [1, 2, 3];
 let b = a.copy();    // explicit clone: `a` stays available
 let c = &a;          // borrow: non-consuming access
@@ -94,7 +94,7 @@ RustScript's ownership annotations make liveness analysis more precise because t
 
 pd-vm closures capture values into hidden local slots at the time the closure is created. The source-level capture expression determines the `CaptureBindingMode`:
 
-```rust
+```rustscript
 let data = [1, 2, 3];
 let f = |x| data.len() + x;    // `data` is moved into the closure
 // data is no longer available here
