@@ -44,6 +44,14 @@ async function listMarkdownFiles(dir) {
   return files.sort((a, b) => a.localeCompare(b));
 }
 
+function isExternalHref(href) {
+  return /^https?:\/\//i.test(href);
+}
+
+function externalLinkAttrs(href) {
+  return isExternalHref(href) ? ' target="_blank" rel="noopener noreferrer"' : "";
+}
+
 function inlineMarkdown(value) {
   let html = escapeHtml(value);
   html = html.replace(/`([^`]+)`/g, "<code>$1</code>");
@@ -51,7 +59,7 @@ function inlineMarkdown(value) {
   html = html.replace(/\*([^*]+)\*/g, "<em>$1</em>");
   html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_m, label, href) => {
     const safeHref = escapeHtml(href);
-    return `<a href="${safeHref}">${label}</a>`;
+    return `<a href="${safeHref}"${externalLinkAttrs(href)}>${label}</a>`;
   });
   return html;
 }
@@ -207,7 +215,7 @@ function layout({ title, description = "RustScript documentation", body, section
         <a href="/docs/blog/">Blog</a>
         <a href="/#ecosystem">Links</a>
       </nav>
-      <a class="header-action" href="https://github.com/rustscript-lang/rustscript">GitHub</a>
+      <a class="header-action" href="https://github.com/rustscript-lang/rustscript" target="_blank" rel="noopener noreferrer">GitHub</a>
     </header>
     <main class="doc-page">
       <article class="doc-shell">
@@ -221,7 +229,7 @@ function layout({ title, description = "RustScript documentation", body, section
         <a href="/">Home</a>
         <a href="/docs/">Docs</a>
         <a href="/docs/blog/">Blog</a>
-        <a href="https://playground.rustscript.org/">Playground</a>
+        <a href="https://playground.rustscript.org/" target="_blank" rel="noopener noreferrer">Playground</a>
       </nav>
     </footer>
   </body>
