@@ -1,0 +1,14 @@
+{
+  "name": "rustscript-website",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "packageManager": "bun@1.2.9",
+  "scripts": {
+    "build": "vite build",
+    "preview": "vite preview --host 127.0.0.1"
+  },
+  "devDependencies": {
+    "vite": "^5.4.10"
+  }
+}

@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="RustScript is a Rust-inspired scripting language and portable VM ecosystem for typed, embeddable automation." />
+    <meta property="og:title" content="RustScript" />
+    <meta property="og:description" content="Typed scripts, portable bytecode, and embeddable VM tooling for apps, games, gateways, and edge runtimes." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://rustscript.org/" />
+    <meta property="og:image" content="https://rustscript.org/assets/rustscript-logo-crabstick.png" />
+    <link rel="icon" href="/assets/rustscript-logo-crabstick.png" />
+    <link rel="stylesheet" href="/src/styles.css" />
+    <title>RustScript</title>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="RustScript home">
+        <img src="/assets/rustscript-logo-crabstick.png" alt="RustScript crab stick logo" width="44" height="44" />
+        <span>RustScript</span>
+      </a>
+      <nav aria-label="Main navigation">
+        <a href="#design">Design</a>
+        <a href="#uses">Uses</a>
+        <a href="#ecosystem">Ecosystem</a>
+        <a href="#start">Start</a>
+      </nav>
+      <a class="header-action" href="https://github.com/rustscript-lang/rustscript">GitHub</a>
+    </header>
+
+    <main id="top">
+      <section class="hero section-shell">
+        <div class="hero-copy">
+          <p class="eyebrow">Rust-inspired scripting for portable runtimes</p>
+          <h1>Typed automation that can travel with your app.</h1>
+          <p class="hero-lede">
+            RustScript pairs a compact Rust-like language with a portable bytecode VM, host-function bindings,
+            debugger hooks, and browser tooling. It is built for teams that need small scripts to run safely inside
+            controllers, edge nodes, browsers, games, gateways, and native host applications.
+          </p>
+          <div class="hero-actions" aria-label="Primary links">
+            <a class="button button-primary" href="https://playground.rustscript.org/">Open Playground</a>
+            <a class="button button-secondary" href="https://github.com/rustscript-lang/rustscript">View on GitHub</a>
+          </div>
+          <div class="link-row" aria-label="Project links">
+            <a href="https://github.com/rustscript-lang/spec">Specification</a>
+            <a href="https://github.com/rustscript-lang/rustscript-compat-frontends">Compatibility plugins</a>
+            <a href="https://github.com/rustscript-lang/playground">Playground repo</a>
+          </div>
+        </div>
+        <div class="hero-card" aria-label="RustScript example">
+          <div class="window-bar"><span></span><span></span><span></span><strong>policy.rsc</strong></div>
+          <pre><code>fn score(route: string, latency_ms: i32) -&gt; i32 {
+  let base = if route == "edge" { 80 } else { 40 };
+  let penalty = latency_ms / 10;
+  return base - penalty;
+}
+
+fn allow(region: string, load: i32) -&gt; bool {
+  return region != "blocked" &amp;&amp; load &lt; 90;
+}</code></pre>
+          <p>
+            Compile once, embed the VM, expose typed host functions, and run the same policy across targets.
+          </p>
+        </div>
+      </section>
+
+      <section class="trust-strip" aria-label="Website references">
+        <span>Inspired by direct language homepages like Rust, Go, and Zig:</span>
+        <strong>clear pitch</strong>
+        <strong>docs links</strong>
+        <strong>playground first</strong>
+        <strong>example-led adoption</strong>
+      </section>
+
+      <section id="design" class="section-shell split-section">
+        <div>
+          <p class="eyebrow">Design ideas</p>
+          <h2>Small language, explicit runtime boundary.</h2>
+          <p>
+            RustScript keeps scripts readable for Rust users while making host integration clear. Scripts describe
+            control flow and data movement; hosts own privileged operations through registered bindings.
+          </p>
+        </div>
+        <div class="card-grid">
+          <article class="feature-card">
+            <h3>Typed by default</h3>
+            <p>Use explicit signatures and predictable values when scripts cross process, VM, WASM, or host boundaries.</p>
+          </article>
+          <article class="feature-card">
+            <h3>Portable VM core</h3>
+            <p>Compile to bytecode or AOT artifacts that can be embedded in services, UI apps, games, and edge agents.</p>
+          </article>
+          <article class="feature-card">
+            <h3>Host-controlled power</h3>
+            <p>Expose only the functions the host chooses. Scripts remain focused on policy, glue, and automation.</p>
+          </article>
+          <article class="feature-card">
+            <h3>Plugin frontends</h3>
+            <p>Compatibility languages can be added through source plugins while the VM stays centered on RustScript.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="uses" class="section-shell">
+        <div class="section-heading">
+          <p class="eyebrow">Use cases</p>
+          <h2>Where RustScript fits.</h2>
+        </div>
+        <div class="use-grid">
+          <article>
+            <span class="icon">01</span>
+            <h3>Programmable edge</h3>
+            <p>Run routing, filtering, and request policy logic through pd-edge and pd-controller.</p>
+          </article>
+          <article>
+            <span class="icon">02</span>
+            <h3>Game behavior</h3>
+            <p>Embed scriptable gameplay rules inside Bevy while keeping the core engine in Rust.</p>
+          </article>
+          <article>
+            <span class="icon">03</span>
+            <h3>Gateway scripting</h3>
+            <p>Prototype gateway decisions and extension points through the Pingora example repository.</p>
+          </article>
+          <article>
+            <span class="icon">04</span>
+            <h3>Desktop tools</h3>
+            <p>Attach small scripts to UI actions in egui or other native host applications.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="ecosystem" class="section-shell ecosystem-section">
+        <div class="section-heading">
+          <p class="eyebrow">Links</p>
+          <h2>Project ecosystem.</h2>
+        </div>
+        <div class="repo-list">
+          <a href="https://github.com/rustscript-lang/rustscript"><strong>rustscript</strong><span>Compiler, VM, tooling, and WASM package</span></a>
+          <a href="https://github.com/rustscript-lang/spec"><strong>spec</strong><span>Language specification and shared assets</span></a>
+          <a href="https://playground.rustscript.org/"><strong>playground</strong><span>Try RustScript in the browser</span></a>
+          <a href="https://github.com/rustscript-lang/playground"><strong>playground repo</strong><span>Source for the browser playground</span></a>
+          <a href="https://github.com/rustscript-lang/rustscript-compat-frontends"><strong>compat frontends</strong><span>JavaScript and Lua frontend plugins</span></a>
+          <a href="https://github.com/rustscript-lang/pd-edge"><strong>pd-edge</strong><span>Programmable data plane powered by RustScript</span></a>
+          <a href="https://github.com/rustscript-lang/pd-controller"><strong>pd-controller</strong><span>Control plane for pd-edge</span></a>
+          <a href="https://github.com/rustscript-lang/rustscript-clr-vm"><strong>clr vm</strong><span>RustScript runtime on Microsoft CLR</span></a>
+        </div>
+      </section>
+
+      <section class="section-shell examples-section">
+        <div class="section-heading">
+          <p class="eyebrow">Examples</p>
+          <h2>Embedding references.</h2>
+        </div>
+        <div class="example-links">
+          <a href="https://github.com/rustscript-lang/rustscript-bevy-gameplay">
+            <strong>Bevy gameplay</strong>
+            <span>Script gameplay rules in a Rust game loop.</span>
+          </a>
+          <a href="https://github.com/rustscript-lang/rustscript-egui-ui">
+            <strong>egui UI</strong>
+            <span>Drive desktop UI behavior from scripts.</span>
+          </a>
+          <a href="https://github.com/rustscript-lang/rustscript-pingora-gateway">
+            <strong>Pingora gateway</strong>
+            <span>Experiment with scripted gateway policies.</span>
+          </a>
+        </div>
+      </section>
+
+      <section id="start" class="section-shell start-section">
+        <div>
+          <p class="eyebrow">Get started</p>
+          <h2>Try it, read it, embed it.</h2>
+          <p>
+            The fastest path is the browser playground. From there, inspect the main repository, read the specification,
+            and use the example repositories as embedding templates.
+          </p>
+        </div>
+        <div class="start-actions">
+          <a class="button button-primary" href="https://playground.rustscript.org/">Launch Playground</a>
+          <a class="button button-secondary" href="https://github.com/rustscript-lang/rustscript">Clone RustScript</a>
+          <a class="button button-secondary" href="https://github.com/rustscript-lang/spec">Read Specification</a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>RustScript</span>
+      <nav aria-label="Footer links">
+        <a href="https://github.com/rustscript-lang">GitHub org</a>
+        <a href="https://github.com/rustscript-lang/website">Website repo</a>
+        <a href="https://playground.rustscript.org/">Playground</a>
+      </nav>
+    </footer>
+  </body>
+</html>
