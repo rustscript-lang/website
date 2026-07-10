@@ -1,5 +1,6 @@
 node_modules/
 dist/
+public/blog/
 public/docs/
 public/assets/site.css
 .DS_Store
