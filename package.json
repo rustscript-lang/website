@@ -5,8 +5,8 @@
   "type": "module",
   "packageManager": "bun@1.2.9",
   "scripts": {
-    "build:content": "node scripts/build-content.mjs",
-    "build": "bun run build:content && vite build",
+    "build:assets": "node scripts/build-assets.mjs",
+    "build": "bun run build:assets && vite build",
     "preview": "vite preview --host 127.0.0.1"
   },
   "devDependencies": {

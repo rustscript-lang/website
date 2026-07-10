@@ -706,13 +706,12 @@ h3 {
 @media (max-width: 900px) {
   .site-header {
     position: static;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
   }
 
   .site-header nav {
-    order: 3;
-    width: 100%;
-    justify-content: center;
+    min-width: 0;
+    justify-content: flex-end;
     overflow-x: auto;
   }
 
@@ -747,15 +746,34 @@ h3 {
   }
 
   .site-header {
+    width: calc(100% - 1rem);
+    gap: 0.35rem;
     padding-inline: 0.5rem;
+  }
+
+  .brand {
+    min-height: 0;
+    padding: 0.28rem;
+  }
+
+  .brand img {
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
   }
 
   .brand span {
     display: none;
   }
 
-  .header-action {
-    margin-left: auto;
+  .site-header nav {
+    gap: 0.1rem;
+    padding: 0.3rem;
+  }
+
+  .site-header nav a {
+    padding: 0.58rem;
+    font-size: 0.8rem;
   }
 
   h1 {
