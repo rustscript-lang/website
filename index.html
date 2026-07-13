@@ -178,6 +178,10 @@
             <strong>micro-rustscript</strong>
             <span>Run precompiled RustScript VMBC on constrained and embedded targets.</span>
           </a>
+          <a href="https://github.com/rustscript-lang/rustscript-clr-vm/blob/master/examples/dotnet-typed-winforms.rss" target="_blank" rel="noopener noreferrer">
+            <strong>CLR / WinForms</strong>
+            <span>Build a Notepad-style .NET desktop application with typed CLR imports and RustScript-owned UI behavior.</span>
+          </a>
         </div>
       </section>
 
@@ -254,6 +258,38 @@
               '}',
               '',
               'pingora::response::status();',
+            ].join("\n"),
+          },
+          {
+            file: "notepad.rss",
+            label: "CLR / WinForms",
+            code: [
+              'use System::Windows::Forms::Form;',
+              'use System::Windows::Forms::RichTextBox;',
+              'use System::Windows::Forms::Control::ControlCollection;',
+              'use System::Windows::EventLoop as Ui;',
+              '',
+              'let form = Form::NewForm();',
+              'Form::SetFormText(form, "RustScript Notepad");',
+              'Form::SetFormWidth(form, 960);',
+              'Form::SetFormHeight(form, 640);',
+              '',
+              'let editor = RichTextBox::NewRichTextBox();',
+              'RichTextBox::SetRichTextBoxDock(editor, "Fill");',
+              'RichTextBox::SetRichTextBoxText(editor, "RustScript on .NET");',
+              'let controls = Form::GetFormControls(form);',
+              'ControlCollection::AddControl(controls, editor);',
+              '',
+              'Ui::UiBindClosing(form, "close");',
+              'Ui::UiShow(form);',
+              'let mut running = true;',
+              'while running {',
+              '    let action = Ui::UiWait(form);',
+              '    if action == "close" || action == "__closed" {',
+              '        running = false;',
+              '    }',
+              '}',
+              'Ui::UiClose(form);',
             ].join("\n"),
           },
           {
