@@ -9,6 +9,8 @@ const generatedBlogRoot = path.join(publicRoot, "blog");
 const retiredDocsRoot = path.join(publicRoot, "docs");
 const siteCssSrc = path.join(root, "src", "styles.css");
 const siteCssDest = path.join(publicRoot, "assets", "site.css");
+const themeJsSrc = path.join(root, "src", "theme.js");
+const themeJsDest = path.join(publicRoot, "assets", "theme.js");
 
 function escapeHtml(value) {
   return value
@@ -300,6 +302,7 @@ ${items
 
 await mkdir(path.dirname(siteCssDest), { recursive: true });
 await copyFile(siteCssSrc, siteCssDest);
+await copyFile(themeJsSrc, themeJsDest);
 await rm(retiredDocsRoot, { recursive: true, force: true });
 await rm(generatedBlogRoot, { recursive: true, force: true });
 

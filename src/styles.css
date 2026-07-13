@@ -376,6 +376,22 @@ h1 {
   background: var(--code-bg);
   color: var(--code-ink);
   box-shadow: 0 34px 100px rgba(43, 28, 22, 0.34);
+  transition: border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+.hero-card.is-changing {
+  border-color: rgba(215, 131, 105, 0.3);
+  box-shadow: 0 34px 100px rgba(215, 131, 105, 0.22);
+}
+
+.hero-card .rss-code,
+.hero-card .window-bar strong {
+  transition: opacity 0.25s ease;
+}
+
+.hero-card.is-changing .rss-code,
+.hero-card.is-changing .window-bar strong {
+  opacity: 0;
 }
 
 .hero-card::before {

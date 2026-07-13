@@ -3,4 +3,5 @@ dist/
 public/blog/
 public/docs/
 public/assets/site.css
+public/assets/theme.js
 .DS_Store

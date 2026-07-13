@@ -27,13 +27,13 @@
         <a href="#ecosystem">Links</a>
       </nav>
       <div id="theme-control" class="theme-control" role="group" aria-label="Color theme" data-theme="system">
-        <button type="button" data-theme-choice="system" aria-label="Follow system theme" title="Follow system theme">
+        <button class="theme-option" type="button" data-theme-choice="system" aria-label="Follow system theme" title="Follow system theme">
           <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="12" rx="2"></rect><path d="M8 21h8M12 17v4"></path></svg>
         </button>
-        <button type="button" data-theme-choice="light" aria-label="Light theme" title="Light theme">
+        <button class="theme-option" type="button" data-theme-choice="light" aria-label="Light theme" title="Light theme">
           <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2.5M12 19.5V22M4.93 4.93 6.7 6.7M17.3 17.3l1.77 1.77M2 12h2.5M19.5 12H22M4.93 19.07 6.7 17.3M17.3 6.7l1.77-1.77"></path></svg>
         </button>
-        <button type="button" data-theme-choice="dark" aria-label="Dark theme" title="Dark theme">
+        <button class="theme-option" type="button" data-theme-choice="dark" aria-label="Dark theme" title="Dark theme">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4 6.8 6.8 0 0 0 20 14.5"></path></svg>
         </button>
       </div>
@@ -219,18 +219,20 @@
             code: [
               'use bevy;',
               '',
+              'let exists = bevy::World::contains_entity();',
               'let hp = bevy::World::get_health();',
               'let armor = bevy::World::get_armor();',
               'let incoming = 50;',
               '',
-              'let effective = if incoming > armor => {',
-              '    incoming - armor',
-              '} else => { 5 };',
-              'let new_hp = if effective > hp => { 0 }',
-              '    else => { hp - effective };',
+              'let applied = if exists && incoming > armor => {',
+              '    let damage = incoming - armor;',
+              '    let new_hp = if damage > hp => { 0 }',
+              '        else => { hp - damage };',
+              '    bevy::World::set_health(new_hp);',
+              '    damage',
+              '} else => { 0 };',
               '',
-              'bevy::World::set_health(new_hp);',
-              'bevy::World::set_score(armor);',
+              'applied;',
             ].join("\n"),
           },
           {
@@ -245,7 +247,7 @@
               '',
               'if path == "/admin" && tier != "pro" {',
               '    pingora::response::set_status(403);',
-              '    pingora::response::set_body("upgrade required");',
+              '    pingora::response::insert_header("x-deny-reason", "upgrade required");',
               '} else if path == "/canary" && method == "GET" {',
               '    pingora::response::insert_header("x-upstream", "loopback");',
               '}',
@@ -322,19 +324,21 @@
 
         const filenameEl = document.getElementById("example-filename");
         const codeEl = document.getElementById("example-code");
+        const cardEl = document.getElementById("hero-example");
         const dotsCenterEl = document.getElementById("example-dots-center");
         const navEl = document.getElementById("example-nav");
+        const reduceMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 
         let current = -1;
         let autoTimer = null;
+        let transitionTimer = null;
 
         function resetTimer() {
           if (autoTimer) clearInterval(autoTimer);
           autoTimer = setInterval(next, 10000);
         }
 
-        function show(index) {
-          current = index;
+        function render(index) {
           const ex = examples[index];
           filenameEl.textContent = ex.file;
           codeEl.innerHTML = highlight(ex.code);
@@ -345,13 +349,38 @@
           });
         }
 
-        function prev() {
-          show((current - 1 + examples.length) % examples.length);
-          resetTimer();
+        function show(index, animate = true) {
+          const normalized = (index + examples.length) % examples.length;
+          current = normalized;
+
+          if (!animate || reduceMotionQuery.matches) {
+            if (transitionTimer) clearTimeout(transitionTimer);
+            cardEl.classList.remove("is-changing");
+            render(normalized);
+            return;
+          }
+
+          if (transitionTimer) clearTimeout(transitionTimer);
+          cardEl.classList.add("is-changing");
+          transitionTimer = setTimeout(() => {
+            render(normalized);
+            requestAnimationFrame(() => cardEl.classList.remove("is-changing"));
+            transitionTimer = null;
+          }, 250);
+        }
+
+        function previous() {
+          show(current - 1);
         }
 
         function next() {
-          show((current + 1) % examples.length);
+          show(current + 1);
+        }
+
+        function manualStep(step) {
+          if (step < 0) previous();
+          else next();
+          resetTimer();
         }
 
         // Build dot indicators
@@ -370,21 +399,21 @@
         prevBtn.type = "button";
         prevBtn.className = "example-nav-btn";
         prevBtn.setAttribute("aria-label", "Previous example");
-        prevBtn.innerHTML = '<svg viewBox="0 0 24 24"><polygon points="12,4 20,18 4,18" fill="currentColor"/></svg>';
-        prevBtn.addEventListener("click", prev);
+        prevBtn.innerHTML = '<svg viewBox="0 0 24 24"><polygon points="5,12 19,4 19,20" fill="currentColor"/></svg>';
+        prevBtn.addEventListener("click", () => manualStep(-1));
         navEl.appendChild(prevBtn);
 
         const nextBtn = document.createElement("button");
         nextBtn.type = "button";
         nextBtn.className = "example-nav-btn";
         nextBtn.setAttribute("aria-label", "Next example");
-        nextBtn.innerHTML = '<svg viewBox="0 0 24 24"><polygon points="12,20 4,6 20,6" fill="currentColor"/></svg>';
-        nextBtn.addEventListener("click", next);
+        nextBtn.innerHTML = '<svg viewBox="0 0 24 24"><polygon points="19,12 5,20 5,4" fill="currentColor"/></svg>';
+        nextBtn.addEventListener("click", () => manualStep(1));
         navEl.appendChild(nextBtn);
 
         // Start at random example
         const start = Math.floor(Math.random() * examples.length);
-        show(start);
+        show(start, false);
         autoTimer = setInterval(next, 10000);
       })();
     </script>
