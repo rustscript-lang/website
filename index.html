@@ -11,6 +11,7 @@
     <meta property="og:image" content="https://rustscript.org/assets/rustscript-logo-crabstick.png" />
     <link rel="icon" href="/assets/rustscript-logo-crabstick.png" />
     <link rel="stylesheet" href="/assets/site.css" />
+    <script src="/assets/theme.js"></script>
     <title>RustScript</title>
   </head>
   <body>
@@ -25,6 +26,17 @@
         <a href="/blog/">Blog</a>
         <a href="#ecosystem">Links</a>
       </nav>
+      <div id="theme-control" class="theme-control" role="group" aria-label="Color theme" data-theme="system">
+        <button type="button" data-theme-choice="system" aria-label="Follow system theme" title="Follow system theme">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="12" rx="2"></rect><path d="M8 21h8M12 17v4"></path></svg>
+        </button>
+        <button type="button" data-theme-choice="light" aria-label="Light theme" title="Light theme">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2.5M12 19.5V22M4.93 4.93 6.7 6.7M17.3 17.3l1.77 1.77M2 12h2.5M19.5 12H22M4.93 19.07 6.7 17.3M17.3 6.7l1.77-1.77"></path></svg>
+        </button>
+        <button type="button" data-theme-choice="dark" aria-label="Dark theme" title="Dark theme">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4 6.8 6.8 0 0 0 20 14.5"></path></svg>
+        </button>
+      </div>
     </header>
 
     <main id="top">
@@ -59,24 +71,13 @@
             <a href="https://github.com/rustscript-lang/playground" target="_blank" rel="noopener noreferrer">Playground repo</a>
           </div>
         </div>
-        <div class="hero-card" aria-label="RustScript example">
-          <div class="window-bar"><span></span><span></span><span></span><strong>policy.rss</strong></div>
-          <pre class="rss-code"><code><span class="tok-kw">fn</span> <span class="tok-fn">first_or</span>&lt;<span class="tok-type">T</span>&gt;(items: [<span class="tok-type">T</span>], fallback: <span class="tok-type">T</span>) -&gt; <span class="tok-type">T</span> {
-  <span class="tok-kw">if</span> items.length &gt; <span class="tok-num">0</span> =&gt; {
-    items[<span class="tok-num">0</span>]
-  } <span class="tok-kw">else</span> =&gt; {
-    fallback
-  }
-}
-
-<span class="tok-kw">fn</span> <span class="tok-fn">score</span>(route: <span class="tok-type">string</span>, samples: [<span class="tok-type">int</span>]) -&gt; <span class="tok-type">int</span> {
-  <span class="tok-kw">let mut</span> base = <span class="tok-num">40</span>;
-  <span class="tok-kw">let</span> latency = <span class="tok-fn">first_or</span>::&lt;<span class="tok-type">int</span>&gt;(samples, <span class="tok-num">120</span>);
-  <span class="tok-kw">if</span> route == <span class="tok-str">"edge"</span> {
-    base = <span class="tok-num">80</span>;
-  }
-  base - latency / <span class="tok-num">10</span>
-}</code></pre>
+        <div class="hero-card" aria-label="RustScript example" id="hero-example">
+          <div class="window-bar"><span></span><span></span><span></span><strong id="example-filename">proxy.rss</strong></div>
+          <pre class="rss-code"><code id="example-code"></code></pre>
+          <div class="example-dots" id="example-dots">
+            <div class="example-dots-center" id="example-dots-center"></div>
+            <div class="example-nav" id="example-nav"></div>
+          </div>
         </div>
       </section>
 
@@ -140,8 +141,8 @@
           </article>
           <article>
             <span class="icon">04</span>
-            <h3>AI Prototyping</h3>
-            <p>Use <a href="https://github.com/rustscript-lang/flint" target="_blank" rel="noopener noreferrer">Flint</a> to rapidly build inference prototypes with near-native performance.</p>
+            <h3>Embedded scripting</h3>
+            <p>Ship VM bytecode to microcontrollers with micro-rustscript.</p>
           </article>
         </div>
       </section>
@@ -189,5 +190,203 @@
         <a href="https://github.com/rustscript-lang/website" target="_blank" rel="noopener noreferrer">Website repo</a>
       </nav>
     </footer>
+
+    <script>
+      (() => {
+        const examples = [
+          {
+            file: "proxy.rss",
+            label: "Programmable Edge",
+            code: [
+              'use http;',
+              'use proxy;',
+              '',
+              'let upstream = http::exchange::default_upstream();',
+              'http::exchange::set_target(upstream, "api.example.com", 443);',
+              'http::exchange::set_path(upstream, "/v1/data");',
+              '',
+              'let body = http::request::get_body();',
+              'http::exchange::set_body(upstream, body);',
+              '',
+              'let downstream = proxy::stream::downstream();',
+              'let upstream_stream = proxy::stream::exchange(upstream);',
+              'proxy::forward_native(downstream, upstream_stream);',
+            ].join("\n"),
+          },
+          {
+            file: "damage.rss",
+            label: "Game Behaviour",
+            code: [
+              'use bevy;',
+              '',
+              'let hp = bevy::World::get_health();',
+              'let armor = bevy::World::get_armor();',
+              'let incoming = 50;',
+              '',
+              'let effective = if incoming > armor => {',
+              '    incoming - armor',
+              '} else => { 5 };',
+              'let new_hp = if effective > hp => { 0 }',
+              '    else => { hp - effective };',
+              '',
+              'bevy::World::set_health(new_hp);',
+              'bevy::World::set_score(armor);',
+            ].join("\n"),
+          },
+          {
+            file: "policy.rss",
+            label: "Gateway Scripting",
+            code: [
+              'use pingora;',
+              '',
+              'let method = pingora::request::method();',
+              'let path = pingora::request::path();',
+              'let tier = pingora::request::header("x-user-tier");',
+              '',
+              'if path == "/admin" && tier != "pro" {',
+              '    pingora::response::set_status(403);',
+              '    pingora::response::set_body("upgrade required");',
+              '} else if path == "/canary" && method == "GET" {',
+              '    pingora::response::insert_header("x-upstream", "loopback");',
+              '}',
+              '',
+              'pingora::response::status();',
+            ].join("\n"),
+          },
+          {
+            file: "blinky.rss",
+            label: "Embedded",
+            code: [
+              'use gpio;',
+              'use mcu;',
+              'use serial;',
+              '',
+              'let configured = gpio::configure(8, 1);',
+              'let mut high = false;',
+              'let mut count = 0;',
+              'while count < 4 {',
+              '    high = !high;',
+              '    gpio::digital_write(8, high);',
+              '    mcu::delay_ms(100);',
+              '    count = count + 1;',
+              '}',
+              '',
+              'if gpio::digital_read(8) {',
+              '    serial::write_line("gpio:high");',
+              '} else {',
+              '    serial::write_line("gpio:low");',
+              '}',
+            ].join("\n"),
+          },
+        ];
+
+        function escapeHtml(text) {
+          return text
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;");
+        }
+
+        function highlight(code) {
+          const tokenPattern =
+            /(\/\/.*)|("(?:\.|[^"\\])*")|(\b\d(?:[\d_]*\d)?\b)|(\b(?:fn|pub|let|mut|if|else|match|for|while|use|struct|return|true|false|None|Some|=>)\b)|(\b(?:int|string|bool|float|bytes|map|array)\b)|(\b[A-Z][A-Za-z0-9_]*\b)|(\b[A-Za-z_][A-Za-z0-9_]*(?=\s*(?:<|::\s*<)?\())/g;
+          let output = "";
+          let cursor = 0;
+          for (const match of code.matchAll(tokenPattern)) {
+            output += escapeHtml(code.slice(cursor, match.index));
+            const [
+              token,
+              comment,
+              stringLiteral,
+              numberLiteral,
+              keyword,
+              builtinType,
+              namedType,
+              fnName,
+            ] = match;
+            let cls = "";
+            if (comment) cls = "tok-comment";
+            else if (stringLiteral) cls = "tok-str";
+            else if (numberLiteral) cls = "tok-num";
+            else if (keyword) cls = "tok-kw";
+            else if (builtinType || namedType) cls = "tok-type";
+            else if (fnName) cls = "tok-fn";
+            const safe = escapeHtml(token);
+            output += cls ? `<span class="${cls}">${safe}</span>` : safe;
+            cursor = match.index + token.length;
+          }
+          output += escapeHtml(code.slice(cursor));
+          return output;
+        }
+
+        const filenameEl = document.getElementById("example-filename");
+        const codeEl = document.getElementById("example-code");
+        const dotsCenterEl = document.getElementById("example-dots-center");
+        const navEl = document.getElementById("example-nav");
+
+        let current = -1;
+        let autoTimer = null;
+
+        function resetTimer() {
+          if (autoTimer) clearInterval(autoTimer);
+          autoTimer = setInterval(next, 10000);
+        }
+
+        function show(index) {
+          current = index;
+          const ex = examples[index];
+          filenameEl.textContent = ex.file;
+          codeEl.innerHTML = highlight(ex.code);
+          const buttons = dotsCenterEl.querySelectorAll("button");
+          buttons.forEach((btn, i) => {
+            btn.classList.toggle("is-active", i === index);
+            btn.setAttribute("aria-current", i === index ? "true" : "false");
+          });
+        }
+
+        function prev() {
+          show((current - 1 + examples.length) % examples.length);
+          resetTimer();
+        }
+
+        function next() {
+          show((current + 1) % examples.length);
+        }
+
+        // Build dot indicators
+        examples.forEach((ex, i) => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "example-dot";
+          btn.setAttribute("aria-label", ex.label);
+          btn.setAttribute("aria-current", i === 0 ? "true" : "false");
+          btn.addEventListener("click", () => { show(i); resetTimer(); });
+          dotsCenterEl.appendChild(btn);
+        });
+
+        // Build prev/next nav buttons
+        const prevBtn = document.createElement("button");
+        prevBtn.type = "button";
+        prevBtn.className = "example-nav-btn";
+        prevBtn.setAttribute("aria-label", "Previous example");
+        prevBtn.innerHTML = '<svg viewBox="0 0 24 24"><polygon points="12,4 20,18 4,18" fill="currentColor"/></svg>';
+        prevBtn.addEventListener("click", prev);
+        navEl.appendChild(prevBtn);
+
+        const nextBtn = document.createElement("button");
+        nextBtn.type = "button";
+        nextBtn.className = "example-nav-btn";
+        nextBtn.setAttribute("aria-label", "Next example");
+        nextBtn.innerHTML = '<svg viewBox="0 0 24 24"><polygon points="12,20 4,6 20,6" fill="currentColor"/></svg>';
+        nextBtn.addEventListener("click", next);
+        navEl.appendChild(nextBtn);
+
+        // Start at random example
+        const start = Math.floor(Math.random() * examples.length);
+        show(start);
+        autoTimer = setInterval(next, 10000);
+      })();
+    </script>
   </body>
 </html>
