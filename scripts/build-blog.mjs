@@ -242,6 +242,7 @@ function layout({ title, description = "RustScript blog", body, section = "Blog"
     <meta name="description" content="${escapeHtml(description)}" />
     <link rel="icon" href="/assets/rustscript-logo-crabstick.png" />
     <link rel="stylesheet" href="/assets/site.css" />
+    <script src="/assets/theme.js"></script>
     <title>${escapeHtml(title)} · RustScript</title>
   </head>
   <body>
@@ -256,6 +257,17 @@ function layout({ title, description = "RustScript blog", body, section = "Blog"
         <a href="/blog/">Blog</a>
         <a href="/#ecosystem">Links</a>
       </nav>
+      <div id="theme-control" class="theme-control" role="group" aria-label="Color theme" data-theme="system">
+        <button class="theme-option" type="button" data-theme-choice="system" aria-label="Follow system theme" title="Follow system theme">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="12" rx="2"></rect><path d="M8 21h8M12 17v4"></path></svg>
+        </button>
+        <button class="theme-option" type="button" data-theme-choice="light" aria-label="Light theme" title="Light theme">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2.5M12 19.5V22M4.93 4.93 6.7 6.7M17.3 17.3l1.77 1.77M2 12h2.5M19.5 12H22M4.93 19.07 6.7 17.3M17.3 6.7l1.77-1.77"></path></svg>
+        </button>
+        <button class="theme-option" type="button" data-theme-choice="dark" aria-label="Dark theme" title="Dark theme">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4 6.8 6.8 0 0 0 20 14.5"></path></svg>
+        </button>
+      </div>
     </header>
     <main class="doc-page">
       <article class="${shellClass}">

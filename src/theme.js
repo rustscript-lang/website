@@ -21,6 +21,11 @@
     const control = document.getElementById("theme-control");
     if (control) {
       control.dataset.theme = preference;
+      control.querySelectorAll("[data-theme-choice]").forEach((button) => {
+        const active = button.dataset.themeChoice === preference;
+        button.classList.toggle("is-active", active);
+        button.setAttribute("aria-pressed", active ? "true" : "false");
+      });
     }
   };
 
@@ -38,6 +43,7 @@
         apply();
       });
     });
+    apply();
   };
 
   if (document.readyState === "loading") {
