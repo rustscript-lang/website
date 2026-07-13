@@ -508,38 +508,6 @@ pre {
   flex: 1;
 }
 
-.example-nav {
-  display: flex;
-  align-items: center;
-  gap: 0;
-  flex: 0 0 auto;
-}
-
-.example-nav-btn {
-  appearance: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.6rem;
-  height: 1.6rem;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: rgba(248, 238, 232, 0.35);
-  cursor: pointer;
-  transition: color 200ms ease;
-}
-
-.example-nav-btn:hover {
-  color: rgba(248, 238, 232, 0.8);
-}
-
-.example-nav-btn svg {
-  width: 0.72rem;
-  height: 0.72rem;
-  display: block;
-}
-
 .example-dot {
   appearance: none;
   display: inline-flex;

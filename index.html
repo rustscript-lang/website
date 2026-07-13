@@ -78,7 +78,6 @@
           <pre class="rss-code"><code id="example-code"></code></pre>
           <div class="example-dots" id="example-dots">
             <div class="example-dots-center" id="example-dots-center"></div>
-            <div class="example-nav" id="example-nav"></div>
           </div>
         </div>
       </section>
@@ -352,7 +351,6 @@
         const codeEl = document.getElementById("example-code");
         const cardEl = document.getElementById("hero-example");
         const dotsCenterEl = document.getElementById("example-dots-center");
-        const navEl = document.getElementById("example-nav");
         const reduceMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 
         let current = -1;
@@ -395,18 +393,8 @@
           }, 250);
         }
 
-        function previous() {
-          show(current - 1);
-        }
-
         function next() {
           show(current + 1);
-        }
-
-        function manualStep(step) {
-          if (step < 0) previous();
-          else next();
-          resetTimer();
         }
 
         // Build dot indicators
@@ -419,23 +407,6 @@
           btn.addEventListener("click", () => { show(i); resetTimer(); });
           dotsCenterEl.appendChild(btn);
         });
-
-        // Build prev/next nav buttons
-        const prevBtn = document.createElement("button");
-        prevBtn.type = "button";
-        prevBtn.className = "example-nav-btn";
-        prevBtn.setAttribute("aria-label", "Previous example");
-        prevBtn.innerHTML = '<svg viewBox="0 0 24 24"><polygon points="5,12 19,4 19,20" fill="currentColor"/></svg>';
-        prevBtn.addEventListener("click", () => manualStep(-1));
-        navEl.appendChild(prevBtn);
-
-        const nextBtn = document.createElement("button");
-        nextBtn.type = "button";
-        nextBtn.className = "example-nav-btn";
-        nextBtn.setAttribute("aria-label", "Next example");
-        nextBtn.innerHTML = '<svg viewBox="0 0 24 24"><polygon points="19,12 5,20 5,4" fill="currentColor"/></svg>';
-        nextBtn.addEventListener("click", () => manualStep(1));
-        navEl.appendChild(nextBtn);
 
         // Start at random example
         const start = Math.floor(Math.random() * examples.length);
