@@ -246,7 +246,8 @@ function layout({ title, description = "RustScript blog", body, section = "Blog"
     <title>${escapeHtml(title)} · RustScript</title>
   </head>
   <body>
-    <header class="site-header">
+    <div class="site-header-shell">
+      <header class="site-header">
       <a class="brand" href="/" aria-label="RustScript home">
         <img src="/assets/rustscript-logo-crabstick.png" alt="RustScript crab stick logo" width="44" height="44" />
         <span>RustScript</span>
@@ -268,7 +269,8 @@ function layout({ title, description = "RustScript blog", body, section = "Blog"
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4 6.8 6.8 0 0 0 20 14.5"></path></svg>
         </button>
       </div>
-    </header>
+      </header>
+    </div>
     <main class="doc-page">
       <article class="${shellClass}">
         <p class="eyebrow">${escapeHtml(section)}</p>

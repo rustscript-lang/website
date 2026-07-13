@@ -89,10 +89,21 @@ a {
   color: inherit;
 }
 
-.site-header {
+.site-header-shell {
   position: sticky;
   top: 0;
   z-index: 20;
+  width: 100%;
+  background: color-mix(in srgb, var(--header-surface) 76%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+  backdrop-filter: blur(18px) saturate(1.2);
+  transition:
+    background 220ms ease,
+    border-color 220ms ease;
+}
+
+.site-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -100,7 +111,6 @@ a {
   width: min(1180px, calc(100% - 2rem));
   margin: 0 auto;
   padding: 1rem 1.25rem;
-  backdrop-filter: blur(18px);
 }
 
 .brand,
@@ -910,8 +920,11 @@ h3 {
 }
 
 @media (max-width: 900px) {
-  .site-header {
+  .site-header-shell {
     position: static;
+  }
+
+  .site-header {
     flex-wrap: nowrap;
   }
 
