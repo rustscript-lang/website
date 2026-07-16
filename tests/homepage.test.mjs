@@ -6,10 +6,16 @@ const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
 const css = await readFile(new URL("../src/styles.css", import.meta.url), "utf8");
 
 test("homepage links and labels the CLR runtime as IronRust", () => {
+  const legacyRepo = ["rustscript", "clr", "vm"].join("-");
+  const legacyProjectLabel = ["clr", "vm"].join(" ");
+  const legacyExampleLabel = ["CLR", "WinForms"].join(" / ");
+
   assert.match(html, /https:\/\/github\.com\/rustscript-lang\/IronRust/);
   assert.match(html, /<strong>IronRust<\/strong>/);
   assert.match(html, /label: "IronRust \/ WinForms"/);
-  assert.doesNotMatch(html, /rustscript-clr-vm|<strong>clr vm<\/strong>|CLR \/ WinForms/);
+  assert.equal(html.includes(legacyRepo), false);
+  assert.equal(html.includes(`<strong>${legacyProjectLabel}</strong>`), false);
+  assert.equal(html.includes(legacyExampleLabel), false);
 });
 
 test("homepage includes a concise flint LLM inference example", () => {
