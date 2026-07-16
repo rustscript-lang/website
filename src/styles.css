@@ -575,12 +575,12 @@ pre {
   align-items: center;
   justify-content: center;
   margin-left: auto;
-  border: 1px solid rgba(248, 238, 232, 0.22);
+  border: 0;
   border-radius: 50%;
   color: rgba(248, 238, 232, 0.68);
   background: rgba(248, 238, 232, 0.06);
   text-decoration: none;
-  transition: color 160ms ease, border-color 160ms ease, background 160ms ease, transform 160ms ease;
+  transition: color 160ms ease, background 160ms ease, transform 160ms ease;
 }
 
 .example-jump-link svg {
@@ -595,7 +595,6 @@ pre {
 
 .example-jump-link:hover {
   color: var(--code-ink);
-  border-color: rgba(248, 238, 232, 0.5);
   background: rgba(248, 238, 232, 0.14);
   transform: translateY(-1px);
 }

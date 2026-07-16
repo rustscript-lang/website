@@ -67,6 +67,8 @@ test("each example exposes its matching GitHub destination from the lower-right 
   assert.match(html, /exampleJumpLink\.href = ex\.repo/);
   assert.match(html, /exampleJumpLink\.setAttribute\("aria-label", `Open \$\{ex\.label\} on GitHub`\)/);
   assert.match(css, /\.example-jump-link\s*\{[^}]*margin-left:\s*auto;/s);
+  assert.match(css, /\.example-jump-link\s*\{[^}]*\bborder:\s*0;/s);
+  assert.doesNotMatch(css, /\.example-jump-link:hover\s*\{[^}]*\bborder(?:-color)?:/s);
 });
 
 test("carousel pauses while focus or pointer interaction could activate the mutable jump link", () => {
