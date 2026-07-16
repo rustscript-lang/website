@@ -76,9 +76,24 @@
         <div class="hero-example-slot">
           <div class="hero-card" aria-label="RustScript example" id="hero-example">
             <div class="window-bar"><span></span><span></span><span></span><strong id="example-filename">proxy.rss</strong></div>
-            <div class="example-code-stack" id="example-code-stack"></div>
+            <pre class="rss-code"><code id="example-code"></code></pre>
             <div class="example-dots" id="example-dots">
+              <span class="example-action-spacer" aria-hidden="true"></span>
               <div class="example-dots-center" id="example-dots-center"></div>
+              <a class="example-jump-link" id="example-jump-link" href="https://github.com/rustscript-lang/pd-edge" target="_blank" rel="noopener noreferrer" aria-label="Open Programmable Edge on GitHub">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path d="M14 5h5v5M19 5l-8 8M18 13v5a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" />
+                </svg>
+              </a>
+            </div>
+          </div>
+          <div class="hero-card hero-card-size-probe" aria-hidden="true">
+            <div class="window-bar"><span></span><span></span><span></span><strong>example.rss</strong></div>
+            <div class="example-code-stack" id="example-code-stack"></div>
+            <div class="example-dots">
+              <span class="example-action-spacer"></span>
+              <div class="example-dots-center"></div>
+              <span class="example-jump-link"></span>
             </div>
           </div>
         </div>
@@ -204,6 +219,7 @@
           {
             file: "proxy.rss",
             label: "Programmable Edge",
+            repo: "https://github.com/rustscript-lang/pd-edge",
             code: [
               'use http;',
               'use proxy;',
@@ -223,6 +239,7 @@
           {
             file: "damage.rss",
             label: "Game Behaviour",
+            repo: "https://github.com/rustscript-lang/rustscript-bevy-gameplay",
             code: [
               'use bevy;',
               '',
@@ -246,6 +263,7 @@
           {
             file: "policy.rss",
             label: "Gateway Scripting",
+            repo: "https://github.com/rustscript-lang/rustscript-pingora-gateway",
             code: [
               'use pingora;',
               '',
@@ -266,6 +284,7 @@
           {
             file: "llm.rss",
             label: "LLM Inference",
+            repo: "https://github.com/rustscript-lang/flint",
             code: [
               'use flint::llama as llama;',
               '',
@@ -292,6 +311,7 @@
           {
             file: "winforms.rss",
             label: "IronRust / WinForms",
+            repo: "https://github.com/rustscript-lang/IronRust",
             code: [
               'use System::Windows::Forms::Form;',
               'use System::Windows::EventLoop as Ui;',
@@ -311,6 +331,7 @@
           {
             file: "blinky.rss",
             label: "Embedded",
+            repo: "https://github.com/rustscript-lang/micro-rustscript",
             code: [
               'use gpio;',
               'use mcu;',
@@ -376,29 +397,49 @@
         }
 
         const filenameEl = document.getElementById("example-filename");
+        const codeEl = document.getElementById("example-code");
         const codeStackEl = document.getElementById("example-code-stack");
         const cardEl = document.getElementById("hero-example");
         const dotsCenterEl = document.getElementById("example-dots-center");
+        const exampleJumpLink = document.getElementById("example-jump-link");
+        const exampleSlotEl = document.querySelector(".hero-example-slot");
         const reduceMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-        const panels = [];
+        const pauseReasons = new Set();
 
         let current = -1;
+        let renderedIndex = -1;
         let autoTimer = null;
         let transitionTimer = null;
 
         function resetTimer() {
           if (autoTimer) clearInterval(autoTimer);
-          autoTimer = setInterval(next, 10000);
+          autoTimer = null;
+          if (pauseReasons.size === 0) autoTimer = setInterval(next, 10000);
+        }
+
+        function pauseAutoRotation(reason) {
+          pauseReasons.add(reason);
+          if (transitionTimer) {
+            clearTimeout(transitionTimer);
+            transitionTimer = null;
+            cardEl.classList.remove("is-changing");
+            current = renderedIndex;
+          }
+          resetTimer();
+        }
+
+        function resumeAutoRotation(reason) {
+          pauseReasons.delete(reason);
+          resetTimer();
         }
 
         function render(index) {
           const ex = examples[index];
+          renderedIndex = index;
           filenameEl.textContent = ex.file;
-          panels.forEach((panel, i) => {
-            const active = i === index;
-            panel.classList.toggle("is-active", active);
-            panel.setAttribute("aria-hidden", active ? "false" : "true");
-          });
+          codeEl.innerHTML = highlight(ex.code);
+          exampleJumpLink.href = ex.repo;
+          exampleJumpLink.setAttribute("aria-label", `Open ${ex.label} on GitHub`);
           const buttons = dotsCenterEl.querySelectorAll("button");
           buttons.forEach((btn, i) => {
             btn.classList.toggle("is-active", i === index);
@@ -430,7 +471,14 @@
           show(current + 1);
         }
 
-        // Build every panel up front so the stack always reserves the tallest example.
+        exampleSlotEl.addEventListener("focusin", () => pauseAutoRotation("focus"));
+        exampleSlotEl.addEventListener("focusout", (event) => {
+          if (!exampleSlotEl.contains(event.relatedTarget)) resumeAutoRotation("focus");
+        });
+        exampleSlotEl.addEventListener("pointerenter", () => pauseAutoRotation("pointer"));
+        exampleSlotEl.addEventListener("pointerleave", () => resumeAutoRotation("pointer"));
+
+        // Build an invisible sizing stack outside the visible card.
         examples.forEach((ex, i) => {
           const panel = document.createElement("pre");
           panel.className = "rss-code example-code-panel";
@@ -440,13 +488,12 @@
           code.innerHTML = highlight(ex.code);
           panel.appendChild(code);
           codeStackEl.appendChild(panel);
-          panels.push(panel);
 
           const btn = document.createElement("button");
           btn.type = "button";
           btn.className = "example-dot";
           btn.setAttribute("aria-label", ex.label);
-          btn.setAttribute("aria-controls", panel.id);
+          btn.setAttribute("aria-controls", "example-code");
           btn.setAttribute("aria-current", i === 0 ? "true" : "false");
           btn.addEventListener("click", () => { show(i); resetTimer(); });
           dotsCenterEl.appendChild(btn);
@@ -455,7 +502,7 @@
         // Start at random example
         const start = Math.floor(Math.random() * examples.length);
         show(start, false);
-        autoTimer = setInterval(next, 10000);
+        resetTimer();
       })();
     </script>
   </body>

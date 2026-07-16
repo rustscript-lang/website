@@ -399,6 +399,8 @@ h1 {
 }
 
 .hero-example-slot {
+  display: grid;
+  align-items: start;
   align-self: center;
   width: 100%;
   min-width: 0;
@@ -406,7 +408,8 @@ h1 {
 
 .hero-card {
   position: relative;
-  align-self: center;
+  grid-area: 1 / 1;
+  align-self: start;
   margin-top: 0;
   overflow: hidden;
   border-radius: var(--radius);
@@ -417,17 +420,27 @@ h1 {
   transition: border-color 0.4s ease, box-shadow 0.4s ease;
 }
 
+#hero-example {
+  z-index: 1;
+}
+
+.hero-card-size-probe {
+  grid-area: 1 / 1;
+  visibility: hidden;
+  pointer-events: none;
+}
+
 .hero-card.is-changing {
   border-color: rgba(215, 131, 105, 0.3);
   box-shadow: 0 34px 100px rgba(215, 131, 105, 0.22);
 }
 
-.hero-card .example-code-panel,
+.hero-card .rss-code,
 .hero-card .window-bar strong {
   transition: opacity 0.25s ease;
 }
 
-.hero-card.is-changing .example-code-panel.is-active,
+.hero-card.is-changing .rss-code,
 .hero-card.is-changing .window-bar strong {
   opacity: 0;
 }
@@ -483,14 +496,6 @@ h1 {
 .example-code-panel {
   grid-area: 1 / 1;
   visibility: hidden;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.example-code-panel.is-active {
-  visibility: visible;
-  opacity: 1;
-  pointer-events: auto;
 }
 
 pre {
@@ -556,6 +561,48 @@ pre {
   justify-content: center;
   gap: 0.5rem;
   flex: 1;
+}
+
+.example-action-spacer,
+.example-jump-link {
+  width: 2rem;
+  height: 2rem;
+  flex: 0 0 2rem;
+}
+
+.example-jump-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+  border: 1px solid rgba(248, 238, 232, 0.22);
+  border-radius: 50%;
+  color: rgba(248, 238, 232, 0.68);
+  background: rgba(248, 238, 232, 0.06);
+  text-decoration: none;
+  transition: color 160ms ease, border-color 160ms ease, background 160ms ease, transform 160ms ease;
+}
+
+.example-jump-link svg {
+  width: 1rem;
+  height: 1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.example-jump-link:hover {
+  color: var(--code-ink);
+  border-color: rgba(248, 238, 232, 0.5);
+  background: rgba(248, 238, 232, 0.14);
+  transform: translateY(-1px);
+}
+
+.example-jump-link:focus-visible {
+  outline: 2px solid var(--accent-soft);
+  outline-offset: 2px;
 }
 
 .example-dot {
