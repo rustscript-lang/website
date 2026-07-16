@@ -73,11 +73,13 @@
             <a href="https://github.com/rustscript-lang/playground" target="_blank" rel="noopener noreferrer">Playground repo</a>
           </div>
         </div>
-        <div class="hero-card" aria-label="RustScript example" id="hero-example">
-          <div class="window-bar"><span></span><span></span><span></span><strong id="example-filename">proxy.rss</strong></div>
-          <pre class="rss-code"><code id="example-code"></code></pre>
-          <div class="example-dots" id="example-dots">
-            <div class="example-dots-center" id="example-dots-center"></div>
+        <div class="hero-example-slot">
+          <div class="hero-card" aria-label="RustScript example" id="hero-example">
+            <div class="window-bar"><span></span><span></span><span></span><strong id="example-filename">proxy.rss</strong></div>
+            <div class="example-code-stack" id="example-code-stack"></div>
+            <div class="example-dots" id="example-dots">
+              <div class="example-dots-center" id="example-dots-center"></div>
+            </div>
           </div>
         </div>
       </section>
@@ -157,7 +159,7 @@
           <a href="https://github.com/rustscript-lang/flint" target="_blank" rel="noopener noreferrer"><strong>flint</strong><span>Scriptable inference runtime based on RustScript and libtorch</span></a>
           <a href="https://github.com/rustscript-lang/pd-edge" target="_blank" rel="noopener noreferrer"><strong>pd-edge</strong><span>Programmable data plane powered by RustScript</span></a>
           <a href="https://github.com/rustscript-lang/pd-controller" target="_blank" rel="noopener noreferrer"><strong>pd-controller</strong><span>Control plane for pd-edge</span></a>
-          <a href="https://github.com/rustscript-lang/rustscript-clr-vm" target="_blank" rel="noopener noreferrer"><strong>clr vm</strong><span>RustScript runtime on Microsoft CLR</span></a>
+          <a href="https://github.com/rustscript-lang/IronRust" target="_blank" rel="noopener noreferrer"><strong>IronRust</strong><span>RustScript runtime on Microsoft CLR</span></a>
         </div>
       </section>
 
@@ -179,8 +181,8 @@
             <strong>micro-rustscript</strong>
             <span>Run precompiled RustScript VMBC on constrained and embedded targets.</span>
           </a>
-          <a href="https://github.com/rustscript-lang/rustscript-clr-vm/blob/master/examples/dotnet-typed-winforms.rss" target="_blank" rel="noopener noreferrer">
-            <strong>CLR / WinForms</strong>
+          <a href="https://github.com/rustscript-lang/IronRust/blob/master/examples/dotnet-typed-winforms.rss" target="_blank" rel="noopener noreferrer">
+            <strong>IronRust / WinForms</strong>
             <span>Build a Notepad-style .NET desktop application with typed CLR imports and RustScript-owned UI behavior.</span>
           </a>
         </div>
@@ -262,8 +264,34 @@
             ].join("\n"),
           },
           {
+            file: "llm.rss",
+            label: "LLM Inference",
+            code: [
+              'use flint::llama as llama;',
+              '',
+              'let backend = llama::backend_init("auto");',
+              'let params = llama::model_params_init(backend);',
+              'llama::model_params_set_gpu_layers(params, 999);',
+              'let model = llama::model_load(backend, params, "model.gguf");',
+              '',
+              'let tokens = llama::model_tokenize(',
+              '    model, "Explain Rust ownership.", true',
+              ');',
+              'let ctx_params = llama::context_params_init(backend);',
+              'let ctx = llama::context_new(model, backend, ctx_params);',
+              'let batch = llama::batch_init(2048, 1);',
+              'llama::batch_add_sequence(batch, tokens, 0, false);',
+              'llama::context_decode(ctx, batch);',
+              '',
+              'let sampler = llama::sampler_chain_init(false);',
+              'llama::sampler_add_dist(sampler, 42);',
+              'llama::sampler_chain_build(sampler);',
+              'llama::sampler_sample(sampler, ctx, -1);',
+            ].join("\n"),
+          },
+          {
             file: "winforms.rss",
-            label: "CLR / WinForms",
+            label: "IronRust / WinForms",
             code: [
               'use System::Windows::Forms::Form;',
               'use System::Windows::EventLoop as Ui;',
@@ -348,10 +376,11 @@
         }
 
         const filenameEl = document.getElementById("example-filename");
-        const codeEl = document.getElementById("example-code");
+        const codeStackEl = document.getElementById("example-code-stack");
         const cardEl = document.getElementById("hero-example");
         const dotsCenterEl = document.getElementById("example-dots-center");
         const reduceMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+        const panels = [];
 
         let current = -1;
         let autoTimer = null;
@@ -365,7 +394,11 @@
         function render(index) {
           const ex = examples[index];
           filenameEl.textContent = ex.file;
-          codeEl.innerHTML = highlight(ex.code);
+          panels.forEach((panel, i) => {
+            const active = i === index;
+            panel.classList.toggle("is-active", active);
+            panel.setAttribute("aria-hidden", active ? "false" : "true");
+          });
           const buttons = dotsCenterEl.querySelectorAll("button");
           buttons.forEach((btn, i) => {
             btn.classList.toggle("is-active", i === index);
@@ -397,12 +430,23 @@
           show(current + 1);
         }
 
-        // Build dot indicators
+        // Build every panel up front so the stack always reserves the tallest example.
         examples.forEach((ex, i) => {
+          const panel = document.createElement("pre");
+          panel.className = "rss-code example-code-panel";
+          panel.id = `example-panel-${i}`;
+          panel.setAttribute("aria-hidden", "true");
+          const code = document.createElement("code");
+          code.innerHTML = highlight(ex.code);
+          panel.appendChild(code);
+          codeStackEl.appendChild(panel);
+          panels.push(panel);
+
           const btn = document.createElement("button");
           btn.type = "button";
           btn.className = "example-dot";
           btn.setAttribute("aria-label", ex.label);
+          btn.setAttribute("aria-controls", panel.id);
           btn.setAttribute("aria-current", i === 0 ? "true" : "false");
           btn.addEventListener("click", () => { show(i); resetTimer(); });
           dotsCenterEl.appendChild(btn);
