@@ -11,6 +11,7 @@ RustScript has separate paths for using the language, looking up language and ru
 
 ## Reference
 
+- [RustScript](/docs/reference/rustscript/)
 - [RSS language](/docs/reference/rss/)
 - [Host functions](/docs/reference/host-functions/)
 - [Runtime controls and artifacts](/docs/reference/runtime-controls/)
@@ -22,7 +23,6 @@ RustScript has separate paths for using the language, looking up language and ru
 - [micro-rustscript](/docs/reference/micro-rustscript/)
 - [IronRust](/docs/reference/ironrust/)
 - [Flint](/docs/reference/flint/)
-- [Complete project documentation](/docs/reference/readmes/)
 
 ## Contributors
 

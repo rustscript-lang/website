@@ -6,7 +6,7 @@
 
 ## Compiler
 
-The compiler accepts RSS source and produces program metadata plus bytecode. The implementation separates source frontends, parsing, IR, type information, code generation, assembler support, host-call handling, and artifact encoding. Current development coverage also exercises callable values and closures, including generic, capture, aliasing, and factory semantics; the [RSS language](/docs/reference/rss/#function-values) describes their language surface.
+The compiler accepts RSS source and produces program metadata plus bytecode. The implementation separates source frontends, parsing, IR, type information, code generation, assembler support, host-call handling, and artifact encoding. Current development coverage also exercises callable values and closures, including generic, capture, aliasing, and factory semantics; the [RSS language](/docs/reference/rss/#callable-development-status) describes their language surface.
 
 ## Public versus internal contracts
 

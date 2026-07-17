@@ -175,12 +175,11 @@ const ecosystemRoutes = new Set([
   "/docs/reference/micro-rustscript/",
   "/docs/reference/ironrust/",
   "/docs/reference/flint/",
-  "/docs/reference/readmes/",
 ]);
 
 const navigationGroups = [
   { label: "Learn", include: (page) => page.href.startsWith("/docs/learn/") },
-  { label: "Reference", include: (page) => page.href.startsWith("/docs/reference/") && !ecosystemRoutes.has(page.href) && !page.href.startsWith("/docs/reference/readmes/") },
+  { label: "Reference", include: (page) => page.href.startsWith("/docs/reference/") && !ecosystemRoutes.has(page.href) },
   { label: "Ecosystem", include: (page) => ecosystemRoutes.has(page.href) },
   { label: "Contribute", include: (page) => page.href.startsWith("/docs/contribute/") },
   { label: "About", include: (page) => page.href !== "/docs/" && !page.href.startsWith("/docs/learn/") && !page.href.startsWith("/docs/reference/") && !page.href.startsWith("/docs/contribute/") },
@@ -191,6 +190,7 @@ const navigationOrder = [
   "/docs/learn/rss-basics/",
   "/docs/learn/embed-pd-vm/",
   "/docs/learn/runtimes/",
+  "/docs/reference/rustscript/",
   "/docs/reference/rss/",
   "/docs/reference/host-functions/",
   "/docs/reference/runtime-controls/",
@@ -199,7 +199,6 @@ const navigationOrder = [
   "/docs/reference/micro-rustscript/",
   "/docs/reference/ironrust/",
   "/docs/reference/flint/",
-  "/docs/reference/readmes/",
   "/docs/contribute/architecture/",
   "/docs/contribute/vm-and-compiler/",
   "/docs/contribute/runtimes/",

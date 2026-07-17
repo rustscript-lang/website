@@ -165,7 +165,7 @@ Built-ins and standard-library modules are regular RSS calls from the script aut
 
 The shared parser also supports JavaScript and Lua compatibility frontends. `import`, JavaScript `require`, dotted JavaScript calls, `typeof`, increment operators, and arrow closures are controlled by frontend dialect options. They are not part of the RSS surface unless a documented RSS feature explicitly uses them.
 
-## Function values
+## Callable development status
 
 Function values are under active development. The current branch has compiler tests for generic function values, higher-order parameters, returned functions, escaping closures, mutable capture state, and independent closure factories. The following accepted test program passes a generic function as a parameter:
 
