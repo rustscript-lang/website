@@ -73,6 +73,8 @@ test("documentation generator emits the main routes", async () => {
   assert.match(rssHtml, /<aside class="docs-sidebar">/);
   assert.match(rssHtml, /aria-label="Documentation navigation"/);
   assert.match(rssHtml, /href="\/docs\/reference\/rss\/" aria-current="page"/);
+  assert.match(rssHtml, /<h2>Getting Started<\/h2>/);
+  assert.doesNotMatch(rssHtml, /<h2>Learn<\/h2>/);
   assert.match(rssHtml, /<h2>Ecosystem<\/h2>/);
   assert.match(rssHtml, /href="\/docs\/reference\/pd-edge\/">pd-edge<\/a><a href="\/docs\/reference\/pd-edge\/full-dag\/">Full DAG Graphs<\/a>/);
   assert.doesNotMatch(rssHtml, />[^<]*reference<\/h1>/i);

@@ -182,7 +182,7 @@ function isEcosystemRoute(href) {
 }
 
 const navigationGroups = [
-  { label: "Learn", include: (page) => page.href.startsWith("/docs/learn/") },
+  { label: "Getting Started", include: (page) => page.href.startsWith("/docs/learn/") },
   { label: "Reference", include: (page) => page.href.startsWith("/docs/reference/") && !isEcosystemRoute(page.href) },
   { label: "Ecosystem", include: (page) => isEcosystemRoute(page.href) },
   { label: "Contribute", include: (page) => page.href.startsWith("/docs/contribute/") },
