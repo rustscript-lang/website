@@ -121,6 +121,21 @@ Reducing the capacity evicts least-recently-used entries immediately. Cache
 statistics are available through `regex_cache_entry_count()`,
 `regex_cache_compile_count()`, and `regex_cache_hit_count()`.
 
+### Script Call Depth
+
+Desktop and `no_std` VMs default to 1024 simultaneously active script call
+frames. Embedders can inspect or change the positive limit per VM:
+
+```rust
+let mut vm = Vm::new(program);
+assert_eq!(vm.max_script_call_depth(), 1024);
+vm.set_max_script_call_depth(256)?;
+```
+
+`pd-vm-run --max-call-depth 256 script.rss` applies the same limit from the
+CLI. A value of zero is rejected. Exceeding the configured limit returns
+`VmError::CallStackOverflow`.
+
 ### Fuel Metering
 
 `pd-vm` provides Wasmtime-style fuel controls on both `Vm` and `Store<T>`:

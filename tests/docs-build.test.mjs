@@ -10,7 +10,7 @@ const examples = JSON.parse(await readFile(new URL("_meta/examples.json", conten
 const projectDocumentationBundles = [
   {
     repository: "rustscript",
-    revision: "9a4509b162fe4500fe91180f3e2ea9d0230df304",
+    revision: "f1a6c3d",
     pages: ["reference/rustscript.md", "reference/rustscript/development.md", "reference/rustscript/internals.md"],
   },
   {
