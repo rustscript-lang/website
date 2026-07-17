@@ -6,7 +6,8 @@
   "packageManager": "bun@1.2.9",
   "scripts": {
     "build:blog": "node scripts/build-blog.mjs",
-    "build": "bun run build:blog && vite build",
+    "build": "bun run build:blog && bun run build:docs && vite build",
+    "build:docs": "node scripts/build-docs.mjs",
     "preview": "vite preview --host 127.0.0.1",
     "test": "node --test tests/*.test.mjs"
   },

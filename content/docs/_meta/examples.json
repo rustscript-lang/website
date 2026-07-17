@@ -1,0 +1,58 @@
+{
+  "examples": [
+    {
+      "page": "learn/getting-started",
+      "repository": "rustscript",
+      "revision": "9a4509b162fe4500fe91180f3e2ea9d0230df304",
+      "path": "examples/example_complex.rss",
+      "lines": "10-45",
+      "verification": "cargo run -p pd-vm --bin pd-vm-run -- --emit-vmbc /tmp/rustscript-docs-example-complex.vmbc examples/example_complex.rss",
+      "result": "passed"
+    },
+    {
+      "page": "learn/embed-pd-vm",
+      "repository": "rustscript",
+      "revision": "9a4509b162fe4500fe91180f3e2ea9d0230df304",
+      "path": "README.md",
+      "lines": "16-24",
+      "verification": "GIT_CONFIG_GLOBAL=/dev/null CARGO_NET_GIT_FETCH_WITH_CLI=true cargo check",
+      "result": "passed in /mnt/TEMP/pd-vm-docs-smoke"
+    },
+    {
+      "page": "reference/rss",
+      "repository": "rustscript",
+      "revision": "9a4509b162fe4500fe91180f3e2ea9d0230df304",
+      "path": "tests/compiler/compiler_rustscript_tests.rs",
+      "lines": "2255-2268, 2280-2284, 2316-2324, 2335-2350",
+      "verification": "cargo test --test compiler_tests compiler_rustscript_tests::<name> -- --exact",
+      "result": "passed for generic values, returned functions, escaping closures, and closure aliasing"
+    },
+    {
+      "page": "learn/runtimes",
+      "repository": "micro-rustscript",
+      "revision": "a874646f2094c2cf2ede008e404785b1516b5a9e",
+      "path": "README.md",
+      "lines": "158-201",
+      "verification": "pio run -e arduino",
+      "result": "passed"
+    },
+    {
+      "page": "learn/runtimes",
+      "repository": "IronRust",
+      "revision": "fce4aa41931135ccf5fdb73c7270ec0baf1a13ef",
+      "path": "README.md",
+      "lines": "28-40",
+      "verification": "PATH=/mnt/TEMP/dotnet:$PATH dotnet build IronRust.sln --nologo",
+      "result": "passed"
+    },
+    {
+      "page": "learn/runtimes",
+      "repository": "pd-edge",
+      "revision": "91e953a43a896febd681cc19a6c55ccb1cbf9230",
+      "path": "README.md",
+      "lines": "86-161",
+      "verification": "cargo run -p pd-edge --bin pd-edge-console -- --help",
+      "result": "passed"
+    }
+  ]
+}
