@@ -22,8 +22,16 @@ function slugify(value) {
 }
 
 function titleFromMarkdown(markdown, fallback) {
+  const docsTitle = markdown.match(/^<!-- docs-title: (.+) -->\n/);
+  if (docsTitle) return docsTitle[1].trim();
   const match = markdown.match(/^#\s+(.+)$/m);
   return match ? match[1].trim() : fallback;
+}
+
+function renderPageMarkdown(markdown, title) {
+  const content = markdown.replace(/^<!-- docs-title: .+ -->\n\n/, "");
+  const heading = content === markdown ? "" : `<h1 id="${slugify(title)}">${escapeHtml(title)}</h1>\n`;
+  return `${heading}${renderMarkdown(content)}`;
 }
 
 async function listMarkdownFiles(dir) {
@@ -195,15 +203,25 @@ const navigationOrder = [
   "/docs/learn/embed-pd-vm/",
   "/docs/learn/runtimes/",
   "/docs/reference/rustscript/",
+  "/docs/reference/rustscript/development/",
+  "/docs/reference/rustscript/internals/",
   "/docs/reference/rss/",
   "/docs/reference/host-functions/",
   "/docs/reference/runtime-controls/",
   "/docs/reference/pd-edge/",
+  "/docs/reference/pd-edge/operations/",
+  "/docs/reference/pd-edge/layered-dags/",
   "/docs/reference/pd-edge/full-dag/",
+  "/docs/reference/pd-edge/distribution/",
   "/docs/reference/pd-controller/",
   "/docs/reference/micro-rustscript/",
+  "/docs/reference/micro-rustscript/firmware-and-development/",
   "/docs/reference/ironrust/",
+  "/docs/reference/ironrust/compilation-and-packaging/",
+  "/docs/reference/ironrust/operations/",
   "/docs/reference/flint/",
+  "/docs/reference/flint/cli-and-execution/",
+  "/docs/reference/flint/host-functions/",
   "/docs/contribute/architecture/",
   "/docs/contribute/vm-and-compiler/",
   "/docs/contribute/runtimes/",
@@ -212,16 +230,38 @@ const navigationOrder = [
 
 function documentationSidebar(pages, currentHref) {
   const overview = pages.find((page) => page.href === "/docs/");
+  const pagesByHref = new Map(pages.map((page) => [page.href, page]));
+  const childrenByHref = new Map();
+  const parentFor = (page) => {
+    const parentParts = page.parts.slice(0, -1);
+    if (parentParts.length === 0) return null;
+    return pagesByHref.get(`/docs/${parentParts.join("/")}/`) ?? null;
+  };
+
+  for (const page of pages) {
+    const parent = parentFor(page);
+    if (!parent) continue;
+    const children = childrenByHref.get(parent.href) ?? [];
+    children.push(page);
+    childrenByHref.set(parent.href, children);
+  }
+
+  const sortPages = (items) => [...items].sort((left, right) => {
+    const leftIndex = navigationOrder.indexOf(left.href);
+    const rightIndex = navigationOrder.indexOf(right.href);
+    return (leftIndex < 0 ? Number.MAX_SAFE_INTEGER : leftIndex) - (rightIndex < 0 ? Number.MAX_SAFE_INTEGER : rightIndex);
+  });
+  const renderLink = (page) => `<a href="${page.href}"${page.href === currentHref ? ' aria-current="page"' : ""}>${escapeHtml(page.title.replace(/`/g, ""))}</a>`;
+  const renderItem = (page) => {
+    const children = sortPages(childrenByHref.get(page.href) ?? []);
+    const nested = children.length > 0 ? `<div class="docs-nav-children">${children.map(renderItem).join("")}</div>` : "";
+    return `<div class="docs-nav-item">${renderLink(page)}${nested}</div>`;
+  };
+  const rootPages = pages.filter((page) => !parentFor(page));
   const groups = navigationGroups.map((group) => {
-    const groupPages = pages.filter(group.include)
-      .sort((left, right) => {
-        const leftIndex = navigationOrder.indexOf(left.href);
-        const rightIndex = navigationOrder.indexOf(right.href);
-        return (leftIndex < 0 ? Number.MAX_SAFE_INTEGER : leftIndex) - (rightIndex < 0 ? Number.MAX_SAFE_INTEGER : rightIndex);
-      });
+    const groupPages = sortPages(rootPages.filter(group.include));
     if (groupPages.length === 0) return "";
-    const links = groupPages.map((page) => `<a href="${page.href}"${page.href === currentHref ? ' aria-current="page"' : ""}>${escapeHtml(page.title.replace(/`/g, ""))}</a>`).join("");
-    return `<section class="docs-nav-section"><h2>${group.label}</h2>${links}</section>`;
+    return `<section class="docs-nav-section"><h2>${group.label}</h2>${groupPages.map(renderItem).join("")}</section>`;
   }).join("");
   const overviewLink = overview ? `<a class="docs-nav-overview" href="${overview.href}"${overview.href === currentHref ? ' aria-current="page"' : ""}>${escapeHtml(overview.title)}</a>` : "";
   return `<aside class="docs-sidebar"><details open><summary>Documentation navigation</summary><nav aria-label="Documentation navigation">${overviewLink}${groups}</nav></details></aside>`;
@@ -248,6 +288,9 @@ function layout({ title, body, breadcrumb, sidebar }) {
       .docs-sidebar a[aria-current="page"] { border-left-color: var(--accent-strong); color: var(--accent-strong); font-weight: 700; background: rgba(167, 83, 66, 0.1); }
       .docs-sidebar .docs-nav-overview { margin-bottom: 0.3rem; color: var(--ink); font-weight: 700; }
       .docs-nav-section { display: grid; gap: 0.12rem; }
+      .docs-nav-item { display: grid; gap: 0.12rem; }
+      .docs-nav-children { display: grid; gap: 0.08rem; margin: 0.05rem 0 0.2rem 0.82rem; padding-left: 0.36rem; border-left: 1px solid var(--border); }
+      .docs-nav-children a { font-size: 0.8rem; }
       .docs-nav-section h2 { margin: 0 0 0.35rem 0.62rem; color: var(--ink); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
       .docs-page { min-width: 0; }
       .doc-shell.docs-page { max-width: none; border: 0; border-radius: 0; background: transparent; box-shadow: none; padding: 0; }
@@ -314,7 +357,7 @@ for (const page of pages) {
   await writeFile(path.join(outDir, "index.html"), layout({
     title: page.title,
     breadcrumb: page.breadcrumb,
-    body: renderMarkdown(page.markdown),
+    body: renderPageMarkdown(page.markdown, page.title),
     sidebar: documentationSidebar(pages, page.href),
   }));
 }

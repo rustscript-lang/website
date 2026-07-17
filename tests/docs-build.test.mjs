@@ -7,26 +7,52 @@ const root = new URL("..", import.meta.url);
 const content = new URL("../content/docs/", import.meta.url);
 const examples = JSON.parse(await readFile(new URL("_meta/examples.json", content), "utf8"));
 
-const completeReadmePages = [
-  { repository: "rustscript", revision: "9a4509b162fe4500fe91180f3e2ea9d0230df304", page: "reference/rustscript.md" },
-  { repository: "pd-edge", revision: "3468170^", page: "reference/pd-edge.md" },
-  { repository: "pd-controller", revision: "d02e12a^", page: "reference/pd-controller.md" },
-  { repository: "micro-rustscript", revision: "6cafab2^", page: "reference/micro-rustscript.md" },
-  { repository: "IronRust", revision: "769aea7^", page: "reference/ironrust.md" },
-  { repository: "flint", revision: "a8d1711^", page: "reference/flint.md" },
+const projectDocumentationBundles = [
+  {
+    repository: "rustscript",
+    revision: "9a4509b162fe4500fe91180f3e2ea9d0230df304",
+    pages: ["reference/rustscript.md", "reference/rustscript/development.md", "reference/rustscript/internals.md"],
+  },
+  {
+    repository: "pd-edge",
+    revision: "3468170^",
+    pages: ["reference/pd-edge.md", "reference/pd-edge/operations.md", "reference/pd-edge/layered-dags.md", "reference/pd-edge/distribution.md"],
+  },
+  { repository: "pd-controller", revision: "d02e12a^", pages: ["reference/pd-controller.md"] },
+  {
+    repository: "micro-rustscript",
+    revision: "6cafab2^",
+    pages: ["reference/micro-rustscript.md", "reference/micro-rustscript/firmware-and-development.md"],
+  },
+  {
+    repository: "IronRust",
+    revision: "769aea7^",
+    pages: ["reference/ironrust.md", "reference/ironrust/compilation-and-packaging.md", "reference/ironrust/operations.md"],
+  },
+  {
+    repository: "flint",
+    revision: "a8d1711^",
+    pages: ["reference/flint.md", "reference/flint/cli-and-execution.md", "reference/flint/host-functions.md"],
+  },
 ];
+
+function stripDocsTitle(markdown) {
+  return markdown.replace(/^<!-- docs-title: .+ -->\n\n/, "");
+}
 
 function run(command, args) {
   execFileSync(command, args, { cwd: root, stdio: "pipe" });
 }
 
-test("primary project documentation preserves every README byte", async () => {
-  for (const { repository, revision, page } of completeReadmePages) {
+test("project documentation bundles preserve every README byte", async () => {
+  for (const { repository, revision, pages } of projectDocumentationBundles) {
     const original = execFileSync("git", ["show", `${revision}:README.md`], {
       cwd: new URL(`../${repository}/`, root),
       encoding: "utf8",
     });
-    const documentation = await readFile(new URL(page, content), "utf8");
+    const documentation = (await Promise.all(
+      pages.map(async (page) => stripDocsTitle(await readFile(new URL(page, content), "utf8"))),
+    )).join("");
     assert.equal(documentation, original, repository);
   }
 });
@@ -58,8 +84,10 @@ test("documentation generator emits the main routes", async () => {
     "docs/learn/getting-started/index.html",
     "docs/reference/rss/index.html",
     "docs/reference/pd-edge/index.html",
+    "docs/reference/pd-edge/operations/index.html",
     "docs/reference/pd-edge/full-dag/index.html",
     "docs/reference/rustscript/index.html",
+    "docs/reference/rustscript/development/index.html",
     "docs/contribute/architecture/index.html",
   ]) {
     const html = await readFile(new URL(`../public/${route}`, import.meta.url), "utf8");
@@ -76,7 +104,8 @@ test("documentation generator emits the main routes", async () => {
   assert.match(rssHtml, /<h2>Getting Started<\/h2>/);
   assert.doesNotMatch(rssHtml, /<h2>Learn<\/h2>/);
   assert.match(rssHtml, /<h2>Ecosystem<\/h2>/);
-  assert.match(rssHtml, /href="\/docs\/reference\/pd-edge\/">pd-edge<\/a><a href="\/docs\/reference\/pd-edge\/full-dag\/">Full DAG Graphs<\/a>/);
+  assert.match(rssHtml, /<div class="docs-nav-item"><a href="\/docs\/reference\/pd-edge\/">pd-edge<\/a><div class="docs-nav-children">[\s\S]*href="\/docs\/reference\/pd-edge\/full-dag\/">Full DAG Graphs<\/a>/);
+  assert.match(rssHtml, /<div class="docs-nav-item"><a href="\/docs\/reference\/rustscript\/">RustScript<\/a><div class="docs-nav-children">[\s\S]*href="\/docs\/reference\/rustscript\/development\/">Development and tooling<\/a>/);
   assert.doesNotMatch(rssHtml, />[^<]*reference<\/h1>/i);
   assert.match(rssHtml, /<table class="docs-table">/);
   assert.match(rssHtml, /<span class="tok-kw">use<\/span>/);
