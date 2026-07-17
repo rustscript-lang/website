@@ -32,7 +32,7 @@ test("primary project documentation preserves every README byte", async () => {
 });
 
 test("pd-edge Full DAG Graphs preserve the moved markdown byte-for-byte", async () => {
-  const original = execFileSync("git", ["show", "HEAD:docs/full-dag.md"], {
+  const original = execFileSync("git", ["show", "3468170:docs/full-dag.md"], {
     cwd: new URL("../pd-edge/", root),
     encoding: "utf8",
   });
