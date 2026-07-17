@@ -147,7 +147,54 @@ function routeFor(file) {
   return [...(parsed.dir ? parsed.dir.split(path.sep) : []), parsed.name];
 }
 
-function layout({ title, body, breadcrumb }) {
+const navigationGroups = [
+  { label: "Learn", prefix: "learn/" },
+  { label: "Reference", prefix: "reference/" },
+  { label: "Contribute", prefix: "contribute/" },
+  { label: "About", prefix: "" },
+];
+
+const navigationOrder = [
+  "/docs/learn/getting-started/",
+  "/docs/learn/rss-basics/",
+  "/docs/learn/embed-pd-vm/",
+  "/docs/learn/runtimes/",
+  "/docs/reference/rss/",
+  "/docs/reference/function-values/",
+  "/docs/reference/host-functions/",
+  "/docs/reference/runtime-controls/",
+  "/docs/reference/pd-edge/",
+  "/docs/reference/pd-controller/",
+  "/docs/reference/micro-rustscript/",
+  "/docs/reference/ironrust/",
+  "/docs/reference/flint/",
+  "/docs/contribute/architecture/",
+  "/docs/contribute/vm-and-compiler/",
+  "/docs/contribute/runtimes/",
+  "/docs/terminology/",
+  "/docs/sources/",
+];
+
+function documentationSidebar(pages, currentHref) {
+  const overview = pages.find((page) => page.href === "/docs/");
+  const groups = navigationGroups.map((group) => {
+    const groupPages = pages.filter((page) => group.prefix
+      ? page.href.startsWith(`/docs/${group.prefix}`)
+      : page.href !== "/docs/" && !page.href.startsWith("/docs/learn/") && !page.href.startsWith("/docs/reference/") && !page.href.startsWith("/docs/contribute/"))
+      .sort((left, right) => {
+        const leftIndex = navigationOrder.indexOf(left.href);
+        const rightIndex = navigationOrder.indexOf(right.href);
+        return (leftIndex < 0 ? Number.MAX_SAFE_INTEGER : leftIndex) - (rightIndex < 0 ? Number.MAX_SAFE_INTEGER : rightIndex);
+      });
+    if (groupPages.length === 0) return "";
+    const links = groupPages.map((page) => `<a href="${page.href}"${page.href === currentHref ? ' aria-current="page"' : ""}>${escapeHtml(page.title.replace(/`/g, ""))}</a>`).join("");
+    return `<section class="docs-nav-section"><h2>${group.label}</h2>${links}</section>`;
+  }).join("");
+  const overviewLink = overview ? `<a class="docs-nav-overview" href="${overview.href}"${overview.href === currentHref ? ' aria-current="page"' : ""}>${escapeHtml(overview.title)}</a>` : "";
+  return `<aside class="docs-sidebar"><details open><summary>Documentation navigation</summary><nav aria-label="Documentation navigation">${overviewLink}${groups}</nav></details></aside>`;
+}
+
+function layout({ title, body, breadcrumb, sidebar }) {
   return `<!doctype html>
 <html lang="en">
   <head>
@@ -157,11 +204,40 @@ function layout({ title, body, breadcrumb }) {
     <link rel="icon" href="/assets/rustscript-logo-crabstick.png" />
     <link rel="stylesheet" href="/assets/site.css" />
     <style>
-      .docs-table-wrap { overflow-x: auto; margin: 1.25rem 0; border: 1px solid var(--line); border-radius: 0.75rem; }
-      .docs-table { width: 100%; border-collapse: collapse; min-width: 32rem; }
-      .docs-table th, .docs-table td { padding: 0.75rem 0.9rem; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
-      .docs-table th { background: var(--surface-strong); font-weight: 700; }
+      .docs-main { width: min(1440px, calc(100% - 2rem)); margin: 0 auto; padding: 1.8rem 0 4rem; }
+      .docs-layout { display: grid; grid-template-columns: minmax(13.5rem, 17rem) minmax(0, 48rem); justify-content: center; gap: clamp(2rem, 5vw, 5.5rem); align-items: start; }
+      .docs-sidebar { position: sticky; top: 6.25rem; max-height: calc(100vh - 7.5rem); overflow-y: auto; padding: 0 1.5rem 1.5rem 0; border-right: 1px solid var(--border); }
+      .docs-sidebar details { margin: 0; }
+      .docs-sidebar summary { display: none; }
+      .docs-sidebar nav { display: grid; gap: 1.45rem; }
+      .docs-sidebar a { display: block; padding: 0.34rem 0.62rem; border-left: 2px solid transparent; color: var(--muted); font-size: 0.88rem; line-height: 1.35; text-decoration: none; }
+      .docs-sidebar a:hover { color: var(--ink); background: var(--card-hover); }
+      .docs-sidebar a[aria-current="page"] { border-left-color: var(--accent-strong); color: var(--accent-strong); font-weight: 700; background: rgba(167, 83, 66, 0.1); }
+      .docs-sidebar .docs-nav-overview { margin-bottom: 0.3rem; color: var(--ink); font-weight: 700; }
+      .docs-nav-section { display: grid; gap: 0.12rem; }
+      .docs-nav-section h2 { margin: 0 0 0.35rem 0.62rem; color: var(--ink); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+      .docs-page { min-width: 0; }
+      .docs-page .doc-shell { max-width: none; border: 0; border-radius: 0; background: transparent; box-shadow: none; padding: 0; }
+      .docs-page .doc-shell h1 { margin: 0 0 1.25rem; font-size: clamp(2.15rem, 5vw, 3.1rem); line-height: 1.08; letter-spacing: -0.045em; }
+      .docs-page .doc-shell h2 { margin-top: 3rem; font-size: clamp(1.45rem, 3vw, 2rem); line-height: 1.18; }
+      .docs-page .doc-shell h3 { margin-top: 2rem; font-size: 1.22rem; }
+      .docs-page .doc-shell p, .docs-page .doc-shell li { color: var(--muted); font-size: 1rem; line-height: 1.76; }
+      .docs-page .doc-shell p { max-width: 72ch; }
+      .docs-page .doc-breadcrumb { margin-bottom: 1.65rem; font-size: 0.82rem; }
+      .docs-page .doc-shell pre { border-radius: 8px; box-shadow: none; }
+      .docs-table-wrap { overflow-x: auto; margin: 1.25rem 0; border: 1px solid var(--border); border-radius: 8px; }
+      .docs-table { width: 100%; min-width: 32rem; border-collapse: collapse; }
+      .docs-table th, .docs-table td { padding: 0.72rem 0.88rem; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
+      .docs-table th { background: rgba(167, 83, 66, 0.08); font-weight: 700; }
       .docs-table tr:last-child td { border-bottom: 0; }
+      @media (max-width: 860px) {
+        .docs-main { width: min(100% - 1.25rem, 48rem); padding-top: 1.25rem; }
+        .docs-layout { display: block; }
+        .docs-sidebar { position: static; max-height: none; overflow: visible; margin-bottom: 1.75rem; padding: 0; border: 1px solid var(--border); border-radius: 8px; background: var(--surface-strong); }
+        .docs-sidebar summary { display: block; padding: 0.9rem 1rem; color: var(--ink); cursor: pointer; font-size: 0.9rem; font-weight: 700; }
+        .docs-sidebar nav { padding: 0 0.5rem 0.75rem; }
+        .docs-page .doc-shell h1 { font-size: clamp(2rem, 10vw, 2.65rem); }
+      }
     </style>
     <script src="/assets/theme.js"></script>
     <title>${escapeHtml(title)} · RustScript Documentation</title>
@@ -178,28 +254,36 @@ function layout({ title, body, breadcrumb }) {
         </div>
       </header>
     </div>
-    <main class="doc-page"><article class="doc-shell docs-page"><nav class="doc-breadcrumb"><a href="/docs/">Documentation</a>${breadcrumb}</nav>${body}</article></main>
+    <main class="docs-main"><div class="docs-layout">${sidebar}<article class="doc-shell docs-page"><nav class="doc-breadcrumb"><a href="/docs/">Documentation</a>${breadcrumb}</nav>${body}</article></div></main>
     <footer class="site-footer"><span>RustScript</span><nav aria-label="Footer links"><a href="/">Home</a><a href="/docs/">Documentation</a><a href="https://github.com/rustscript-lang" target="_blank" rel="noopener noreferrer">GitHub org</a></nav></footer>
   </body>
 </html>`;
 }
 
 const files = await listMarkdownFiles(contentRoot);
-await rm(outputRoot, { recursive: true, force: true });
-const routes = [];
-for (const file of files) {
+const pages = await Promise.all(files.map(async (file) => {
   const markdown = await readFile(file, "utf8");
   const title = titleFromMarkdown(markdown, path.basename(file, ".md"));
   const parts = routeFor(file);
   const href = `/docs/${parts.length ? `${parts.join("/")}/` : ""}`;
-  const breadcrumbs = parts.length
+  const breadcrumb = parts.length
     ? ` / ${parts.map((part, index) => index === parts.length - 1 ? escapeHtml(part.replaceAll("-", " ")) : `<a href="/docs/${parts.slice(0, index + 1).join("/")}/">${escapeHtml(part.replaceAll("-", " "))}</a>`).join(" / ")}`
     : "";
-  const outDir = path.join(outputRoot, ...parts);
+  return { file, markdown, title, parts, href, breadcrumb };
+}));
+
+await rm(outputRoot, { recursive: true, force: true });
+for (const page of pages) {
+  const outDir = path.join(outputRoot, ...page.parts);
   await mkdir(outDir, { recursive: true });
-  await writeFile(path.join(outDir, "index.html"), layout({ title, breadcrumb: breadcrumbs, body: renderMarkdown(markdown) }));
-  routes.push({ file: path.relative(root, file), href, title });
+  await writeFile(path.join(outDir, "index.html"), layout({
+    title: page.title,
+    breadcrumb: page.breadcrumb,
+    body: renderMarkdown(page.markdown),
+    sidebar: documentationSidebar(pages, page.href),
+  }));
 }
 
+const routes = pages.map(({ file, href, title }) => ({ file: path.relative(root, file), href, title }));
 await writeFile(path.join(outputRoot, "routes.json"), `${JSON.stringify(routes, null, 2)}\n`);
 console.log(`generated ${routes.length} documentation pages`);

@@ -69,6 +69,9 @@ test("documentation generator emits the main routes", async () => {
     assert.match(html, /Documentation/);
   }
   const rssHtml = await readFile(new URL("../public/docs/reference/rss/index.html", import.meta.url), "utf8");
+  assert.match(rssHtml, /<aside class="docs-sidebar">/);
+  assert.match(rssHtml, /aria-label="Documentation navigation"/);
+  assert.match(rssHtml, /href="\/docs\/reference\/rss\/" aria-current="page"/);
   assert.match(rssHtml, /<table class="docs-table">/);
   assert.doesNotMatch(rssHtml, /<p>\| Form \| Meaning \|/);
 });
