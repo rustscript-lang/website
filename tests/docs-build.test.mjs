@@ -9,6 +9,15 @@ const sourceMap = JSON.parse(await readFile(new URL("_meta/source-map.json", con
 const migrationMap = JSON.parse(await readFile(new URL("_meta/migration-map.json", content), "utf8"));
 const examples = JSON.parse(await readFile(new URL("_meta/examples.json", content), "utf8"));
 
+const readmeArchives = [
+  { repository: "rustscript", revision: "9a4509b162fe4500fe91180f3e2ea9d0230df304", archive: "reference/readmes/rustscript.md" },
+  { repository: "pd-edge", revision: "3468170^", archive: "reference/readmes/pd-edge.md" },
+  { repository: "pd-controller", revision: "d02e12a^", archive: "reference/readmes/pd-controller.md" },
+  { repository: "micro-rustscript", revision: "6cafab2^", archive: "reference/readmes/micro-rustscript.md" },
+  { repository: "IronRust", revision: "769aea7^", archive: "reference/readmes/ironrust.md" },
+  { repository: "flint", revision: "a8d1711^", archive: "reference/readmes/flint.md" },
+];
+
 function run(command, args) {
   execFileSync(command, args, { cwd: root, stdio: "pipe" });
 }
@@ -43,6 +52,17 @@ test("migrated project READMEs retain only introduction, quick start, and docume
   }
 });
 
+test("complete project documentation preserves every archived README byte", async () => {
+  for (const { repository, revision, archive } of readmeArchives) {
+    const original = execFileSync("git", ["show", `${revision}:README.md`], {
+      cwd: new URL(`../${repository}/`, root),
+      encoding: "utf8",
+    });
+    const archived = await readFile(new URL(archive, content), "utf8");
+    assert.equal(archived, original, repository);
+  }
+});
+
 test("documentation examples are tracked source files with recorded successful verification", async () => {
   for (const example of examples.examples) {
     assert.equal(example.result.includes("passed"), true);
@@ -60,6 +80,7 @@ test("documentation generator emits the main routes", async () => {
     "docs/index.html",
     "docs/learn/getting-started/index.html",
     "docs/reference/rss/index.html",
+    "docs/reference/readmes/pd-edge/index.html",
     "docs/contribute/architecture/index.html",
   ]) {
     const html = await readFile(new URL(`../public/${route}`, import.meta.url), "utf8");

@@ -14,6 +14,7 @@ RustScript has separate paths for using the language, looking up language and ru
 - [RSS language reference](/docs/reference/rss/)
 - [Host functions](/docs/reference/host-functions/)
 - [Runtime controls and artifacts](/docs/reference/runtime-controls/)
+- [Complete project documentation](/docs/reference/readmes/)
 
 ## Contributors
 
