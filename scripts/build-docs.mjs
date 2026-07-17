@@ -177,10 +177,14 @@ const ecosystemRoutes = new Set([
   "/docs/reference/flint/",
 ]);
 
+function isEcosystemRoute(href) {
+  return ecosystemRoutes.has(href) || href.startsWith("/docs/reference/pd-edge/");
+}
+
 const navigationGroups = [
   { label: "Learn", include: (page) => page.href.startsWith("/docs/learn/") },
-  { label: "Reference", include: (page) => page.href.startsWith("/docs/reference/") && !ecosystemRoutes.has(page.href) },
-  { label: "Ecosystem", include: (page) => ecosystemRoutes.has(page.href) },
+  { label: "Reference", include: (page) => page.href.startsWith("/docs/reference/") && !isEcosystemRoute(page.href) },
+  { label: "Ecosystem", include: (page) => isEcosystemRoute(page.href) },
   { label: "Contribute", include: (page) => page.href.startsWith("/docs/contribute/") },
   { label: "About", include: (page) => page.href !== "/docs/" && !page.href.startsWith("/docs/learn/") && !page.href.startsWith("/docs/reference/") && !page.href.startsWith("/docs/contribute/") },
 ];
@@ -195,6 +199,7 @@ const navigationOrder = [
   "/docs/reference/host-functions/",
   "/docs/reference/runtime-controls/",
   "/docs/reference/pd-edge/",
+  "/docs/reference/pd-edge/full-dag/",
   "/docs/reference/pd-controller/",
   "/docs/reference/micro-rustscript/",
   "/docs/reference/ironrust/",

@@ -31,6 +31,15 @@ test("primary project documentation preserves every README byte", async () => {
   }
 });
 
+test("pd-edge Full DAG Graphs preserve the moved markdown byte-for-byte", async () => {
+  const original = execFileSync("git", ["show", "HEAD:docs/full-dag.md"], {
+    cwd: new URL("../pd-edge/", root),
+    encoding: "utf8",
+  });
+  const documentation = await readFile(new URL("reference/pd-edge/full-dag.md", content), "utf8");
+  assert.equal(documentation, original);
+});
+
 test("documentation examples are tracked source files with recorded successful verification", async () => {
   for (const example of examples.examples) {
     assert.equal(example.result.includes("passed"), true);
@@ -49,6 +58,7 @@ test("documentation generator emits the main routes", async () => {
     "docs/learn/getting-started/index.html",
     "docs/reference/rss/index.html",
     "docs/reference/pd-edge/index.html",
+    "docs/reference/pd-edge/full-dag/index.html",
     "docs/reference/rustscript/index.html",
     "docs/contribute/architecture/index.html",
   ]) {
@@ -64,7 +74,7 @@ test("documentation generator emits the main routes", async () => {
   assert.match(rssHtml, /aria-label="Documentation navigation"/);
   assert.match(rssHtml, /href="\/docs\/reference\/rss\/" aria-current="page"/);
   assert.match(rssHtml, /<h2>Ecosystem<\/h2>/);
-  assert.match(rssHtml, /href="\/docs\/reference\/pd-edge\/">pd-edge<\/a>/);
+  assert.match(rssHtml, /href="\/docs\/reference\/pd-edge\/">pd-edge<\/a><a href="\/docs\/reference\/pd-edge\/full-dag\/">Full DAG Graphs<\/a>/);
   assert.doesNotMatch(rssHtml, />[^<]*reference<\/h1>/i);
   assert.match(rssHtml, /<table class="docs-table">/);
   assert.match(rssHtml, /<span class="tok-kw">use<\/span>/);
