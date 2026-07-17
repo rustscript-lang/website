@@ -1,3 +1,4 @@
+import { highlightRust, highlightRustScript, isRustFence, isRustScriptFence } from "./code-highlighting.mjs";
 import { copyFile, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
@@ -90,39 +91,13 @@ function renderTable(lines) {
     .join("")}</tbody></table></div>`;
 }
 
-function isRustScriptFence(lang) {
-  return /^(rss|rustscript)$/i.test(lang.trim());
-}
-
-function highlightRustScript(code) {
-  const tokenPattern = /(\/\/.*)|("(?:\\\\.|[^"\\\\])*")|(\b\d(?:[\d_]*\d)?\b)|(\b(?:fn|pub|let|mut|if|else|match|for|while|use|struct|return|true|false|None|Some)\b)|(\b(?:int|string|bool|float|bytes|map)\b)|(\b[A-Z][A-Za-z0-9_]*\b)|(\b[A-Za-z_][A-Za-z0-9_]*(?=\s*(?:<|::\s*<)?\())/g;
-  let output = "";
-  let cursor = 0;
-
-  for (const match of code.matchAll(tokenPattern)) {
-    output += escapeHtml(code.slice(cursor, match.index));
-    const [token, comment, stringLiteral, numberLiteral, keyword, builtinType, namedType, fnName] = match;
-    let className = "";
-    if (comment) className = "tok-comment";
-    else if (stringLiteral) className = "tok-str";
-    else if (numberLiteral) className = "tok-num";
-    else if (keyword) className = "tok-kw";
-    else if (builtinType || namedType) className = "tok-type";
-    else if (fnName) className = "tok-fn";
-
-    const escapedToken = escapeHtml(token);
-    output += className ? `<span class="${className}">${escapedToken}</span>` : escapedToken;
-    cursor = match.index + token.length;
-  }
-
-  output += escapeHtml(code.slice(cursor));
-  return output;
-}
-
 function renderCodeFence(lang, code) {
   const safeLang = escapeHtml(lang.trim());
   if (isRustScriptFence(lang)) {
     return `<pre class="rss-code"><code class="language-${safeLang}">${highlightRustScript(code)}</code></pre>`;
+  }
+  if (isRustFence(lang)) {
+    return `<pre class="rss-code"><code class="language-${safeLang}">${highlightRust(code)}</code></pre>`;
   }
   return `<pre><code class="language-${safeLang}">${escapeHtml(code)}</code></pre>`;
 }

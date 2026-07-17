@@ -1,3 +1,4 @@
+import { highlightRust, highlightRustScript, isRustFence, isRustScriptFence } from "./code-highlighting.mjs";
 import { copyFile, mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
@@ -67,26 +68,6 @@ function inlineMarkdown(value) {
   return html;
 }
 
-function highlightRss(code) {
-  const tokenPattern = /(\/\/.*)|("(?:\\.|[^"\\])*")|(\b\d(?:[\d_]*\d)?\b)|(\b(?:fn|pub|let|mut|if|else|match|for|while|use|struct|return|true|false|None|Some|=>)\b)|(\b(?:int|string|bool|float|bytes|map|array)\b)|(\b[A-Z][A-Za-z0-9_]*\b)|(\b[A-Za-z_][A-Za-z0-9_]*(?=\s*(?:<|::\s*<)?\())/g;
-  let output = "";
-  let cursor = 0;
-  for (const match of code.matchAll(tokenPattern)) {
-    output += escapeHtml(code.slice(cursor, match.index));
-    const [token, comment, stringLiteral, numberLiteral, keyword, builtinType, namedType, fnName] = match;
-    const cls = comment ? "tok-comment"
-      : stringLiteral ? "tok-str"
-        : numberLiteral ? "tok-num"
-          : keyword ? "tok-kw"
-            : builtinType || namedType ? "tok-type"
-              : fnName ? "tok-fn"
-                : "";
-    output += cls ? `<span class="${cls}">${escapeHtml(token)}</span>` : escapeHtml(token);
-    cursor = match.index + token.length;
-  }
-  return output + escapeHtml(code.slice(cursor));
-}
-
 function renderMarkdown(markdown) {
   const lines = markdown.replace(/\r\n/g, "\n").split("\n");
   const blocks = [];
@@ -121,7 +102,11 @@ function renderMarkdown(markdown) {
         if (fence.language === "mermaid") {
           blocks.push(`<div class="mermaid" role="img" aria-label="Mermaid diagram">${escapeHtml(code)}</div>`);
         } else {
-          const codeHtml = fence.language === "rss" ? highlightRss(code) : escapeHtml(code);
+          const codeHtml = isRustScriptFence(fence.language)
+            ? highlightRustScript(code)
+            : isRustFence(fence.language)
+              ? highlightRust(code)
+              : escapeHtml(code);
           blocks.push(`<pre class="rss-code"><code class="language-${escapeHtml(fence.language)}">${codeHtml}</code></pre>`);
         }
         fence = null;

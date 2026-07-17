@@ -77,6 +77,20 @@ test("documentation examples are tracked source files with recorded successful v
   }
 });
 
+test("documentation generators highlight Rust and RustScript fences", async () => {
+  run("node", ["scripts/build-blog.mjs"]);
+  run("node", ["scripts/build-docs.mjs"]);
+
+  const rustDocs = await readFile(new URL("../public/docs/reference/rustscript/development/index.html", import.meta.url), "utf8");
+  assert.match(rustDocs, /<code class="language-rust"><span class="tok-kw">let<\/span> <span class="tok-kw">mut<\/span> vm/);
+
+  const rustBlog = await readFile(new URL("../public/blog/v05-async-suspension/index.html", import.meta.url), "utf8");
+  assert.match(rustBlog, /<code class="language-rust"><span class="tok-kw">enum<\/span> <span class="tok-type">CallOutcome<\/span>/);
+
+  const rustScriptBlog = await readFile(new URL("../public/blog/e01-protocol-dag-and-session-reuse/index.html", import.meta.url), "utf8");
+  assert.match(rustScriptBlog, /<code class="language-rustscript"><span class="tok-kw">use<\/span> http;/);
+});
+
 test("documentation generator emits the main routes", async () => {
   run("node", ["scripts/build-docs.mjs"]);
   for (const route of [
