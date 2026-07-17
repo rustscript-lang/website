@@ -37,4 +37,4 @@ let matched = match profile?.stats?.score {
 
 - [RSS basics](/docs/learn/rss-basics/) introduces imports, bindings, types, and host calls.
 - [Embed `pd-vm`](/docs/learn/embed-pd-vm/) covers Rust integration.
-- [RSS language reference](/docs/reference/rss/) is the complete syntax index.
+- [RSS language](/docs/reference/rss/) is the complete syntax index.

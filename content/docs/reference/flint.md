@@ -1,4 +1,4 @@
-# Flint reference
+# Flint
 
 ## Runtime model
 

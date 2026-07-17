@@ -1,4 +1,4 @@
-# RSS language reference
+# RSS language
 
 This reference describes the RustScript frontend accepted by the current `pd-vm` parser. It distinguishes implemented RSS syntax from compatibility-language syntax and from function values that are still under development.
 

@@ -1,4 +1,4 @@
-# pd-controller reference
+# pd-controller
 
 ## Service scope
 

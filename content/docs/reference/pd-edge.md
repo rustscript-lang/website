@@ -1,4 +1,4 @@
-# pd-edge reference
+# pd-edge
 
 ## Runtime scope
 

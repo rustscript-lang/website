@@ -8,7 +8,7 @@
 cargo run -p pd-edge --bin pd-edge-console -- --help
 ```
 
-For HTTP proxy, console, admin API, active control-plane RPC, Docker, protocol DAGs, and release artifacts, use the [pd-edge reference](/docs/reference/pd-edge/) and the [runtime implementation guide](/docs/contribute/runtimes/#pd-edge).
+For HTTP proxy, console, admin API, active control-plane RPC, Docker, protocol DAGs, and release artifacts, use [pd-edge](/docs/reference/pd-edge/) and the [runtime implementation guide](/docs/contribute/runtimes/#pd-edge).
 
 ## pd-controller
 
@@ -18,7 +18,7 @@ For HTTP proxy, console, admin API, active control-plane RPC, Docker, protocol D
 cargo run -p pd-controller
 ```
 
-The controller listens on `0.0.0.0:9100` by default and serves a built Web UI under `/ui`. Operational details are in the [pd-controller reference](/docs/reference/pd-controller/).
+The controller listens on `0.0.0.0:9100` by default and serves a built Web UI under `/ui`. Operational details are in [pd-controller](/docs/reference/pd-controller/).
 
 ## micro-rustscript
 
@@ -28,7 +28,7 @@ micro-rustscript runs VMBC on ESP32-C3, ESP32-S31 preview hardware, and a native
 pio run -e arduino
 ```
 
-The Arduino target builds the bridge and a compiled VMBC program on the host. A successful simulator run finishes with `rss:status=0`. See the [micro-rustscript reference](/docs/reference/micro-rustscript/) for target images, VMBC partition replacement, and the serial REPL.
+The Arduino target builds the bridge and a compiled VMBC program on the host. A successful simulator run finishes with `rss:status=0`. See [micro-rustscript](/docs/reference/micro-rustscript/) for target images, VMBC partition replacement, and the serial REPL.
 
 ## IronRust
 
@@ -38,10 +38,10 @@ IronRust provides a RustScript runtime and compiler for Microsoft CLR. `PdVm.Com
 dotnet build IronRust.sln
 ```
 
-IronRust requires the .NET 10 SDK. Build the solution first; then use `PdVm.Runner` to compile or run RSS and VMBC programs. The typed CLR wrapper discovers reachable `use System::...` imports and generates bindings for supported public members. Dynamic reflection requires explicit `--enable-dynamic-dotnet`. See the [IronRust reference](/docs/reference/ironrust/).
+IronRust requires the .NET 10 SDK. Build the solution first; then use `PdVm.Runner` to compile or run RSS and VMBC programs. The typed CLR wrapper discovers reachable `use System::...` imports and generates bindings for supported public members. Dynamic reflection requires explicit `--enable-dynamic-dotnet`. See [IronRust](/docs/reference/ironrust/).
 
 ## Flint
 
 Flint is a RustScript-native AI inference framework. It exposes Torch tensor operations, llama.cpp primitives, stable-diffusion.cpp image generation, GGML discovery, tokenization, and safetensors I/O as host functions.
 
-Use the [Flint reference](/docs/reference/flint/) for the current CLI invocation, host namespaces, and model-specific RSS programs. `--llm` selects Torch-based RSS programs, `--llama` selects llama.cpp programs, and `--sd` selects stable-diffusion.cpp or GGML programs. Scripts keep model architecture, sampling loops, and inference workflows in RSS.
+Use [Flint](/docs/reference/flint/) for the current CLI invocation, host namespaces, and model-specific RSS programs. `--llm` selects Torch-based RSS programs, `--llama` selects llama.cpp programs, and `--sd` selects stable-diffusion.cpp or GGML programs. Scripts keep model architecture, sampling loops, and inference workflows in RSS.

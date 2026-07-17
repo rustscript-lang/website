@@ -1,4 +1,4 @@
-# micro-rustscript reference
+# micro-rustscript
 
 ## Targets and images
 

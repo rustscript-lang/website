@@ -11,9 +11,17 @@ RustScript has separate paths for using the language, looking up language and ru
 
 ## Reference
 
-- [RSS language reference](/docs/reference/rss/)
+- [RSS language](/docs/reference/rss/)
 - [Host functions](/docs/reference/host-functions/)
 - [Runtime controls and artifacts](/docs/reference/runtime-controls/)
+
+## Ecosystem
+
+- [pd-edge](/docs/reference/pd-edge/)
+- [pd-controller](/docs/reference/pd-controller/)
+- [micro-rustscript](/docs/reference/micro-rustscript/)
+- [IronRust](/docs/reference/ironrust/)
+- [Flint](/docs/reference/flint/)
 - [Complete project documentation](/docs/reference/readmes/)
 
 ## Contributors

@@ -53,4 +53,4 @@ let total = if !string::non_empty("rustscript") => {
 };
 ```
 
-See the [RSS language reference](/docs/reference/rss/) for the complete accepted syntax and [host functions](/docs/reference/host-functions/) for the embedding contract.
+See the [RSS language](/docs/reference/rss/) for the complete accepted syntax and [host functions](/docs/reference/host-functions/) for the embedding contract.

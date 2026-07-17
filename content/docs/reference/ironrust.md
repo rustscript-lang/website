@@ -1,4 +1,4 @@
-# IronRust reference
+# IronRust
 
 ## Components
 

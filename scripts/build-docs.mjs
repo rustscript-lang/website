@@ -169,11 +169,21 @@ function routeFor(file) {
   return [...(parsed.dir ? parsed.dir.split(path.sep) : []), parsed.name];
 }
 
+const ecosystemRoutes = new Set([
+  "/docs/reference/pd-edge/",
+  "/docs/reference/pd-controller/",
+  "/docs/reference/micro-rustscript/",
+  "/docs/reference/ironrust/",
+  "/docs/reference/flint/",
+  "/docs/reference/readmes/",
+]);
+
 const navigationGroups = [
-  { label: "Learn", prefix: "learn/" },
-  { label: "Reference", prefix: "reference/" },
-  { label: "Contribute", prefix: "contribute/" },
-  { label: "About", prefix: "" },
+  { label: "Learn", include: (page) => page.href.startsWith("/docs/learn/") },
+  { label: "Reference", include: (page) => page.href.startsWith("/docs/reference/") && !ecosystemRoutes.has(page.href) && !page.href.startsWith("/docs/reference/readmes/") },
+  { label: "Ecosystem", include: (page) => ecosystemRoutes.has(page.href) },
+  { label: "Contribute", include: (page) => page.href.startsWith("/docs/contribute/") },
+  { label: "About", include: (page) => page.href !== "/docs/" && !page.href.startsWith("/docs/learn/") && !page.href.startsWith("/docs/reference/") && !page.href.startsWith("/docs/contribute/") },
 ];
 
 const navigationOrder = [
@@ -189,19 +199,17 @@ const navigationOrder = [
   "/docs/reference/micro-rustscript/",
   "/docs/reference/ironrust/",
   "/docs/reference/flint/",
+  "/docs/reference/readmes/",
   "/docs/contribute/architecture/",
   "/docs/contribute/vm-and-compiler/",
   "/docs/contribute/runtimes/",
   "/docs/terminology/",
-  "/docs/sources/",
 ];
 
 function documentationSidebar(pages, currentHref) {
   const overview = pages.find((page) => page.href === "/docs/");
   const groups = navigationGroups.map((group) => {
-    const groupPages = pages.filter((page) => group.prefix
-      ? page.href.startsWith(`/docs/${group.prefix}`)
-      : page.href !== "/docs/" && !page.href.startsWith("/docs/learn/") && !page.href.startsWith("/docs/reference/") && !page.href.startsWith("/docs/contribute/"))
+    const groupPages = pages.filter(group.include)
       .sort((left, right) => {
         const leftIndex = navigationOrder.indexOf(left.href);
         const rightIndex = navigationOrder.indexOf(right.href);

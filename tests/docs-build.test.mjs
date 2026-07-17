@@ -87,10 +87,16 @@ test("documentation generator emits the main routes", async () => {
     assert.match(html, /assets\/site\.css/);
     assert.match(html, /Documentation/);
   }
+  const generatedRoutes = JSON.parse(await readFile(new URL("../public/docs/routes.json", import.meta.url), "utf8"));
+  assert.equal(generatedRoutes.some(({ title }) => /\breference\b/i.test(title)), false);
+
   const rssHtml = await readFile(new URL("../public/docs/reference/rss/index.html", import.meta.url), "utf8");
   assert.match(rssHtml, /<aside class="docs-sidebar">/);
   assert.match(rssHtml, /aria-label="Documentation navigation"/);
   assert.match(rssHtml, /href="\/docs\/reference\/rss\/" aria-current="page"/);
+  assert.match(rssHtml, /<h2>Ecosystem<\/h2>/);
+  assert.match(rssHtml, /href="\/docs\/reference\/pd-edge\/">pd-edge<\/a>/);
+  assert.doesNotMatch(rssHtml, />[^<]*reference<\/h1>/i);
   assert.match(rssHtml, /<table class="docs-table">/);
   assert.match(rssHtml, /<span class="tok-kw">use<\/span>/);
   assert.doesNotMatch(rssHtml, /<p>\| Form \| Meaning \|/);
