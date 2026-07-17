@@ -56,6 +56,26 @@ function inlineMarkdown(value) {
   return html;
 }
 
+function highlightRss(code) {
+  const tokenPattern = /(\/\/.*)|("(?:\\.|[^"\\])*")|(\b\d(?:[\d_]*\d)?\b)|(\b(?:fn|pub|let|mut|if|else|match|for|while|use|struct|return|true|false|None|Some|=>)\b)|(\b(?:int|string|bool|float|bytes|map|array)\b)|(\b[A-Z][A-Za-z0-9_]*\b)|(\b[A-Za-z_][A-Za-z0-9_]*(?=\s*(?:<|::\s*<)?\())/g;
+  let output = "";
+  let cursor = 0;
+  for (const match of code.matchAll(tokenPattern)) {
+    output += escapeHtml(code.slice(cursor, match.index));
+    const [token, comment, stringLiteral, numberLiteral, keyword, builtinType, namedType, fnName] = match;
+    const cls = comment ? "tok-comment"
+      : stringLiteral ? "tok-str"
+        : numberLiteral ? "tok-num"
+          : keyword ? "tok-kw"
+            : builtinType || namedType ? "tok-type"
+              : fnName ? "tok-fn"
+                : "";
+    output += cls ? `<span class="${cls}">${escapeHtml(token)}</span>` : escapeHtml(token);
+    cursor = match.index + token.length;
+  }
+  return output + escapeHtml(code.slice(cursor));
+}
+
 function renderMarkdown(markdown) {
   const lines = markdown.replace(/\r\n/g, "\n").split("\n");
   const blocks = [];
@@ -86,7 +106,9 @@ function renderMarkdown(markdown) {
   for (const line of lines) {
     if (line.startsWith("```")) {
       if (fence) {
-        blocks.push(`<pre class="rss-code"><code class="language-${escapeHtml(fence.language)}">${escapeHtml(fence.lines.join("\n"))}</code></pre>`);
+        const code = fence.lines.join("\n");
+        const codeHtml = fence.language === "rss" ? highlightRss(code) : escapeHtml(code);
+        blocks.push(`<pre class="rss-code"><code class="language-${escapeHtml(fence.language)}">${codeHtml}</code></pre>`);
         fence = null;
       } else {
         flushParagraph();
@@ -160,7 +182,6 @@ const navigationOrder = [
   "/docs/learn/embed-pd-vm/",
   "/docs/learn/runtimes/",
   "/docs/reference/rss/",
-  "/docs/reference/function-values/",
   "/docs/reference/host-functions/",
   "/docs/reference/runtime-controls/",
   "/docs/reference/pd-edge/",
@@ -217,14 +238,17 @@ function layout({ title, body, breadcrumb, sidebar }) {
       .docs-nav-section { display: grid; gap: 0.12rem; }
       .docs-nav-section h2 { margin: 0 0 0.35rem 0.62rem; color: var(--ink); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
       .docs-page { min-width: 0; }
-      .docs-page .doc-shell { max-width: none; border: 0; border-radius: 0; background: transparent; box-shadow: none; padding: 0; }
-      .docs-page .doc-shell h1 { margin: 0 0 1.25rem; font-size: clamp(2.15rem, 5vw, 3.1rem); line-height: 1.08; letter-spacing: -0.045em; }
-      .docs-page .doc-shell h2 { margin-top: 3rem; font-size: clamp(1.45rem, 3vw, 2rem); line-height: 1.18; }
-      .docs-page .doc-shell h3 { margin-top: 2rem; font-size: 1.22rem; }
-      .docs-page .doc-shell p, .docs-page .doc-shell li { color: var(--muted); font-size: 1rem; line-height: 1.76; }
-      .docs-page .doc-shell p { max-width: 72ch; }
+      .doc-shell.docs-page { max-width: none; border: 0; border-radius: 0; background: transparent; box-shadow: none; padding: 0; }
+      .doc-shell.docs-page h1 { margin: 0 0 0.625rem; font-size: clamp(1.3rem, 3vw, 2.8rem); line-height: 1.08; letter-spacing: -0.045em; }
+      .doc-shell.docs-page h2 { margin-top: 1.5rem; font-size: clamp(0.9rem, 2vw, 1.5rem); line-height: 1.18; }
+      .doc-shell.docs-page h3 { margin-top: 1rem; font-size: 0.725rem; }
+      .doc-shell.docs-page h4 { margin-top: 0.85rem; font-size: 0.5rem; }
+      .doc-shell.docs-page h5 { margin-top: 0.75rem; font-size: 0.42rem; }
+      .doc-shell.docs-page h6 { margin-top: 0.65rem; font-size: 0.36rem; }
+      .doc-shell.docs-page p, .doc-shell.docs-page li { color: var(--muted); font-size: 1rem; line-height: 1.76; }
+      .doc-shell.docs-page p { max-width: 72ch; }
       .docs-page .doc-breadcrumb { margin-bottom: 1.65rem; font-size: 0.82rem; }
-      .docs-page .doc-shell pre { border-radius: 8px; box-shadow: none; }
+      .doc-shell.docs-page pre { border-radius: 8px; box-shadow: none; }
       .docs-table-wrap { overflow-x: auto; margin: 1.25rem 0; border: 1px solid var(--border); border-radius: 8px; }
       .docs-table { width: 100%; min-width: 32rem; border-collapse: collapse; }
       .docs-table th, .docs-table td { padding: 0.72rem 0.88rem; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
@@ -236,7 +260,6 @@ function layout({ title, body, breadcrumb, sidebar }) {
         .docs-sidebar { position: static; max-height: none; overflow: visible; margin-bottom: 1.75rem; padding: 0; border: 1px solid var(--border); border-radius: 8px; background: var(--surface-strong); }
         .docs-sidebar summary { display: block; padding: 0.9rem 1rem; color: var(--ink); cursor: pointer; font-size: 0.9rem; font-weight: 700; }
         .docs-sidebar nav { padding: 0 0.5rem 0.75rem; }
-        .docs-page .doc-shell h1 { font-size: clamp(2rem, 10vw, 2.65rem); }
       }
     </style>
     <script src="/assets/theme.js"></script>

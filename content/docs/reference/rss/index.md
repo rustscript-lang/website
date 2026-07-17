@@ -31,7 +31,7 @@ use super::stdlib::rss::strings as string;
 use bytes;
 ```
 
-Source: [`examples/example_complex.rss`](https://github.com/rustscript-lang/rustscript/blob/9a4509b162fe4500fe91180f3e2ea9d0230df304/examples/example_complex.rss#L1-L4). A namespace form uses `use namespace;`; aliases use `use namespace as local_name;`; named imports use `use namespace::{member, member as local_name};`; wildcard imports use `use namespace::*;`.
+A namespace form uses `use namespace;`; aliases use `use namespace as local_name;`; named imports use `use namespace::{member, member as local_name};`; wildcard imports use `use namespace::*;`.
 
 Source modules support `self`, `super`, aliases, named imports, and wildcard imports. Built-in host namespaces require namespace calls and reject list imports where the host ABI does not expose them.
 
@@ -46,9 +46,7 @@ for i in 0..4 {
 }
 ```
 
-Source: [`examples/example_complex.rss`](https://github.com/rustscript-lang/rustscript/blob/9a4509b162fe4500fe91180f3e2ea9d0230df304/examples/example_complex.rss#L18-L21).
-
-Source: [`examples/example_complex.rss`](https://github.com/rustscript-lang/rustscript/blob/9a4509b162fe4500fe91180f3e2ea9d0230df304/examples/example_complex.rss#L36). A binding can use a type annotation:
+A binding can use a type annotation:
 
 ```rss
 let profile: Profile = {stats: {score: closure_value}};
@@ -72,9 +70,7 @@ struct Profile {
 }
 ```
 
-Source: [`examples/example_complex.rss`](https://github.com/rustscript-lang/rustscript/blob/9a4509b162fe4500fe91180f3e2ea9d0230df304/examples/example_complex.rss#L10-L16).
-
-Source: [`examples/example_complex.rss`](https://github.com/rustscript-lang/rustscript/blob/9a4509b162fe4500fe91180f3e2ea9d0230df304/examples/example_complex.rss#L36). Construct an object with braces and fields. Nested braces construct nested values:
+Construct an object with braces and fields. Nested braces construct nested values:
 
 ```rss
 let profile: Profile = {stats: {score: closure_value}};
@@ -92,7 +88,7 @@ fn apply<T>(mapper: fn(T) -> T, value: T) -> T { mapper(value) }
 apply::<int>(identity, 42);
 ```
 
-Direct calls to declared functions are implemented. Function declarations and closures participate in compiler callable analysis. See [Function values](/docs/reference/function-values/) for current development status of runtime callable values.
+Direct calls to declared functions are implemented. Function declarations and closures participate in compiler callable analysis; runtime callable values remain under active development.
 
 ## Closures
 
@@ -104,7 +100,7 @@ let add = |value| value + base;
 let closure_value = add(5);
 ```
 
-The source form above is from [`examples/example_complex.rss`](https://github.com/rustscript-lang/rustscript/blob/9a4509b162fe4500fe91180f3e2ea9d0230df304/examples/example_complex.rss#L31-L34). It was compiled to VMBC before publication. JavaScript arrow-closure syntax is not RSS syntax.
+JavaScript arrow-closure syntax is not RSS syntax.
 
 ## Expressions and operators
 
@@ -150,8 +146,6 @@ let matched = match profile?.stats?.score {
 };
 ```
 
-Source: [`examples/example_complex.rss`](https://github.com/rustscript-lang/rustscript/blob/9a4509b162fe4500fe91180f3e2ea9d0230df304/examples/example_complex.rss#L36-L45). The complete file was compiled to VMBC before publication.
-
 ## Collections
 
 Array values use `[]`; map and object-style literals use `{}` according to their field or key form. Index expressions read collection items. An assignment target can be a local, field, or supported index expression.
@@ -180,11 +174,3 @@ fn identity<T>(value: T) -> T { value }
 fn apply<T>(mapper: fn(T) -> T, value: T) -> T { mapper(value) }
 apply::<int>(identity, 42);
 ```
-
-Source: [`tests/compiler/compiler_rustscript_tests.rs`](https://github.com/rustscript-lang/rustscript/blob/9a4509b162fe4500fe91180f3e2ea9d0230df304/tests/compiler/compiler_rustscript_tests.rs#L2264-L2268). This feature remains a development contract until the release documentation defines compatibility, artifact-format, and embedding guarantees.
-
-## Sources
-
-RustScript README: `How To Use`, `Internals / Compiler Internals`, revision `9a4509b162fe4500fe91180f3e2ea9d0230df304`.
-
-Parser and verification sources: `src/compiler/parser/lexer.rs`, `statements.rs`, `expressions.rs`, `src/compiler/ir.rs`, `tests/compiler/`, `examples/example_complex.rss` at the same revision.

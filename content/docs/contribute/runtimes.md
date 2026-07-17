@@ -19,7 +19,3 @@ IronRust contains a CLR value/runtime layer, VMBC-to-CLR compiler, runner, tests
 ## Flint
 
 Flint runs RSS programs through `ScriptRunner` and binds native GGML, llama.cpp, stable-diffusion.cpp, LibTorch, tokenizer, and safetensors capabilities. Native resources cross the VM boundary as opaque handles, while model architecture and generation loops remain in RSS.
-
-## Sources
-
-pd-edge README `Layered DAGs`, `ABI Source of Truth`, `Codebase Layout`; pd-controller README `Service guide`, `Web UI`; micro-rustscript README `Targets and source layout`; IronRust README `Projects`, `Current Status`; Flint README `How it works`, `Host functions`.

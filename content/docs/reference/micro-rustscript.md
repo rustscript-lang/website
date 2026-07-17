@@ -15,7 +15,3 @@ RSS programs use framework namespaces for board and device services, including G
 ## VMBC updates and build limits
 
 The VMBC partition can be replaced independently of a full image. The serial REPL provides an alternative program-loading route. The build documentation records ESP32-C3 image-size constraints and the supported build targets.
-
-## Source
-
-micro-rustscript README: `Flash complete images`, `ESP32-C3`, `ESP32-S31 preview`, `Targets and source layout`, `Framework API from RSS`, `Replace only the VMBC partition`, `Serial REPL`, `Build`, and `ESP32-C3 image size`, revision `a874646f2094c2cf2ede008e404785b1516b5a9e`.

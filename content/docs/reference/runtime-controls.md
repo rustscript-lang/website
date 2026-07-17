@@ -33,7 +33,3 @@ Disassemble a VMBC file with `--disasm-vmbc`; use `--show-source` when source is
 ## JIT, WebAssembly, and no_std
 
 The runner can report trace-JIT activity with `--jit-hot-loop` and `--jit-dump`. RustScript also has a WebAssembly runtime and a `no_std` runtime for constrained environments. The user-facing controls remain separate from compiler and JIT implementation details in the contributor documentation.
-
-## Source
-
-RustScript README `How To Use / REPL`, `Debugging`, `Recording and Replay`, `Bytecode and VMBC`, `JIT`, `Fuel Metering`, `Epoch Interruption`, `Wasm`, and `no_std`, revision `9a4509b162fe4500fe91180f3e2ea9d0230df304`.

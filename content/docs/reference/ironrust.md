@@ -15,7 +15,3 @@ The compiler accepts RustScript source through the native compiler path and comp
 ## Proxy and benchmark scope
 
 `PdEdge.Http` is a minimal CLR HTTP proxy rather than a replacement for the pd-edge transport stack. The repository describes how to exercise the existing Rust benchmark harness against that proxy.
-
-## Source
-
-IronRust README: `Projects`, `Requirements`, `Build`, `Test`, `Compile Source To VMBC`, `Compile VMBC To CLR`, `Release packages`, `Run The Minimal HTTP Proxy`, `PdEdge.Http Scope`, `Benchmark With The Existing Rust Harness`, and `Current Status`, revision `fce4aa41931135ccf5fdb73c7270ec0baf1a13ef`.

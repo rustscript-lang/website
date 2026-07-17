@@ -19,7 +19,3 @@ The edge ABI is the source of truth for host functions visible to an RSS program
 ## Performance framework
 
 The repository includes an HTTP proxy performance framework for comparing runtime modes and exercising proxy behavior under load.
-
-## Source
-
-pd-edge README: `Cargo usage`, `Test`, `Runtime guide`, `Binary Scope`, `Quick Start`, `HTTP Proxy Admin API`, `CLI`, `Active Control-Plane RPC`, `HTTP Proxy Performance Framework`, `Layered DAGs`, `ABI Source of Truth`, `Release Artifacts`, `Docker`, and `Codebase Layout`, revision `91e953a43a896febd681cc19a6c55ccb1cbf9230`.

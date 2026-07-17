@@ -5,7 +5,7 @@
       "revision": "9a4509b162fe4500fe91180f3e2ea9d0230df304",
       "readme": "README.md",
       "sections": ["Crate usage", "Overview", "How To Use", "Internals", "TODO"],
-      "pages": ["index", "learn/getting-started", "learn/rss-basics", "learn/embed-pd-vm", "reference/rss", "reference/function-values", "reference/host-functions", "reference/runtime-controls", "contribute/architecture", "contribute/vm-and-compiler"]
+      "pages": ["index", "learn/getting-started", "learn/rss-basics", "learn/embed-pd-vm", "reference/rss", "reference/host-functions", "reference/runtime-controls", "contribute/architecture", "contribute/vm-and-compiler"]
     },
     {
       "repository": "pd-edge",

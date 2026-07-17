@@ -14,7 +14,3 @@ RustScript is the language and VM/compiler core. pd-edge runs programs in the ed
 | Flint | inference workflows in RSS | native resource handles and inference host functions |
 
 Read a user guide before changing its implementation counterpart. User documentation describes observable behavior and supported commands. Contributor documentation describes repository boundaries and maintenance responsibilities.
-
-## Sources
-
-Top-level README files for RustScript, pd-edge, pd-controller, micro-rustscript, IronRust, and Flint at the revisions recorded in the [source map](/docs/sources/).

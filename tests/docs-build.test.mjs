@@ -60,9 +60,7 @@ test("documentation generator emits the main routes", async () => {
     "docs/index.html",
     "docs/learn/getting-started/index.html",
     "docs/reference/rss/index.html",
-    "docs/reference/function-values/index.html",
     "docs/contribute/architecture/index.html",
-    "docs/sources/index.html",
   ]) {
     const html = await readFile(new URL(`../public/${route}`, import.meta.url), "utf8");
     assert.match(html, /assets\/site\.css/);
@@ -73,5 +71,9 @@ test("documentation generator emits the main routes", async () => {
   assert.match(rssHtml, /aria-label="Documentation navigation"/);
   assert.match(rssHtml, /href="\/docs\/reference\/rss\/" aria-current="page"/);
   assert.match(rssHtml, /<table class="docs-table">/);
+  assert.match(rssHtml, /<span class="tok-kw">use<\/span>/);
   assert.doesNotMatch(rssHtml, /<p>\| Form \| Meaning \|/);
+  assert.doesNotMatch(rssHtml, /Source:|Documentation sources|revision [0-9a-f]{40}/);
+  await assert.rejects(access(new URL("../public/docs/reference/function-values/index.html", import.meta.url)));
+  await assert.rejects(access(new URL("../public/docs/sources/index.html", import.meta.url)));
 });

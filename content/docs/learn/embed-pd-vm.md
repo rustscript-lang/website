@@ -12,8 +12,6 @@ pd-vm = { git = "https://github.com/rustscript-lang/rustscript", package = "pd-v
 pd-host-function = { git = "https://github.com/rustscript-lang/rustscript", package = "pd-host-function" }
 ```
 
-Source: [`rustscript/README.md`](https://github.com/rustscript-lang/rustscript/blob/9a4509b162fe4500fe91180f3e2ea9d0230df304/README.md#L16-L24). The dependency example was validated in a temporary Cargo project before publication.
-
 ## Compile and execute
 
 An embedding application follows this boundary:
@@ -28,7 +26,3 @@ The [host functions reference](/docs/reference/host-functions/) documents namesp
 ## Compatibility frontends
 
 RustScript is the built-in `.rss` frontend. JavaScript and Lua use source-plugin crates and are compiled from an embedding application through `CompileSourceFileOptions::with_source_plugin(...)`.
-
-## Source
-
-RustScript README: `Crate usage`, `How To Use / Run Programs`, `Fuel Metering`, and `Internals / Compiler APIs`, revision `9a4509b162fe4500fe91180f3e2ea9d0230df304`.
