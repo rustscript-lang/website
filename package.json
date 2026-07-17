@@ -14,5 +14,8 @@
   "devDependencies": {
     "happy-dom": "^20.10.6",
     "vite": "^5.4.10"
+  },
+  "dependencies": {
+    "mermaid": "^11.16.0"
   }
 }

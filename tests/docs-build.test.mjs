@@ -94,6 +94,13 @@ test("documentation generator emits the main routes", async () => {
     assert.match(html, /assets\/site\.css/);
     assert.match(html, /Documentation/);
   }
+  const fullDagHtml = await readFile(new URL("../public/docs/reference/pd-edge/full-dag/index.html", import.meta.url), "utf8");
+  assert.match(fullDagHtml, /<div class="mermaid" role="img" aria-label="Mermaid diagram">[\s\S]*flowchart LR/);
+  assert.match(fullDagHtml, /<script defer src="\/assets\/mermaid\.min\.js"><\/script>/);
+  assert.match(fullDagHtml, /<script defer src="\/assets\/mermaid-init\.js"><\/script>/);
+  await access(new URL("../public/assets/mermaid.min.js", import.meta.url));
+  await access(new URL("../public/assets/mermaid-init.js", import.meta.url));
+
   const generatedRoutes = JSON.parse(await readFile(new URL("../public/docs/routes.json", import.meta.url), "utf8"));
   assert.equal(generatedRoutes.some(({ title }) => /\breference\b/i.test(title)), false);
 

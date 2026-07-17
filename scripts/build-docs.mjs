@@ -1,10 +1,13 @@
-import { mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
+import { copyFile, mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
 
 const root = process.cwd();
 const contentRoot = path.join(root, "content", "docs");
 const outputRoot = path.join(root, "public", "docs");
+const assetRoot = path.join(root, "public", "assets");
+const mermaidBundle = path.join(root, "node_modules", "mermaid", "dist", "mermaid.min.js");
+const mermaidInit = path.join(root, "src", "mermaid-init.js");
 
 function escapeHtml(value) {
   return value
@@ -115,8 +118,12 @@ function renderMarkdown(markdown) {
     if (line.startsWith("```")) {
       if (fence) {
         const code = fence.lines.join("\n");
-        const codeHtml = fence.language === "rss" ? highlightRss(code) : escapeHtml(code);
-        blocks.push(`<pre class="rss-code"><code class="language-${escapeHtml(fence.language)}">${codeHtml}</code></pre>`);
+        if (fence.language === "mermaid") {
+          blocks.push(`<div class="mermaid" role="img" aria-label="Mermaid diagram">${escapeHtml(code)}</div>`);
+        } else {
+          const codeHtml = fence.language === "rss" ? highlightRss(code) : escapeHtml(code);
+          blocks.push(`<pre class="rss-code"><code class="language-${escapeHtml(fence.language)}">${codeHtml}</code></pre>`);
+        }
         fence = null;
       } else {
         flushParagraph();
@@ -267,7 +274,7 @@ function documentationSidebar(pages, currentHref) {
   return `<aside class="docs-sidebar"><details open><summary>Documentation navigation</summary><nav aria-label="Documentation navigation">${overviewLink}${groups}</nav></details></aside>`;
 }
 
-function layout({ title, body, breadcrumb, sidebar }) {
+function layout({ title, body, breadcrumb, sidebar, hasMermaid }) {
   return `<!doctype html>
 <html lang="en">
   <head>
@@ -304,6 +311,9 @@ function layout({ title, body, breadcrumb, sidebar }) {
       .doc-shell.docs-page p { max-width: 72ch; }
       .docs-page .doc-breadcrumb { margin-bottom: 1.65rem; font-size: 0.82rem; }
       .doc-shell.docs-page pre { border-radius: 8px; box-shadow: none; }
+      .mermaid { overflow-x: auto; margin: 1.5rem 0; padding: 1rem; border: 1px solid var(--border); border-radius: 8px; background: var(--surface-strong); text-align: center; }
+      .mermaid svg { display: block; width: max-content; min-width: 100%; max-width: none; height: auto; margin: 0 auto; }
+      .mermaid-render-failed { color: var(--muted); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; text-align: left; white-space: pre; }
       .docs-table-wrap { overflow-x: auto; margin: 1.25rem 0; border: 1px solid var(--border); border-radius: 8px; }
       .docs-table { width: 100%; min-width: 32rem; border-collapse: collapse; }
       .docs-table th, .docs-table td { padding: 0.72rem 0.88rem; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
@@ -318,6 +328,7 @@ function layout({ title, body, breadcrumb, sidebar }) {
       }
     </style>
     <script src="/assets/theme.js"></script>
+    ${hasMermaid ? '<script defer src="/assets/mermaid.min.js"></script>\n    <script defer src="/assets/mermaid-init.js"></script>' : ""}
     <title>${escapeHtml(title)} · RustScript Documentation</title>
   </head>
   <body>
@@ -347,10 +358,17 @@ const pages = await Promise.all(files.map(async (file) => {
   const breadcrumb = parts.length
     ? ` / ${parts.map((part, index) => index === parts.length - 1 ? escapeHtml(part.replaceAll("-", " ")) : `<a href="/docs/${parts.slice(0, index + 1).join("/")}/">${escapeHtml(part.replaceAll("-", " "))}</a>`).join(" / ")}`
     : "";
-  return { file, markdown, title, parts, href, breadcrumb };
+  return { file, markdown, hasMermaid: /```mermaid\s*$/m.test(markdown), title, parts, href, breadcrumb };
 }));
 
 await rm(outputRoot, { recursive: true, force: true });
+if (pages.some((page) => page.hasMermaid)) {
+  await mkdir(assetRoot, { recursive: true });
+  await Promise.all([
+    copyFile(mermaidBundle, path.join(assetRoot, "mermaid.min.js")),
+    copyFile(mermaidInit, path.join(assetRoot, "mermaid-init.js")),
+  ]);
+}
 for (const page of pages) {
   const outDir = path.join(outputRoot, ...page.parts);
   await mkdir(outDir, { recursive: true });
@@ -358,6 +376,7 @@ for (const page of pages) {
     title: page.title,
     breadcrumb: page.breadcrumb,
     body: renderPageMarkdown(page.markdown, page.title),
+    hasMermaid: page.hasMermaid,
     sidebar: documentationSidebar(pages, page.href),
   }));
 }
