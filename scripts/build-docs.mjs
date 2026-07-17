@@ -296,9 +296,15 @@ function layout({ title, body, breadcrumb, sidebar, hasMermaid }) {
       .doc-shell.docs-page p { max-width: 72ch; }
       .docs-page .doc-breadcrumb { margin-bottom: 1.65rem; font-size: 0.82rem; }
       .doc-shell.docs-page pre { border-radius: 8px; box-shadow: none; }
-      .mermaid { overflow-x: auto; margin: 1.5rem 0; padding: 1rem; border: 1px solid var(--border); border-radius: 8px; background: var(--surface-strong); text-align: center; }
-      .mermaid svg { display: block; width: max-content; min-width: 100%; max-width: none; height: auto; margin: 0 auto; }
-      .mermaid-render-failed { color: var(--muted); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; text-align: left; white-space: pre; }
+      .mermaid { margin: 1.5rem 0; border: 1px solid var(--border); border-radius: 8px; background: var(--surface-strong); }
+      .mermaid-controls { display: flex; align-items: center; gap: 0.4rem; padding: 0.55rem 0.65rem; border-bottom: 1px solid var(--border); }
+      .mermaid-controls button { min-width: 2rem; padding: 0.28rem 0.5rem; border: 1px solid var(--border); border-radius: 5px; background: transparent; color: var(--ink); font: inherit; font-size: 0.78rem; cursor: pointer; }
+      .mermaid-controls button:hover { background: var(--card-hover); }
+      .mermaid-controls output { min-width: 3.4rem; color: var(--muted); font-size: 0.78rem; font-variant-numeric: tabular-nums; text-align: center; }
+      .mermaid-viewport { min-height: 20rem; overflow: hidden; padding: 1rem; cursor: grab; touch-action: none; }
+      .mermaid-viewport.is-panning { cursor: grabbing; user-select: none; }
+      .mermaid-viewport svg { display: block; width: max-content; min-width: 100%; max-width: none; height: auto; margin: 0; will-change: transform; }
+      .mermaid-render-failed { margin: 1.5rem 0; padding: 1rem; border: 1px solid var(--border); border-radius: 8px; color: var(--muted); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; text-align: left; white-space: pre; }
       .docs-table-wrap { overflow-x: auto; margin: 1.25rem 0; border: 1px solid var(--border); border-radius: 8px; }
       .docs-table { width: 100%; min-width: 32rem; border-collapse: collapse; }
       .docs-table th, .docs-table td { padding: 0.72rem 0.88rem; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
