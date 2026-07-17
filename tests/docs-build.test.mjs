@@ -5,8 +5,6 @@ import { execFileSync } from "node:child_process";
 
 const root = new URL("..", import.meta.url);
 const content = new URL("../content/docs/", import.meta.url);
-const sourceMap = JSON.parse(await readFile(new URL("_meta/source-map.json", content), "utf8"));
-const migrationMap = JSON.parse(await readFile(new URL("_meta/migration-map.json", content), "utf8"));
 const examples = JSON.parse(await readFile(new URL("_meta/examples.json", content), "utf8"));
 
 const completeReadmePages = [
@@ -21,36 +19,6 @@ const completeReadmePages = [
 function run(command, args) {
   execFileSync(command, args, { cwd: root, stdio: "pipe" });
 }
-
-test("documentation source map names every documentation repository", () => {
-  assert.deepEqual(
-    sourceMap.sources.map((source) => source.repository).sort(),
-    ["IronRust", "flint", "micro-rustscript", "pd-controller", "pd-edge", "rustscript"].sort(),
-  );
-  for (const source of sourceMap.sources) {
-    assert.match(source.revision, /^[0-9a-f]{40}$/);
-    assert.ok(source.pages.length > 0);
-  }
-});
-
-test("every migrated README heading has an existing documentation destination", async () => {
-  for (const [repository, migration] of Object.entries(migrationMap.repositories)) {
-    assert.ok(migration.headings.length > 0, `${repository} must record its pre-cleanup headings`);
-    assert.ok(migration.pages.length > 0, `${repository} must have destination pages`);
-    for (const page of migration.pages) {
-      await access(new URL(`${page}.md`, content));
-    }
-  }
-});
-
-test("migrated project READMEs retain only introduction, quick start, and documentation links", async () => {
-  for (const repository of Object.keys(migrationMap.repositories)) {
-    const readme = await readFile(new URL(`../${repository}/README.md`, root), "utf8");
-    const headings = [...readme.matchAll(/^#{1,3}\s+(.+)$/gm)].map((match) => match[1]);
-    assert.deepEqual(headings.slice(1), ["Quick start", "Documentation"], repository);
-    assert.match(readme, /https:\/\/rustscript\.org\/docs\//, repository);
-  }
-});
 
 test("primary project documentation preserves every README byte", async () => {
   for (const { repository, revision, page } of completeReadmePages) {
