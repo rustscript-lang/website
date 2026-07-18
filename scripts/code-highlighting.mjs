@@ -38,7 +38,7 @@ export function isTomlFence(language) {
 }
 
 export function highlightRustScript(code) {
-  return highlight(code, /(\/\/.*)|("(?:\\.|[^"\\])*")|(\b\d(?:[\d_]*\d)?\b)|(\b(?:fn|pub|let|mut|if|else|match|for|while|use|struct|return|true|false|None|Some|=>)\b)|(\b(?:int|string|bool|float|bytes|map|array)\b)|(\b[A-Z][A-Za-z0-9_]*\b)|(\b[A-Za-z_][A-Za-z0-9_]*(?=\s*(?:<|::\s*<)?\())/g);
+  return highlight(code, /(\/\/.*|\/\*[\s\S]*?\*\/)|(b?"(?:\\.|[^"\\])*"|b?'(?:\\.|[^'\\])*')|(\b(?:0[xX][0-9A-Fa-f]+|\d+(?:\.\d+)?)\b)|(=>|\b(?:as|break|continue|else|false|fn|for|if|in|let|match|mut|null|pub|self|Some|None|struct|super|true|use|while)\b)|(\b(?:array|bool|bytes|float|int|map|number|string|unknown)\b)|(\b[A-Z][A-Za-z0-9_]*\b)|(\b[A-Za-z_][A-Za-z0-9_]*(?=\s*(?:<|::\s*<)?\())/g);
 }
 
 export function highlightRust(code) {

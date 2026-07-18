@@ -234,6 +234,77 @@ test("RustScript project documentation is split by task and implementation area"
   window.close();
 });
 
+test("Syntax Cheatsheet is split into complete highlighted RSS topic pages", async () => {
+  run("node", ["scripts/build-docs.mjs"]);
+  const topics = [
+    ["primitive-types", "Primitive Types and Literals"],
+    ["type-inference", "Type Inference and Annotations"],
+    ["bindings-and-ownership", "Bindings, Mutability, and Ownership"],
+    ["collections-and-structs", "Collections, Structs, and Optional Values"],
+    ["expressions-and-operators", "Expressions and Operators"],
+    ["control-flow", "Control Flow and Pattern Matching"],
+    ["functions-and-generics", "Functions, Generics, and Recursion"],
+    ["callables-and-closures", "Callables and Closures"],
+    ["modules-and-imports", "Modules, Imports, and Host Calls"],
+    ["lexical-structure", "Lexical Structure"],
+  ];
+  const rendered = [];
+  const renderedText = [];
+  for (const [slug, title] of topics) {
+    const html = await readFile(new URL(`../public/docs/reference/rss/${slug}/index.html`, import.meta.url), "utf8");
+    const window = new Window();
+    window.document.write(html);
+    const article = window.document.querySelector("article");
+    assert.equal(article.querySelector("h1")?.textContent, title);
+    const sections = [...article.querySelectorAll("h2")];
+    assert.ok(sections.length > 0, `${slug} must contain syntax sections`);
+    for (const section of sections) {
+      let cursor = section.nextElementSibling;
+      let example = null;
+      while (cursor && cursor.tagName !== "H2") {
+        example ||= cursor.matches("pre")
+          ? cursor.querySelector("code.language-rss")
+          : cursor.querySelector?.("code.language-rss");
+        cursor = cursor.nextElementSibling;
+      }
+      assert.ok(example, `${slug}#${section.id} must contain an RSS example`);
+      assert.ok(example.querySelector('[class^="tok-"]'), `${slug}#${section.id} must be syntax highlighted`);
+    }
+    rendered.push(html);
+    renderedText.push(article.textContent);
+    window.close();
+  }
+
+  const combined = rendered.join("\n");
+  const combinedText = renderedText.join("\n");
+  assert.doesNotMatch(combinedText, /under active development|still under development|remain under active development/i);
+  assert.match(combinedText, /fn\(int\) -> int/);
+  assert.match(combinedText, /let int_identity: fn\(int\) -> int = identity/);
+  assert.match(combinedText, /for \(key: string, value: int\) in &values/);
+  assert.match(combinedText, /Some\(value\)/);
+  assert.match(combinedText, /\.copy\(\)/);
+  assert.ok(combined.includes("language-rss"));
+  const lexicalHtml = rendered.at(-1);
+  assert.match(lexicalHtml, /<span class="tok-comment">\/\*[\s\S]*?\*\/<\/span>/);
+  assert.match(lexicalHtml, /<span class="tok-str">'RustScript'<\/span>/);
+  assert.match(lexicalHtml, /<span class="tok-str">b&quot;RSS\\x00&quot;<\/span>/);
+  assert.match(lexicalHtml, /<span class="tok-num">0x2A<\/span>/);
+
+  const overview = await readFile(new URL("../public/docs/reference/rss/index.html", import.meta.url), "utf8");
+  const window = new Window();
+  window.document.write(overview);
+  const syntaxLink = [...window.document.querySelectorAll(".docs-nav-item a")]
+    .find((link) => link.textContent === "Syntax Cheatsheet");
+  const syntaxBranch = syntaxLink.closest("details.docs-nav-branch");
+  const children = [...syntaxBranch.querySelector(":scope > .docs-nav-children").children]
+    .map((item) => item.firstElementChild.textContent);
+  assert.deepEqual(children, [...topics.map(([, title]) => title), "Builtins", "Stdlibs"]);
+  for (const [slug, title] of topics) {
+    assert.match(overview, new RegExp(`href="\\./${slug}/">${title}<\\/a>`));
+  }
+  window.close();
+});
+
 test("API reference covers every catalog entry and renders nested module navigation", async () => {
   run("node", ["scripts/generate-api-reference.mjs"]);
   const catalog = JSON.parse(await readFile(new URL("_meta/runtime-api.json", content), "utf8"));
@@ -265,8 +336,8 @@ test("API reference covers every catalog entry and renders nested module navigat
   const syntaxBranch = syntaxLink.closest("details.docs-nav-branch");
   const syntaxChildren = [...syntaxBranch.children].find((element) => element.classList.contains("docs-nav-children"));
   const sectionItems = [...syntaxChildren.children];
-  assert.deepEqual(sectionItems.map((item) => item.firstElementChild.textContent), ["Builtins", "Stdlibs"]);
-  const builtinsChildren = [...sectionItems[0].children].find((element) => element.classList.contains("docs-nav-children"));
+  assert.deepEqual(sectionItems.slice(-2).map((item) => item.firstElementChild.textContent), ["Builtins", "Stdlibs"]);
+  const builtinsChildren = [...sectionItems.at(-2).children].find((element) => element.classList.contains("docs-nav-children"));
   assert.equal(builtinsChildren.firstElementChild.firstElementChild.textContent, "Global functions");
   assert.equal(builtinsChildren.firstElementChild.firstElementChild.getAttribute("aria-current"), "page");
   window.close();
@@ -345,6 +416,16 @@ test("documentation generator emits the main routes", async () => {
     "docs/index.html",
     "docs/learn/getting-started/index.html",
     "docs/reference/rss/index.html",
+    "docs/reference/rss/primitive-types/index.html",
+    "docs/reference/rss/type-inference/index.html",
+    "docs/reference/rss/bindings-and-ownership/index.html",
+    "docs/reference/rss/collections-and-structs/index.html",
+    "docs/reference/rss/expressions-and-operators/index.html",
+    "docs/reference/rss/control-flow/index.html",
+    "docs/reference/rss/functions-and-generics/index.html",
+    "docs/reference/rss/callables-and-closures/index.html",
+    "docs/reference/rss/modules-and-imports/index.html",
+    "docs/reference/rss/lexical-structure/index.html",
     "docs/reference/pd-edge/index.html",
     "docs/reference/pd-edge/operations/index.html",
     "docs/reference/pd-edge/full-dag/index.html",
@@ -396,8 +477,10 @@ test("documentation generator emits the main routes", async () => {
   assert.match(rssHtml, /\.docs-nav-branch > summary::before \{[^}]*position: absolute;[^}]*left: 0\.45rem;/);
   assert.match(rssHtml, /\.docs-nav-children \{[^}]*margin: 0\.05rem 0 0\.2rem 0\.65rem;[^}]*padding-left: 0\.25rem;/);
   assert.doesNotMatch(rssHtml, />[^<]*reference<\/h1>/i);
-  assert.match(rssHtml, /<table class="docs-table">/);
-  assert.match(rssHtml, /<span class="tok-kw">use<\/span>/);
+  const primitiveHtml = await readFile(new URL("../public/docs/reference/rss/primitive-types/index.html", import.meta.url), "utf8");
+  const modulesHtml = await readFile(new URL("../public/docs/reference/rss/modules-and-imports/index.html", import.meta.url), "utf8");
+  assert.match(primitiveHtml, /<table class="docs-table">/);
+  assert.match(modulesHtml, /<span class="tok-kw">use<\/span>/);
   assert.doesNotMatch(rssHtml, /<p>\| Form \| Meaning \|/);
   assert.doesNotMatch(rssHtml, /Source:|Documentation sources|revision [0-9a-f]{40}/);
   await assert.rejects(access(new URL("../public/docs/reference/function-values/index.html", import.meta.url)));

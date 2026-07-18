@@ -21,11 +21,11 @@
     {
       "page": "reference/rss",
       "repository": "rustscript",
-      "revision": "9a4509b162fe4500fe91180f3e2ea9d0230df304",
+      "revision": "a2b9ff4c21c3a34986180b9e44bae5000ae351ad",
       "path": "tests/compiler/compiler_rustscript_tests.rs",
-      "lines": "2255-2268, 2280-2284, 2316-2324, 2335-2350",
-      "verification": "cargo test --test compiler_tests compiler_rustscript_tests::<name> -- --exact",
-      "result": "passed for generic values, returned functions, escaping closures, and closure aliasing"
+      "lines": "158-3752",
+      "verification": "CARGO_TARGET_DIR=/tmp/rss-syntax-check/target CARGO_BUILD_JOBS=2 cargo test --test compiler_tests",
+      "result": "passed: 155 compiler tests; 112 valid Syntax Cheatsheet examples compiled; 2 rejection examples failed as documented"
     },
     {
       "page": "learn/runtimes",
