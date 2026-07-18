@@ -308,14 +308,16 @@ function layout({ title, body, breadcrumb, sidebar, hasMermaid }) {
       .docs-sidebar .docs-nav-overview { margin-bottom: 0.3rem; color: var(--ink); font-weight: 700; }
       .docs-nav-section > summary, .docs-nav-branch > summary { list-style: none; cursor: pointer; }
       .docs-nav-section > summary::-webkit-details-marker, .docs-nav-branch > summary::-webkit-details-marker { display: none; }
-      .docs-nav-section > summary { display: flex; align-items: center; gap: 0.4rem; padding: 0.42rem 0.62rem; color: var(--ink); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+      .docs-nav-section > summary { display: flex; align-items: center; gap: 0.4rem; padding: 0.42rem 0.62rem 0.42rem 0.25rem; color: var(--ink); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
       .docs-nav-section > summary::before, .docs-nav-branch > summary::before { content: ""; width: 0; height: 0; flex: 0 0 auto; border-top: 0.25rem solid transparent; border-bottom: 0.25rem solid transparent; border-left: 0.35rem solid currentColor; transition: transform 120ms ease; }
+      .docs-nav-branch > summary::before { position: absolute; left: 0.45rem; }
       .docs-nav-section[open] > summary::before, .docs-nav-branch[open] > summary::before { transform: rotate(90deg); }
       .docs-nav-section-items { display: grid; gap: 0.12rem; padding-bottom: 0.35rem; }
       .docs-nav-item { display: grid; gap: 0.12rem; }
-      .docs-nav-branch > summary { display: flex; align-items: center; gap: 0.4rem; color: var(--muted); }
-      .docs-nav-branch > summary > a { min-width: 0; flex: 1; }
-      .docs-nav-children { display: grid; gap: 0.08rem; margin: 0.05rem 0 0.2rem 2rem; padding-left: 0.5rem; border-left: 1px solid var(--border); }
+      .docs-nav-branch > summary { position: relative; display: flex; align-items: center; color: var(--muted); }
+      .docs-nav-item > a, .docs-nav-branch > summary > a { min-width: 0; padding-left: 1.35rem; }
+      .docs-nav-branch > summary > a { flex: 1; }
+      .docs-nav-children { display: grid; gap: 0.08rem; margin: 0.05rem 0 0.2rem 0.65rem; padding-left: 0.25rem; border-left: 1px solid var(--border); }
       .docs-nav-children a { font-size: 0.8rem; }
       .docs-page { min-width: 0; }
       .doc-shell.docs-page { max-width: none; border: 0; border-radius: 0; background: transparent; box-shadow: none; padding: 0; }
