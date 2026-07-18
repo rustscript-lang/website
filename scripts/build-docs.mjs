@@ -279,8 +279,7 @@ function documentationSidebar(pages, currentHref) {
   const groups = navigationGroups.map((group) => {
     const groupPages = sortPages(rootPages.filter(group.include));
     if (groupPages.length === 0) return "";
-    const open = groupPages.some(containsCurrent) ? " open" : "";
-    return `<details class="docs-nav-section"${open}><summary>${group.label}</summary><div class="docs-nav-section-items">${groupPages.map(renderItem).join("")}</div></details>`;
+    return `<details class="docs-nav-section" open><summary>${group.label}</summary><div class="docs-nav-section-items">${groupPages.map(renderItem).join("")}</div></details>`;
   }).join("");
   const overviewLink = overview ? `<a class="docs-nav-overview" href="${overview.href}"${overview.href === currentHref ? ' aria-current="page"' : ""}>${escapeHtml(overview.title)}</a>` : "";
   return `<aside class="docs-sidebar"><details class="docs-sidebar-disclosure" open><summary>Documentation navigation</summary><nav aria-label="Documentation navigation">${overviewLink}${groups}</nav></details></aside>`;

@@ -78,32 +78,28 @@ test("documentation examples are tracked source files with recorded successful v
   }
 });
 
-test("documentation sidebar expands only the current route path", async () => {
+test("documentation sidebar expands every top-level group and only the current branch path", async () => {
   run("node", ["scripts/build-blog.mjs"]);
   run("node", ["scripts/build-docs.mjs"]);
 
   const cases = [
     {
       route: "../public/docs/index.html",
-      openGroup: null,
       openBranches: [],
       active: "RustScript Documentation",
     },
     {
       route: "../public/docs/learn/embed-pd-vm/index.html",
-      openGroup: "Getting Started",
       openBranches: [],
       active: "Use in Rust projects",
     },
     {
       route: "../public/docs/reference/rss/builtins/global/index.html",
-      openGroup: "Reference",
       openBranches: ["Syntax Cheatsheet", "Builtins"],
       active: "Global functions",
     },
     {
       route: "../public/docs/reference/ironrust/internals/index.html",
-      openGroup: "Ecosystem",
       openBranches: ["IronRust"],
       active: "Internals",
     },
@@ -120,7 +116,7 @@ test("documentation sidebar expands only the current route path", async () => {
     ]);
     assert.deepEqual(
       groups.filter((group) => group.hasAttribute("open")).map((group) => group.firstElementChild.textContent.trim()),
-      expected.openGroup ? [expected.openGroup] : [],
+      ["Getting Started", "Reference", "Ecosystem", "Contribute", "About"],
     );
     assert.deepEqual(
       [...window.document.querySelectorAll("details.docs-nav-branch[open] > summary > a")]
@@ -328,9 +324,9 @@ test("documentation generator emits the main routes", async () => {
   assert.match(rssHtml, /aria-label="Documentation navigation"/);
   assert.match(rssHtml, /href="\/docs\/reference\/rss\/" aria-current="page">Syntax Cheatsheet<\/a>/);
   assert.match(rssHtml, /<h1 id="syntax-cheatsheet">Syntax Cheatsheet<\/h1>/);
-  assert.match(rssHtml, /<details class="docs-nav-section"><summary>Getting Started<\/summary>/);
+  assert.match(rssHtml, /<details class="docs-nav-section" open><summary>Getting Started<\/summary>/);
   assert.doesNotMatch(rssHtml, /<summary>Learn<\/summary>/);
-  assert.match(rssHtml, /<details class="docs-nav-section"><summary>Ecosystem<\/summary>/);
+  assert.match(rssHtml, /<details class="docs-nav-section" open><summary>Ecosystem<\/summary>/);
   assert.match(rssHtml, /<details class="docs-nav-item docs-nav-branch"><summary><a href="\/docs\/reference\/pd-edge\/">pd-edge<\/a><\/summary><div class="docs-nav-children">[\s\S]*href="\/docs\/reference\/pd-edge\/full-dag\/">Full DAG Graphs<\/a>/);
   assert.match(rssHtml, /<details class="docs-nav-item docs-nav-branch"><summary><a href="\/docs\/reference\/rustscript\/">RustScript<\/a><\/summary><div class="docs-nav-children">[\s\S]*href="\/docs\/reference\/rustscript\/development\/">Development and tooling<\/a>/);
   assert.match(rssHtml, /\.docs-nav-section > summary \{[^}]*padding: 0\.42rem 0\.62rem 0\.42rem 0\.25rem;/);
