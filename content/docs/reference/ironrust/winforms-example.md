@@ -30,7 +30,7 @@ dotnet run --project PdVm.Runner -- run `
   --profile winforms
 ```
 
-The process remains active until the RustScript event loop handles the close action.
+The Runner executes the top-level RustScript setup, then keeps the process active with the main form's WinForms message loop until the form closes.
 
 ## Keep the compiled assembly
 
@@ -81,7 +81,7 @@ CLR objects cross the RustScript boundary as integer handles. Strings, booleans,
 
 Overloaded members receive generated suffixes such as `String`, `Bool`, or `Array`. Use the exact name accepted by the generated module; the example demonstrates names selected from the current .NET metadata, including `NewToolStripMenuItemString`.
 
-## Event-loop methods
+## Callable event handlers
 
 The example imports the IronRust adapter as `Ui`:
 
@@ -91,38 +91,37 @@ use System::Windows::EventLoop as Ui;
 
 | Method | What it does |
 | --- | --- |
-| `Ui::Show(form)` | Shows the form on IronRust's WinForms dispatcher thread. |
-| `Ui::BindClick(form, control, action)` | Subscribes to `Click` and queues the supplied action string. |
-| `Ui::BindDialog(form, control, dialog, action)` | Uses the control's click event to queue an action. The RustScript handler decides when to call `ShowDialog`. |
-| `Ui::BindClosing(form, action)` | Intercepts `FormClosing`, cancels that close attempt, and queues the action until RustScript calls `Ui::Close`. |
-| `Ui::Wait(form)` | Waits on the VM execution thread until an action is queued. The UI thread remains available to process Windows messages. |
-| `Ui::WaitTimeout(form, milliseconds)` | Returns a queued action, or an empty string after the timeout. |
+| `Ui::Show(form)` | Registers the main form. After top-level RSS setup halts, the Runner enters `Application.Run(form)` on its STA thread. |
+| `Ui::BindClick(form, control, callable)` | Subscribes to `Click` and posts a zero-argument RSS callable. |
+| `Ui::BindDialog(form, control, dialog, callable)` | Convenience click binding for a zero-argument RSS callable; the handler can call `ShowDialog`. |
+| `Ui::BindShown(form, callable)` | Posts a zero-argument RSS callable when the main form is shown. |
+| `Ui::BindClosing(form, callable)` | Cancels the close attempt and posts a zero-argument RSS callable until that handler calls `Ui::Close`. |
+| `Ui::BindMouseDown/Up/DoubleClick/Leave(form, control, callable)` | Posts an RSS callable with a map containing pointer-event data. |
+| `Ui::BindTimer(form, milliseconds, callable)` | Starts a WinForms timer and posts a zero-argument RSS callable on each tick. |
 | `Ui::ShowDialog(form, dialog)` | Calls `ShowDialog(IWin32Window)` with the form as owner and returns the dialog result name. |
-| `Ui::Close(form)` | Allows closing, then calls `Close` on the dispatcher thread. |
-| `Ui::BindPointer(form, control, prefix)` | Queues `<prefix>_down`, `_up`, `_double`, and `_leave` actions. |
-| `Ui::GetPointerButton/X/Y/Clicks(form)` | Reads the pointer snapshot attached to the most recently dequeued pointer event. |
+| `Ui::Close(form)` | Permits the pending close and closes the form. |
 
-The application's behavior remains in RustScript:
+The checked-in Notepad example defines ordinary RSS functions, then binds closures directly to CLR events:
 
 ```rustscript
-Ui::BindDialog(form, open_item, open_dialog, "open");
-Ui::BindClick(form, wrap_item, "wrap");
-Ui::BindClosing(form, "close");
-Ui::Show(form);
-
-while true {
-    let action = Ui::Wait(form);
-    if action == "open" {
-        if Ui::ShowDialog(form, open_dialog) == "OK" {
-            let path = OpenFileDialog::GetOpenFileDialogFileName(open_dialog);
-            RichTextBox::SetRichTextBoxText(editor, File::ReadAllText(path));
-        }
+fn on_open() -> null {
+    if Ui::ShowDialog(form, open_dialog) == "OK" {
+        let current_path = OpenFileDialog::GetOpenFileDialogFileName(open_dialog);
+        SaveFileDialog::SetSaveFileDialogFileName(save_dialog, current_path.copy());
+        RichTextBox::SetRichTextBoxText(editor, File::ReadAllText(current_path.copy()));
     }
-    if action == "close" || action == "__closed" {
-        Ui::Close(form);
-        break;
-    }
+    null
 }
+
+fn on_close() -> null {
+    Ui::Close(form);
+    null
+}
+
+Ui::BindClick(form, open_item, || on_open());
+Ui::BindClick(form, wrap_item, || on_wrap());
+Ui::BindClosing(form, || on_close());
+Ui::Show(form);
 ```
 
-`BindDialog` does not display a dialog itself. It queues the action, then the RustScript branch opens the dialog and handles its result.
+The CLR event adapter returns immediately after posting the callback. IronRust serializes callbacks through the callable program and schedules each handler through the main form's synchronization context, so UI operations execute on the owning STA thread. The application no longer needs a polling loop: each click, close request, pointer event, or timer tick invokes its bound RSS handler directly.

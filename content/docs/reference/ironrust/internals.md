@@ -1,6 +1,6 @@
 <!-- docs-title: Internals -->
 
-IronRust compiles RustScript bytecode into a CLR assembly and executes a generated `IPdVmProgram`. The WinForms path adds metadata-derived CLR bindings, object handles, a dedicated STA dispatcher, and an event queue.
+IronRust compiles RustScript bytecode into a CLR assembly and executes a generated `IPdVmProgram`. The WinForms path adds metadata-derived CLR bindings, object handles, callable RSS functions, and a main-form application session on the Runner's STA thread.
 
 ## Components
 
@@ -12,12 +12,14 @@ IronRust compiles RustScript bytecode into a CLR assembly and executes a generat
 | `PdVm.Compiler.PdVmVmbcReader` | Decodes VMBC into `PdVmProgramModel`. |
 | `PdVm.Compiler.PdVmStackAnalyzer` | Computes reachable operand-stack depths before IL emission. |
 | `PdVm.Compiler.PdVmClrCompiler` | Emits and saves the generated CLR program assembly. |
-| `PdVm.Runtime.PdVmProgramBase` | Stores resumable program state and implements shared host-call behavior. |
+| `PdVm.Runtime.PdVmProgramBase` | Stores resumable program state, real call frames, callable values, and the serialized callback queue. |
+| `PdVm.Runtime.IPdVmCallableProgram` | Exposes exported and runtime callable values, managed callback creation, reset, and shutdown. |
+| `PdVm.Runtime.PdVmScriptCallback` | Converts managed event arguments, posts RSS callable invocations, and optionally schedules them on a synchronization context. |
 | `PdVm.Runtime.PdVmAssemblyLoader` | Loads the generated assembly and creates its concrete `IPdVmProgram`. |
 | `PdVm.Runtime.PdVmExecution` | Drives `RunStep`, instruction budgets, yield, and asynchronous host completion. |
 | `PdVm.Runtime.PdVmDotNetHost` | Decodes exact CLR binding descriptors, converts values, and invokes CLR members. |
-| `PdVm.Runtime.PdVmWinFormsDispatcher` | Owns the WinForms STA thread and marshals UI work onto it. |
-| `PdVm.Runtime.PdVmWinFormsEventLoop` | Converts WinForms events into RustScript action strings and tracks form state. |
+| `PdVm.Runtime.PdVmWinFormsApplication` | Attaches a callable program to the current STA context, owns callback resources, registers the main form, and runs its message loop. |
+| `PdVm.Runtime.PdVmWinFormsEventLoop` | Binds WinForms events directly to RSS callable values and tracks close permission. |
 
 ## Source-to-assembly pipeline
 
@@ -99,9 +101,11 @@ The operand stack normally lives in generated CLR locals. IronRust materializes 
 
 For a saved DLL, `PdVmAssemblyLoader.LoadProgram` registers the output directory for dependency resolution, loads the assembly, finds a non-abstract parameterless type implementing `IPdVmProgram`, and creates it.
 
-For direct `.rss` execution, the Runner compiles to a temporary DLL and calls `PdVmAssemblyLoader.CreateProgram` on an in-memory assembly. Both paths then create the console host, register `PdVmDotNetHost.Call` as fallback host dispatch, and call `PdVmExecution.RunAsync`.
+For direct `.rss` execution, the Runner compiles to a temporary DLL and calls `PdVmAssemblyLoader.CreateProgram` on an in-memory assembly. Both paths then create the console host and register `PdVmDotNetHost.Call` as fallback host dispatch.
 
-`PdVmExecution.RunAsync` repeatedly calls `RunStep` until the program halts. A waiting status is completed through `IAsyncPdVmHost.WaitAsync`, then passed back with `ResumePending`. `--max-steps` supplies the total instruction limit, while checks inside generated CLR code enforce the remaining budget during a single `RunStep` call.
+For non-WinForms profiles, `PdVmExecution.RunAsync` repeatedly calls `RunStep` until the program halts. A waiting status is completed through `IAsyncPdVmHost.WaitAsync`, then passed back with `ResumePending`. `--max-steps` supplies the total instruction limit, while checks inside generated CLR code enforce the remaining budget during a single `RunStep` call.
+
+The WinForms profile requires a callable VMBC v10 program implementing `IPdVmCallableProgram`. The Runner sets a callback error observer, attaches `PdVmWinFormsApplication`, executes top-level RSS setup with `PdVmExecution.Run`, then calls `RunMessageLoop` when `Ui::Show` registered a main form.
 
 ## CLR values and object handles
 
@@ -116,19 +120,12 @@ A generated release call removes both mappings. If the CLR object implements `ID
 
 ## WinForms threading and events
 
-`PdVmWinFormsDispatcher` starts one background thread named `PdVm WinForms UI`, sets it to STA, initializes per-monitor-v2 DPI awareness and WinForms visual styles, creates a hidden `Form` as an invoker, and enters `Application.Run()`.
+`Program.Main` carries `[STAThread]` and initializes WinForms before entering the Runner. `PdVmWinFormsApplication.Attach` records the callable program and host in an application session bound to that thread. `Ui::Show(form)` registers one main form; after top-level RSS setup completes, `RunMessageLoop` invokes `Application.Run(form)` on the same thread.
 
-UI-bound exact calls are sent to that thread with `BeginInvoke`. `PdVmDotNetHost.RequiresWinFormsDispatcher` dispatches members from the `System.Windows.Forms` assembly and most `PdVmWinFormsEventLoop` methods there. `Wait` and `WaitTimeout` are deliberately excluded because they block while waiting for queued work.
+Every `BindClick`, `BindShown`, `BindClosing`, pointer, and timer binding accepts an RSS callable value. The application session converts that value into a `PdVmScriptCallback`, schedules it on a `ControlSynchronizationContext` backed by the form's `BeginInvoke`, and tracks both callback and event subscription for disposal.
 
-`PdVmWinFormsEventLoop` stores one `FormState` per form in a `ConditionalWeakTable`. Each state contains:
+The CLR event handler calls `Post` and returns without running RustScript inside the managed event stack. `PdVmProgramBase` serializes callback work, restores the callable's function or closure environment, executes it through the generated program, and reports asynchronous failures through `CallbackErrorObserver`.
 
-- `ConcurrentQueue<QueuedEvent>` for action strings and optional pointer snapshots
-- `AutoResetEvent` to wake `Wait` or `WaitTimeout`
-- the close-permission flag
-- the most recently dequeued pointer snapshot
+`BindClosing` installs a delegate matching the form's `FormClosing` event. Until an explicit close is allowed, the handler sets the event argument's `Cancel` property and posts the bound RSS callable. `Ui::Close` sets `AllowClose` and invokes the form's `Close` method from that callback.
 
-A click or pointer event runs on the UI thread, enqueues a small record, and signals the waiter. The RustScript VM waits on its execution thread, so the WinForms message loop remains available.
-
-`BindClosing` installs a delegate matching the form's `FormClosing` event. Before an explicit close is allowed, the handler sets the event argument's `Cancel` property and queues the configured action. `Close` sets `AllowClose`, then invokes the form's `Close` method on the dispatcher thread.
-
-This division keeps window creation and application behavior in `examples/dotnet-typed-winforms.rss`; the C# event adapter only provides thread marshalling, action delivery, dialog invocation, pointer snapshots, and close coordination.
+This division keeps window creation and application behavior in `examples/dotnet-typed-winforms.rss`; the C# layer supplies callable adaptation, UI-thread scheduling, dialog invocation, pointer payload conversion, timer subscriptions, and close coordination.

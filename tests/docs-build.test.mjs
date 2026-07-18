@@ -236,14 +236,18 @@ test("IronRust documents the checked-in WinForms example and its implementation 
     "examples/dotnet-typed-winforms.rss",
     "--profile winforms",
     "System::Windows::EventLoop",
-    "Ui::BindClick",
-    "Ui::BindDialog",
-    "Ui::BindClosing",
-    "Ui::Wait",
+    "fn on_open() -> null",
+    "fn on_close() -> null",
+    "Ui::BindClick(form, open_item, || on_open())",
+    "Ui::BindClosing(form, || on_close())",
+    "Ui::Show(form)",
     "Ui::ShowDialog",
     "Ui::Close",
   ]) {
     assert.ok(exampleText.includes(expected), `WinForms guide missing ${expected}`);
+  }
+  for (const retired of ["PdVmWinFormsDispatcher", "Ui::Wait(", "Ui::WaitTimeout(", "action string"]) {
+    assert.equal(exampleText.includes(retired), false, `WinForms guide still contains ${retired}`);
   }
   exampleWindow.close();
 
@@ -261,12 +265,17 @@ test("IronRust documents the checked-in WinForms example and its implementation 
     "PdVmAssemblyLoader",
     "PdVmExecution",
     "PdVmDotNetHost",
-    "PdVmWinFormsDispatcher",
+    "IPdVmCallableProgram",
+    "PdVmScriptCallback",
+    "PdVmWinFormsApplication",
     "PdVmWinFormsEventLoop",
-    "ConcurrentQueue",
-    "AutoResetEvent",
+    "ControlSynchronizationContext",
+    "RunMessageLoop",
   ]) {
     assert.ok(internalsText.includes(expected), `IronRust internals missing ${expected}`);
+  }
+  for (const retired of ["PdVmWinFormsDispatcher", "Ui::Wait", "Ui::WaitTimeout", "AutoResetEvent"]) {
+    assert.equal(internalsText.includes(retired), false, `IronRust internals still contains ${retired}`);
   }
 
   const ironRustLink = [...window.document.querySelectorAll(".docs-nav-item a")]

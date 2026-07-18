@@ -86,6 +86,28 @@ const examples = [
   ["blinky.rss", "Embedded", "https://github.com/rustscript-lang/micro-rustscript"],
 ];
 
+test("WinForms carousel uses direct RSS callable event handlers", () => {
+  const page = createCarouselPage();
+  const buttons = [...page.window.document.querySelectorAll(".example-dot")];
+
+  buttons[4].click();
+  page.flushTimeouts();
+  const code = page.window.document.getElementById("example-code").textContent;
+
+  for (const expected of [
+    "fn on_close() -> null",
+    "Ui::BindClosing(form, || on_close())",
+    "Ui::Show(form)",
+  ]) {
+    assert.ok(code.includes(expected), `WinForms carousel missing ${expected}`);
+  }
+  for (const retired of ["Ui::Ui", "Ui::Wait", "dispatcher"]) {
+    assert.equal(code.includes(retired), false, `WinForms carousel still contains ${retired}`);
+  }
+
+  page.window.close();
+});
+
 test("carousel renders each example with its exact hardened GitHub action", () => {
   const page = createCarouselPage();
   const { document } = page.window;
