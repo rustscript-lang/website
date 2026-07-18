@@ -1,0 +1,2050 @@
+{
+  "builtins": {
+    "title": "Builtins",
+    "description": "Functions supplied directly by the compiler and VM runtime.",
+    "modules": [
+      {
+        "slug": "global",
+        "title": "Global functions",
+        "qualified": "global",
+        "description": "Language-level builtins and default output functions available without an import.",
+        "import": null,
+        "wasm": true,
+        "functions": [
+          {
+            "name": "len",
+            "qualified": "len",
+            "description": "Return the length of a string, array, or map.",
+            "signatures": [
+              "fn len(text: string) -> int",
+              "fn len(items: array) -> int",
+              "fn len(items: bytes) -> int",
+              "fn len(entries: map) -> int"
+            ]
+          },
+          {
+            "name": "slice",
+            "qualified": "slice",
+            "description": "Slice a string from the given start and length.",
+            "signatures": [
+              "fn slice(text: string, start: int, length: int) -> string",
+              "fn slice(items: array, start: int, length: int) -> array",
+              "fn slice(items: bytes, start: int, length: int) -> bytes"
+            ]
+          },
+          {
+            "name": "concat",
+            "qualified": "concat",
+            "description": "Concatenate two strings.",
+            "signatures": [
+              "fn concat(left: string, right: string) -> string",
+              "fn concat(left: array, right: array) -> array",
+              "fn concat(left: bytes, right: bytes) -> bytes"
+            ]
+          },
+          {
+            "name": "array_new",
+            "qualified": "array_new",
+            "description": "Create an empty array.",
+            "signatures": [
+              "fn array_new() -> array"
+            ]
+          },
+          {
+            "name": "array_push",
+            "qualified": "array_push",
+            "description": "Append a value to an array and return the updated array.",
+            "signatures": [
+              "fn array_push(items: array, value: any) -> array"
+            ]
+          },
+          {
+            "name": "map_new",
+            "qualified": "map_new",
+            "description": "Create an empty map.",
+            "signatures": [
+              "fn map_new() -> map"
+            ]
+          },
+          {
+            "name": "get",
+            "qualified": "get",
+            "description": "Read a string entry.",
+            "signatures": [
+              "fn get(text: string, index: int) -> string",
+              "fn get(items: array, index: int) -> unknown",
+              "fn get(items: bytes, index: int) -> int",
+              "fn get(entries: map, key: any) -> unknown"
+            ]
+          },
+          {
+            "name": "has",
+            "qualified": "has",
+            "description": "Check whether an array contains a valid index.",
+            "signatures": [
+              "fn has(items: array, index: int) -> bool",
+              "fn has(items: bytes, index: int) -> bool",
+              "fn has(entries: map, key: any) -> bool"
+            ]
+          },
+          {
+            "name": "type",
+            "qualified": "type",
+            "description": "Return the runtime type name of a value.",
+            "signatures": [
+              "fn type(value: any) -> string"
+            ]
+          },
+          {
+            "name": "set",
+            "qualified": "set",
+            "description": "Update an array entry and return the updated array.",
+            "signatures": [
+              "fn set(items: array, index: int, value: any) -> array",
+              "fn set(entries: map, key: any, value: any) -> map"
+            ]
+          },
+          {
+            "name": "keys",
+            "qualified": "keys",
+            "description": "Return an array of container keys or indices.",
+            "signatures": [
+              "fn keys(items: array) -> array",
+              "fn keys(entries: map) -> array"
+            ]
+          },
+          {
+            "name": "count",
+            "qualified": "count",
+            "description": "Return the number of entries in an array or map.",
+            "signatures": [
+              "fn count(items: array) -> int",
+              "fn count(entries: map) -> int"
+            ]
+          },
+          {
+            "name": "assert",
+            "qualified": "assert",
+            "description": "Abort execution if the condition is false.",
+            "signatures": [
+              "fn assert(condition: bool) -> null"
+            ]
+          },
+          {
+            "name": "string_contains",
+            "qualified": "string_contains",
+            "description": "Return true when `needle` is found within `text`.",
+            "signatures": [
+              "fn string_contains(text: string, needle: string) -> bool"
+            ]
+          },
+          {
+            "name": "string_replace_literal",
+            "qualified": "string_replace_literal",
+            "description": "Replace non-overlapping literal `needle` matches in `text`.",
+            "signatures": [
+              "fn string_replace_literal(text: string, needle: string, replacement: string) -> string"
+            ]
+          },
+          {
+            "name": "string_lower_ascii",
+            "qualified": "string_lower_ascii",
+            "description": "Lower ASCII `A`-`Z` bytes in `text` while preserving UTF-8.",
+            "signatures": [
+              "fn string_lower_ascii(text: string) -> string"
+            ]
+          },
+          {
+            "name": "string_split_literal",
+            "qualified": "string_split_literal",
+            "description": "Split `text` on non-overlapping literal `delimiter` matches.",
+            "signatures": [
+              "fn string_split_literal(text: string, delimiter: string) -> array"
+            ]
+          },
+          {
+            "name": "print",
+            "qualified": "print",
+            "description": "Writes a value to the runtime print sink.",
+            "signatures": [
+              "fn print(value: any) -> any"
+            ]
+          },
+          {
+            "name": "println",
+            "qualified": "println",
+            "description": "Writes a value to the runtime print sink and appends a newline.",
+            "signatures": [
+              "fn println(value: any) -> any"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "bytes",
+        "title": "bytes",
+        "qualified": "bytes",
+        "description": "Binary bytes builtin namespace.",
+        "import": "use bytes;",
+        "wasm": true,
+        "functions": [
+          {
+            "name": "from_utf8",
+            "qualified": "bytes::from_utf8",
+            "description": "Encodes a string as UTF-8 bytes.",
+            "signatures": [
+              "fn from_utf8(text: string) -> bytes"
+            ]
+          },
+          {
+            "name": "to_utf8",
+            "qualified": "bytes::to_utf8",
+            "description": "Decodes UTF-8 bytes into a string.",
+            "signatures": [
+              "fn to_utf8(payload: bytes) -> string"
+            ]
+          },
+          {
+            "name": "to_utf8_lossy",
+            "qualified": "bytes::to_utf8_lossy",
+            "description": "Decodes bytes into a string using UTF-8 replacement semantics.",
+            "signatures": [
+              "fn to_utf8_lossy(payload: bytes) -> string"
+            ]
+          },
+          {
+            "name": "from_hex",
+            "qualified": "bytes::from_hex",
+            "description": "Decodes a hexadecimal string into bytes.",
+            "signatures": [
+              "fn from_hex(text: string) -> bytes"
+            ]
+          },
+          {
+            "name": "to_hex",
+            "qualified": "bytes::to_hex",
+            "description": "Encodes bytes as lowercase hexadecimal.",
+            "signatures": [
+              "fn to_hex(payload: bytes) -> string"
+            ]
+          },
+          {
+            "name": "from_base64",
+            "qualified": "bytes::from_base64",
+            "description": "Decodes a base64 string into bytes.",
+            "signatures": [
+              "fn from_base64(text: string) -> bytes"
+            ]
+          },
+          {
+            "name": "to_base64",
+            "qualified": "bytes::to_base64",
+            "description": "Encodes bytes as standard base64.",
+            "signatures": [
+              "fn to_base64(payload: bytes) -> string"
+            ]
+          },
+          {
+            "name": "from_array_u8",
+            "qualified": "bytes::from_array_u8",
+            "description": "Converts an array of ints in 0..=255 into bytes.",
+            "signatures": [
+              "fn from_array_u8(values: array) -> bytes"
+            ]
+          },
+          {
+            "name": "to_array_u8",
+            "qualified": "bytes::to_array_u8",
+            "description": "Converts bytes into an array of ints in 0..=255.",
+            "signatures": [
+              "fn to_array_u8(payload: bytes) -> array"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "io",
+        "title": "io",
+        "qualified": "io",
+        "description": "I/O builtin namespace.",
+        "import": "use io;",
+        "wasm": false,
+        "functions": [
+          {
+            "name": "open",
+            "qualified": "io::open",
+            "description": "Opens a file handle for runtime I/O.",
+            "signatures": [
+              "fn open(path: string, mode: string) -> int"
+            ]
+          },
+          {
+            "name": "popen",
+            "qualified": "io::popen",
+            "description": "Starts a child process and returns a process-backed handle.",
+            "signatures": [
+              "fn popen(command: string, mode: string) -> int"
+            ]
+          },
+          {
+            "name": "read_all",
+            "qualified": "io::read_all",
+            "description": "Reads all remaining text from an I/O handle.",
+            "signatures": [
+              "fn read_all(handle_id: int) -> string"
+            ]
+          },
+          {
+            "name": "read_line",
+            "qualified": "io::read_line",
+            "description": "Reads a single line of text from an I/O handle.",
+            "signatures": [
+              "fn read_line(handle_id: int) -> string"
+            ]
+          },
+          {
+            "name": "write",
+            "qualified": "io::write",
+            "description": "Writes text to an I/O handle.",
+            "signatures": [
+              "fn write(handle_id: int, text: string) -> int"
+            ]
+          },
+          {
+            "name": "flush",
+            "qualified": "io::flush",
+            "description": "Flushes buffered output for an I/O handle.",
+            "signatures": [
+              "fn flush(handle_id: int) -> bool"
+            ]
+          },
+          {
+            "name": "close",
+            "qualified": "io::close",
+            "description": "Closes an I/O handle.",
+            "signatures": [
+              "fn close(handle_id: int) -> bool"
+            ]
+          },
+          {
+            "name": "exists",
+            "qualified": "io::exists",
+            "description": "Returns whether a file system path exists.",
+            "signatures": [
+              "fn exists(path: string) -> bool"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "re",
+        "title": "re",
+        "qualified": "re",
+        "description": "Regex builtin namespace.",
+        "import": "use re;",
+        "wasm": true,
+        "functions": [
+          {
+            "name": "match",
+            "qualified": "re::match",
+            "description": "Returns whether a regular expression matches the input text.",
+            "signatures": [
+              "fn match(pattern: string, text: string) -> bool"
+            ]
+          },
+          {
+            "name": "find",
+            "qualified": "re::find",
+            "description": "Returns the first substring matched by a regular expression.",
+            "signatures": [
+              "fn find(pattern: string, text: string) -> string",
+              "null"
+            ]
+          },
+          {
+            "name": "replace",
+            "qualified": "re::replace",
+            "description": "Replaces all regular-expression matches in a string.",
+            "signatures": [
+              "fn replace(pattern: string, text: string, replacement: string) -> string"
+            ]
+          },
+          {
+            "name": "split",
+            "qualified": "re::split",
+            "description": "Splits a string on regular-expression matches.",
+            "signatures": [
+              "fn split(pattern: string, text: string) -> array"
+            ]
+          },
+          {
+            "name": "captures",
+            "qualified": "re::captures",
+            "description": "Returns the capture groups produced by the first regular-expression match.",
+            "signatures": [
+              "fn captures(pattern: string, text: string) -> array"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "json",
+        "title": "json",
+        "qualified": "json",
+        "description": "JSON builtin namespace.",
+        "import": "use json;",
+        "wasm": true,
+        "functions": [
+          {
+            "name": "encode",
+            "qualified": "json::encode",
+            "description": "Encodes a `Value` into a JSON string.",
+            "signatures": [
+              "fn encode(value: any) -> string"
+            ]
+          },
+          {
+            "name": "decode",
+            "qualified": "json::decode",
+            "description": "Decodes a JSON string into a `Value`.\nNote: This function enforces a strict unique-keys contract for JSON objects.\nIf the JSON string contains duplicate keys, it will return an error instead of letting the last key win.",
+            "signatures": [
+              "fn decode(text: string) -> unknown"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "jit",
+        "title": "jit",
+        "qualified": "jit",
+        "description": "JIT control builtin namespace.",
+        "import": "use jit;",
+        "wasm": true,
+        "functions": [
+          {
+            "name": "set_config",
+            "qualified": "jit::set_config",
+            "description": "Sets the JIT runtime configuration from a map.",
+            "signatures": [
+              "fn set_config(enabled: bool, hot_loop_threshold: int, max_trace_len: int) -> map"
+            ]
+          },
+          {
+            "name": "get_config",
+            "qualified": "jit::get_config",
+            "description": "Returns the current JIT runtime configuration as a map.",
+            "signatures": [
+              "fn get_config() -> map"
+            ]
+          },
+          {
+            "name": "set_enabled",
+            "qualified": "jit::set_enabled",
+            "description": "Enables or disables the JIT at runtime.",
+            "signatures": [
+              "fn set_enabled(enabled: bool) -> bool"
+            ]
+          },
+          {
+            "name": "get_enabled",
+            "qualified": "jit::get_enabled",
+            "description": "Returns whether the JIT is enabled at runtime.",
+            "signatures": [
+              "fn get_enabled() -> bool"
+            ]
+          },
+          {
+            "name": "set_hot_loop_threshold",
+            "qualified": "jit::set_hot_loop_threshold",
+            "description": "Sets the loop-hotness threshold used by the JIT.",
+            "signatures": [
+              "fn set_hot_loop_threshold(hot_loop_threshold: int) -> int"
+            ]
+          },
+          {
+            "name": "get_hot_loop_threshold",
+            "qualified": "jit::get_hot_loop_threshold",
+            "description": "Returns the loop-hotness threshold used by the JIT.",
+            "signatures": [
+              "fn get_hot_loop_threshold() -> int"
+            ]
+          },
+          {
+            "name": "set_max_trace_len",
+            "qualified": "jit::set_max_trace_len",
+            "description": "Sets the maximum trace length used by the JIT.",
+            "signatures": [
+              "fn set_max_trace_len(max_trace_len: int) -> int"
+            ]
+          },
+          {
+            "name": "get_max_trace_len",
+            "qualified": "jit::get_max_trace_len",
+            "description": "Returns the maximum trace length used by the JIT.",
+            "signatures": [
+              "fn get_max_trace_len() -> int"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "math",
+        "title": "math",
+        "qualified": "math",
+        "description": "Numeric math builtin namespace.",
+        "import": "use math;",
+        "wasm": true,
+        "functions": [
+          {
+            "name": "pi",
+            "qualified": "math::pi",
+            "description": "Returns the constant pi.",
+            "signatures": [
+              "fn pi() -> float"
+            ]
+          },
+          {
+            "name": "tau",
+            "qualified": "math::tau",
+            "description": "Returns the constant tau.",
+            "signatures": [
+              "fn tau() -> float"
+            ]
+          },
+          {
+            "name": "e",
+            "qualified": "math::e",
+            "description": "Returns Euler's number.",
+            "signatures": [
+              "fn e() -> float"
+            ]
+          },
+          {
+            "name": "epsilon",
+            "qualified": "math::epsilon",
+            "description": "Returns the machine epsilon for floating-point comparisons.",
+            "signatures": [
+              "fn epsilon() -> float"
+            ]
+          },
+          {
+            "name": "inf",
+            "qualified": "math::inf",
+            "description": "Returns positive infinity.",
+            "signatures": [
+              "fn inf() -> float"
+            ]
+          },
+          {
+            "name": "neg_inf",
+            "qualified": "math::neg_inf",
+            "description": "Returns negative infinity.",
+            "signatures": [
+              "fn neg_inf() -> float"
+            ]
+          },
+          {
+            "name": "nan",
+            "qualified": "math::nan",
+            "description": "Returns NaN.",
+            "signatures": [
+              "fn nan() -> float"
+            ]
+          },
+          {
+            "name": "abs",
+            "qualified": "math::abs",
+            "description": "Returns the absolute value of a number.",
+            "signatures": [
+              "fn abs(value: number) -> number"
+            ]
+          },
+          {
+            "name": "sqrt",
+            "qualified": "math::sqrt",
+            "description": "Returns the square root of a number.",
+            "signatures": [
+              "fn sqrt(value: number) -> float"
+            ]
+          },
+          {
+            "name": "cbrt",
+            "qualified": "math::cbrt",
+            "description": "Returns the cube root of a number.",
+            "signatures": [
+              "fn cbrt(value: number) -> float"
+            ]
+          },
+          {
+            "name": "exp",
+            "qualified": "math::exp",
+            "description": "Returns e raised to the given power.",
+            "signatures": [
+              "fn exp(value: number) -> float"
+            ]
+          },
+          {
+            "name": "exp2",
+            "qualified": "math::exp2",
+            "description": "Returns 2 raised to the given power.",
+            "signatures": [
+              "fn exp2(value: number) -> float"
+            ]
+          },
+          {
+            "name": "ln",
+            "qualified": "math::ln",
+            "description": "Returns the natural logarithm of a number.",
+            "signatures": [
+              "fn ln(value: number) -> float"
+            ]
+          },
+          {
+            "name": "ln_1p",
+            "qualified": "math::ln_1p",
+            "description": "Returns the natural logarithm of one plus a number.",
+            "signatures": [
+              "fn ln_1p(value: number) -> float"
+            ]
+          },
+          {
+            "name": "log2",
+            "qualified": "math::log2",
+            "description": "Returns the base-2 logarithm of a number.",
+            "signatures": [
+              "fn log2(value: number) -> float"
+            ]
+          },
+          {
+            "name": "log10",
+            "qualified": "math::log10",
+            "description": "Returns the base-10 logarithm of a number.",
+            "signatures": [
+              "fn log10(value: number) -> float"
+            ]
+          },
+          {
+            "name": "sin",
+            "qualified": "math::sin",
+            "description": "Returns the sine of an angle in radians.",
+            "signatures": [
+              "fn sin(value: number) -> float"
+            ]
+          },
+          {
+            "name": "cos",
+            "qualified": "math::cos",
+            "description": "Returns the cosine of an angle in radians.",
+            "signatures": [
+              "fn cos(value: number) -> float"
+            ]
+          },
+          {
+            "name": "tan",
+            "qualified": "math::tan",
+            "description": "Returns the tangent of an angle in radians.",
+            "signatures": [
+              "fn tan(value: number) -> float"
+            ]
+          },
+          {
+            "name": "asin",
+            "qualified": "math::asin",
+            "description": "Returns the arcsine of a number.",
+            "signatures": [
+              "fn asin(value: number) -> float"
+            ]
+          },
+          {
+            "name": "acos",
+            "qualified": "math::acos",
+            "description": "Returns the arccosine of a number.",
+            "signatures": [
+              "fn acos(value: number) -> float"
+            ]
+          },
+          {
+            "name": "atan",
+            "qualified": "math::atan",
+            "description": "Returns the arctangent of a number.",
+            "signatures": [
+              "fn atan(value: number) -> float"
+            ]
+          },
+          {
+            "name": "sinh",
+            "qualified": "math::sinh",
+            "description": "Returns the hyperbolic sine of a number.",
+            "signatures": [
+              "fn sinh(value: number) -> float"
+            ]
+          },
+          {
+            "name": "cosh",
+            "qualified": "math::cosh",
+            "description": "Returns the hyperbolic cosine of a number.",
+            "signatures": [
+              "fn cosh(value: number) -> float"
+            ]
+          },
+          {
+            "name": "tanh",
+            "qualified": "math::tanh",
+            "description": "Returns the hyperbolic tangent of a number.",
+            "signatures": [
+              "fn tanh(value: number) -> float"
+            ]
+          },
+          {
+            "name": "floor",
+            "qualified": "math::floor",
+            "description": "Rounds a number down to the nearest integer value.",
+            "signatures": [
+              "fn floor(value: number) -> number"
+            ]
+          },
+          {
+            "name": "ceil",
+            "qualified": "math::ceil",
+            "description": "Rounds a number up to the nearest integer value.",
+            "signatures": [
+              "fn ceil(value: number) -> number"
+            ]
+          },
+          {
+            "name": "round",
+            "qualified": "math::round",
+            "description": "Rounds a number to the nearest integer value.",
+            "signatures": [
+              "fn round(value: number) -> number"
+            ]
+          },
+          {
+            "name": "trunc",
+            "qualified": "math::trunc",
+            "description": "Truncates the fractional part of a number.",
+            "signatures": [
+              "fn trunc(value: number) -> number"
+            ]
+          },
+          {
+            "name": "fract",
+            "qualified": "math::fract",
+            "description": "Returns the fractional part of a number.",
+            "signatures": [
+              "fn fract(value: number) -> float"
+            ]
+          },
+          {
+            "name": "signum",
+            "qualified": "math::signum",
+            "description": "Returns the sign of a number.",
+            "signatures": [
+              "fn signum(value: number) -> number"
+            ]
+          },
+          {
+            "name": "to_degrees",
+            "qualified": "math::to_degrees",
+            "description": "Converts radians to degrees.",
+            "signatures": [
+              "fn to_degrees(value: number) -> float"
+            ]
+          },
+          {
+            "name": "to_radians",
+            "qualified": "math::to_radians",
+            "description": "Converts degrees to radians.",
+            "signatures": [
+              "fn to_radians(value: number) -> float"
+            ]
+          },
+          {
+            "name": "is_nan",
+            "qualified": "math::is_nan",
+            "description": "Returns whether a number is NaN.",
+            "signatures": [
+              "fn is_nan(value: number) -> bool"
+            ]
+          },
+          {
+            "name": "is_infinite",
+            "qualified": "math::is_infinite",
+            "description": "Returns whether a number is infinite.",
+            "signatures": [
+              "fn is_infinite(value: number) -> bool"
+            ]
+          },
+          {
+            "name": "is_finite",
+            "qualified": "math::is_finite",
+            "description": "Returns whether a number is finite.",
+            "signatures": [
+              "fn is_finite(value: number) -> bool"
+            ]
+          },
+          {
+            "name": "atan2",
+            "qualified": "math::atan2",
+            "description": "Returns the four-quadrant arctangent of two numbers.",
+            "signatures": [
+              "fn atan2(y: number, x: number) -> float"
+            ]
+          },
+          {
+            "name": "powf",
+            "qualified": "math::powf",
+            "description": "Raises a number to a floating-point power.",
+            "signatures": [
+              "fn powf(value: number, exponent: number) -> float"
+            ]
+          },
+          {
+            "name": "powi",
+            "qualified": "math::powi",
+            "description": "Raises a number to an integer power.",
+            "signatures": [
+              "fn powi(value: number, exponent: int) -> float"
+            ]
+          },
+          {
+            "name": "hypot",
+            "qualified": "math::hypot",
+            "description": "Returns the hypotenuse length for two numbers.",
+            "signatures": [
+              "fn hypot(left: number, right: number) -> float"
+            ]
+          },
+          {
+            "name": "log",
+            "qualified": "math::log",
+            "description": "Returns the logarithm of a number for the given base.",
+            "signatures": [
+              "fn log(value: number, base: number) -> float"
+            ]
+          },
+          {
+            "name": "min",
+            "qualified": "math::min",
+            "description": "Returns the smaller of two numbers.",
+            "signatures": [
+              "fn min(left: number, right: number) -> number"
+            ]
+          },
+          {
+            "name": "max",
+            "qualified": "math::max",
+            "description": "Returns the larger of two numbers.",
+            "signatures": [
+              "fn max(left: number, right: number) -> number"
+            ]
+          },
+          {
+            "name": "copysign",
+            "qualified": "math::copysign",
+            "description": "Returns the first number with the sign of the second number.",
+            "signatures": [
+              "fn copysign(value: number, sign: number) -> float"
+            ]
+          },
+          {
+            "name": "clamp",
+            "qualified": "math::clamp",
+            "description": "Clamps a number to an inclusive range.",
+            "signatures": [
+              "fn clamp(value: number, min: number, max: number) -> number"
+            ]
+          },
+          {
+            "name": "mul_add",
+            "qualified": "math::mul_add",
+            "description": "Computes a fused multiply-add operation.",
+            "signatures": [
+              "fn mul_add(left: number, right: number, addend: number) -> float"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "runtime",
+        "title": "runtime",
+        "qualified": "runtime",
+        "description": "Default controls for sleeping and terminating the current VM invocation.",
+        "import": null,
+        "wasm": true,
+        "functions": [
+          {
+            "name": "sleep",
+            "qualified": "runtime::sleep",
+            "description": "Sleeps for the requested milliseconds.",
+            "signatures": [
+              "fn sleep(ms: int) -> bool"
+            ]
+          },
+          {
+            "name": "exit",
+            "qualified": "runtime::exit",
+            "description": "Halts the current VM invocation immediately.",
+            "signatures": [
+              "fn exit() -> unknown"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "stdlibs": {
+    "title": "Stdlibs",
+    "description": "Pure RustScript modules shipped with the runtime.",
+    "modules": [
+      {
+        "slug": "bytes",
+        "title": "bytes",
+        "qualified": "stdlib::rss::bytes",
+        "description": "Byte-sequence slicing, comparison, searching, and integer encoding helpers.",
+        "import": "use stdlib::rss::bytes;",
+        "functions": [
+          {
+            "name": "slice",
+            "qualified": "slice",
+            "description": "Returns a byte slice.",
+            "signatures": [
+              "pub fn slice(buf: bytes, start: int, len: int) -> bytes"
+            ]
+          },
+          {
+            "name": "equal",
+            "qualified": "equal",
+            "description": "Returns whether two byte sequences are equal.",
+            "signatures": [
+              "pub fn equal(lhs: bytes, rhs: bytes) -> bool"
+            ]
+          },
+          {
+            "name": "starts_with",
+            "qualified": "starts_with",
+            "description": "Returns whether buf starts with prefix.",
+            "signatures": [
+              "pub fn starts_with(buf: bytes, prefix: bytes) -> bool"
+            ]
+          },
+          {
+            "name": "ends_with",
+            "qualified": "ends_with",
+            "description": "Returns whether buf ends with suffix.",
+            "signatures": [
+              "pub fn ends_with(buf: bytes, suffix: bytes) -> bool"
+            ]
+          },
+          {
+            "name": "index_of",
+            "qualified": "index_of",
+            "description": "Returns the first index of needle in buf, or -1 when it is absent.",
+            "signatures": [
+              "pub fn index_of(buf: bytes, needle: bytes) -> int"
+            ]
+          },
+          {
+            "name": "push_u8",
+            "qualified": "push_u8",
+            "description": "Appends a single u8 value to a byte sequence.",
+            "signatures": [
+              "pub fn push_u8(buf: bytes, value: int) -> bytes"
+            ]
+          },
+          {
+            "name": "read_u8",
+            "qualified": "read_u8",
+            "description": "Reads a u8 value at the given offset.",
+            "signatures": [
+              "pub fn read_u8(buf: bytes, offset: int) -> int"
+            ]
+          },
+          {
+            "name": "read_u16_be",
+            "qualified": "read_u16_be",
+            "description": "Reads a big-endian u16 at the given offset.",
+            "signatures": [
+              "pub fn read_u16_be(buf: bytes, offset: int) -> int"
+            ]
+          },
+          {
+            "name": "read_u16_le",
+            "qualified": "read_u16_le",
+            "description": "Reads a little-endian u16 at the given offset.",
+            "signatures": [
+              "pub fn read_u16_le(buf: bytes, offset: int) -> int"
+            ]
+          },
+          {
+            "name": "write_u16_be",
+            "qualified": "write_u16_be",
+            "description": "Encodes a big-endian u16 value.",
+            "signatures": [
+              "pub fn write_u16_be(value: int) -> bytes"
+            ]
+          },
+          {
+            "name": "write_u16_le",
+            "qualified": "write_u16_le",
+            "description": "Encodes a little-endian u16 value.",
+            "signatures": [
+              "pub fn write_u16_le(value: int) -> bytes"
+            ]
+          }
+        ],
+        "types": []
+      },
+      {
+        "slug": "collections",
+        "title": "collections",
+        "qualified": "stdlib::rss::collections",
+        "description": "Generic array and map helpers.",
+        "import": "use stdlib::rss::collections;",
+        "functions": [
+          {
+            "name": "index_of",
+            "qualified": "index_of",
+            "description": "Returns the first index of a value in an array, or -1 when it is absent.",
+            "signatures": [
+              "pub fn index_of<T>(values: [T], needle: T) -> int"
+            ]
+          },
+          {
+            "name": "contains",
+            "qualified": "contains",
+            "description": "Returns whether an array contains a value.",
+            "signatures": [
+              "pub fn contains<T>(values: [T], needle: T) -> bool"
+            ]
+          },
+          {
+            "name": "reverse",
+            "qualified": "reverse",
+            "description": "Returns a reversed copy of an array.",
+            "signatures": [
+              "pub fn reverse<T>(values: [T]) -> [T]"
+            ]
+          },
+          {
+            "name": "dedup",
+            "qualified": "dedup",
+            "description": "Returns an array with duplicate values removed.",
+            "signatures": [
+              "pub fn dedup<T>(values: [T]) -> [T]"
+            ]
+          },
+          {
+            "name": "has",
+            "qualified": "has",
+            "description": "Returns whether a map contains a key.",
+            "signatures": [
+              "pub fn has<K, V>(map: map<V>, key: K) -> bool"
+            ]
+          },
+          {
+            "name": "get_or",
+            "qualified": "get_or",
+            "description": "Returns a map value or a fallback when the key is absent.",
+            "signatures": [
+              "pub fn get_or<K, V>(map: map<V>, key: K, fallback: V) -> V"
+            ]
+          },
+          {
+            "name": "values",
+            "qualified": "values",
+            "description": "Returns the values from a map as an array.",
+            "signatures": [
+              "pub fn values<V>(map: map<V>) -> [V]"
+            ]
+          },
+          {
+            "name": "entries",
+            "qualified": "entries",
+            "description": "Returns the [key, value] pairs from a map as an array.",
+            "signatures": [
+              "pub fn entries<K, V>(map: map<V>) -> [[K, V]]"
+            ]
+          },
+          {
+            "name": "merge",
+            "qualified": "merge",
+            "description": "Merges two maps, preferring values from rhs for duplicate keys.",
+            "signatures": [
+              "pub fn merge<V>(lhs: map<V>, rhs: map<V>) -> map<V>"
+            ]
+          }
+        ],
+        "types": []
+      },
+      {
+        "slug": "io",
+        "title": "io",
+        "qualified": "stdlib::rss::io",
+        "description": "High-level text file operations built on the native `io` namespace.",
+        "import": "use stdlib::rss::io;",
+        "functions": [
+          {
+            "name": "read_text",
+            "qualified": "read_text",
+            "description": "Reads an entire file into a string.",
+            "signatures": [
+              "pub fn read_text(path: string) -> string"
+            ]
+          },
+          {
+            "name": "write_text",
+            "qualified": "write_text",
+            "description": "Writes text to a file, replacing any existing contents.",
+            "signatures": [
+              "pub fn write_text(path: string, text: string) -> int"
+            ]
+          },
+          {
+            "name": "append_text",
+            "qualified": "append_text",
+            "description": "Appends text to the end of a file.",
+            "signatures": [
+              "pub fn append_text(path: string, text: string) -> int"
+            ]
+          },
+          {
+            "name": "read_lines",
+            "qualified": "read_lines",
+            "description": "Reads a file and splits it into newline-delimited lines.",
+            "signatures": [
+              "pub fn read_lines(path: string) -> [string]"
+            ]
+          }
+        ],
+        "types": []
+      },
+      {
+        "slug": "iter",
+        "title": "iter",
+        "qualified": "stdlib::rss::iter",
+        "description": "Range, collection traversal, transformation, filtering, and reduction helpers.",
+        "import": "use stdlib::rss::iter;",
+        "functions": [
+          {
+            "name": "range_step",
+            "qualified": "range_step",
+            "description": "Returns an array of numbers from start to stop using the given step.",
+            "signatures": [
+              "pub fn range_step(start: int, stop: int, step: int) -> [int]"
+            ]
+          },
+          {
+            "name": "range",
+            "qualified": "range",
+            "description": "Returns an array of numbers from 0 up to stop.",
+            "signatures": [
+              "pub fn range(stop: int) -> [int]"
+            ]
+          },
+          {
+            "name": "enumerate",
+            "qualified": "enumerate",
+            "description": "Returns [index, value] pairs for an array.",
+            "signatures": [
+              "pub fn enumerate<T>(values: [T]) -> [[int, T]]"
+            ]
+          },
+          {
+            "name": "zip",
+            "qualified": "zip",
+            "description": "Zips two arrays into [lhs, rhs] pairs up to the shorter length.",
+            "signatures": [
+              "pub fn zip<L, R>(lhs: [L], rhs: [R]) -> [[L, R]]"
+            ]
+          },
+          {
+            "name": "take",
+            "qualified": "take",
+            "description": "Returns the first count values from an array.",
+            "signatures": [
+              "pub fn take<T>(values: [T], count: int) -> [T]"
+            ]
+          },
+          {
+            "name": "skip",
+            "qualified": "skip",
+            "description": "Returns an array without the first count values.",
+            "signatures": [
+              "pub fn skip<T>(values: [T], count: int) -> [T]"
+            ]
+          },
+          {
+            "name": "chunk",
+            "qualified": "chunk",
+            "description": "Splits an array into fixed-size chunks.",
+            "signatures": [
+              "pub fn chunk<T>(values: [T], size: int) -> [[T]]"
+            ]
+          },
+          {
+            "name": "sum",
+            "qualified": "sum",
+            "description": "Returns the sum of numeric values.",
+            "signatures": [
+              "pub fn sum(values: [number]) -> number"
+            ]
+          },
+          {
+            "name": "any_true",
+            "qualified": "any_true",
+            "description": "Returns whether any value in an array is truthy.",
+            "signatures": [
+              "pub fn any_true(values: [bool]) -> bool"
+            ]
+          },
+          {
+            "name": "all_true",
+            "qualified": "all_true",
+            "description": "Returns whether every value in an array is truthy.",
+            "signatures": [
+              "pub fn all_true(values: [bool]) -> bool"
+            ]
+          },
+          {
+            "name": "map",
+            "qualified": "map",
+            "description": "Applies a function to each value in an array.",
+            "signatures": [
+              "pub fn map<T, U>(values: [T], func: fn(T) -> U) -> [U]"
+            ]
+          },
+          {
+            "name": "filter",
+            "qualified": "filter",
+            "description": "Returns the values for which pred(value) is true.",
+            "signatures": [
+              "pub fn filter<T>(values: [T], pred: fn(T) -> bool) -> [T]"
+            ]
+          },
+          {
+            "name": "reduce",
+            "qualified": "reduce",
+            "description": "Reduces an array by applying func(acc, value) from left to right.",
+            "signatures": [
+              "pub fn reduce<T, U>(values: [T], init: U, func: fn(U, T) -> U) -> U"
+            ]
+          },
+          {
+            "name": "each",
+            "qualified": "each",
+            "description": "Calls a function for each value in an array and returns null.",
+            "signatures": [
+              "pub fn each<T, U>(values: [T], func: fn(T) -> U) -> null"
+            ]
+          }
+        ],
+        "types": []
+      },
+      {
+        "slug": "lrucache",
+        "title": "lrucache",
+        "qualified": "stdlib::rss::lrucache",
+        "description": "A generic least-recently-used cache implemented in pure RustScript.",
+        "import": "use stdlib::rss::lrucache;",
+        "functions": [
+          {
+            "name": "new",
+            "qualified": "new",
+            "description": "Creates an LRU cache with the given capacity.",
+            "signatures": [
+              "pub fn new<K, V>(raw_capacity: int) -> LruCacheState<K, V>"
+            ]
+          },
+          {
+            "name": "capacity",
+            "qualified": "capacity",
+            "description": "Returns the cache capacity.",
+            "signatures": [
+              "pub fn capacity<K, V>(cache: LruCacheState<K, V>) -> int"
+            ]
+          },
+          {
+            "name": "len",
+            "qualified": "len",
+            "description": "Returns the number of cached entries.",
+            "signatures": [
+              "pub fn len<K, V>(cache: LruCacheState<K, V>) -> int"
+            ]
+          },
+          {
+            "name": "is_empty",
+            "qualified": "is_empty",
+            "description": "Returns whether the cache is empty.",
+            "signatures": [
+              "pub fn is_empty<K, V>(cache: LruCacheState<K, V>) -> bool"
+            ]
+          },
+          {
+            "name": "has",
+            "qualified": "has",
+            "description": "Returns whether the cache contains a key.",
+            "signatures": [
+              "pub fn has<K, V>(cache: LruCacheState<K, V>, key: K) -> bool"
+            ]
+          },
+          {
+            "name": "peek",
+            "qualified": "peek",
+            "description": "Returns the cached value without updating recency.",
+            "signatures": [
+              "pub fn peek<K, V>(cache: LruCacheState<K, V>, key: K) -> LruPeekResult<V>"
+            ]
+          },
+          {
+            "name": "get",
+            "qualified": "get",
+            "description": "Returns the cached value and promotes it to the most recently used position.",
+            "signatures": [
+              "pub fn get<K, V>(cache: LruCacheState<K, V>, key: K) -> LruGetResult<K, V>"
+            ]
+          },
+          {
+            "name": "put",
+            "qualified": "put",
+            "description": "Inserts or updates a cache entry and returns the next cache state.",
+            "signatures": [
+              "pub fn put<K, V>(cache: LruCacheState<K, V>, key: K, value: V) -> LruCacheState<K, V>"
+            ]
+          },
+          {
+            "name": "touch",
+            "qualified": "touch",
+            "description": "Promotes a key to the most recently used position if it exists.",
+            "signatures": [
+              "pub fn touch<K, V>(cache: LruCacheState<K, V>, key: K) -> LruCacheState<K, V>"
+            ]
+          },
+          {
+            "name": "remove",
+            "qualified": "remove",
+            "description": "Removes a cache entry by key.",
+            "signatures": [
+              "pub fn remove<K, V>(cache: LruCacheState<K, V>, key: K) -> LruCacheState<K, V>"
+            ]
+          },
+          {
+            "name": "clear",
+            "qualified": "clear",
+            "description": "Removes all entries from the cache.",
+            "signatures": [
+              "pub fn clear<K, V>(cache: LruCacheState<K, V>) -> LruCacheState<K, V>"
+            ]
+          },
+          {
+            "name": "keys",
+            "qualified": "keys",
+            "description": "Returns cache keys from oldest to newest.",
+            "signatures": [
+              "pub fn keys<K, V>(cache: LruCacheState<K, V>) -> [K]"
+            ]
+          },
+          {
+            "name": "values",
+            "qualified": "values",
+            "description": "Returns cache values from oldest to newest.",
+            "signatures": [
+              "pub fn values<K, V>(cache: LruCacheState<K, V>) -> [V]"
+            ]
+          },
+          {
+            "name": "entries",
+            "qualified": "entries",
+            "description": "Returns cache entries from oldest to newest.",
+            "signatures": [
+              "pub fn entries<K, V>(cache: LruCacheState<K, V>) -> [LruEntryRow<K, V>]"
+            ]
+          },
+          {
+            "name": "oldest",
+            "qualified": "oldest",
+            "description": "Returns the oldest cache entry report.",
+            "signatures": [
+              "pub fn oldest<K, V>(cache: LruCacheState<K, V>) -> LruEntryReport<K, V>"
+            ]
+          },
+          {
+            "name": "newest",
+            "qualified": "newest",
+            "description": "Returns the newest cache entry report.",
+            "signatures": [
+              "pub fn newest<K, V>(cache: LruCacheState<K, V>) -> LruEntryReport<K, V>"
+            ]
+          }
+        ],
+        "types": [
+          {
+            "name": "LruCacheState",
+            "description": "Opaque cache state passed to and returned by cache operations.",
+            "declaration": "struct LruCacheState<K, V> {\n    capacity: int,\n    size: int,\n    next_id: int,\n    head: int,\n    tail: int,\n    lookup: map<int>,\n    nodes: map<LruNode<K, V>>\n}"
+          },
+          {
+            "name": "LruPeekResult",
+            "description": "Result of a non-promoting cache lookup.",
+            "declaration": "struct LruPeekResult<V> {\n    found: bool,\n    value: V\n}"
+          },
+          {
+            "name": "LruGetResult",
+            "description": "Result of a promoting cache lookup, including the updated cache state.",
+            "declaration": "struct LruGetResult<K, V> {\n    cache: LruCacheState<K, V>,\n    found: bool,\n    value: V\n}"
+          },
+          {
+            "name": "LruEntryReport",
+            "description": "Optional oldest or newest cache entry.",
+            "declaration": "struct LruEntryReport<K, V> {\n    found: bool,\n    key: K,\n    value: V\n}"
+          },
+          {
+            "name": "LruEntryRow",
+            "description": "Key-value row returned by `entries`.",
+            "declaration": "struct LruEntryRow<K, V> {\n    key: K,\n    value: V\n}"
+          }
+        ]
+      },
+      {
+        "slug": "math",
+        "title": "math",
+        "qualified": "stdlib::rss::math",
+        "description": "Numeric constants, predicates, arithmetic helpers, and transcendental functions.",
+        "import": "use stdlib::rss::math;",
+        "functions": [
+          {
+            "name": "pi",
+            "qualified": "pi",
+            "description": "Returns the constant pi.",
+            "signatures": [
+              "pub fn pi() -> float"
+            ]
+          },
+          {
+            "name": "tau",
+            "qualified": "tau",
+            "description": "Returns the constant tau.",
+            "signatures": [
+              "pub fn tau() -> float"
+            ]
+          },
+          {
+            "name": "e",
+            "qualified": "e",
+            "description": "Returns Euler's number.",
+            "signatures": [
+              "pub fn e() -> float"
+            ]
+          },
+          {
+            "name": "epsilon",
+            "qualified": "epsilon",
+            "description": "Returns the machine epsilon for floating-point comparisons.",
+            "signatures": [
+              "pub fn epsilon() -> float"
+            ]
+          },
+          {
+            "name": "inf",
+            "qualified": "inf",
+            "description": "Returns positive infinity.",
+            "signatures": [
+              "pub fn inf() -> float"
+            ]
+          },
+          {
+            "name": "neg_inf",
+            "qualified": "neg_inf",
+            "description": "Returns negative infinity.",
+            "signatures": [
+              "pub fn neg_inf() -> float"
+            ]
+          },
+          {
+            "name": "nan",
+            "qualified": "nan",
+            "description": "Returns NaN.",
+            "signatures": [
+              "pub fn nan() -> float"
+            ]
+          },
+          {
+            "name": "abs",
+            "qualified": "abs",
+            "description": "Returns the absolute value of a number.",
+            "signatures": [
+              "pub fn abs(value: number) -> number"
+            ]
+          },
+          {
+            "name": "min",
+            "qualified": "min",
+            "description": "Returns the smaller of two numbers.",
+            "signatures": [
+              "pub fn min(lhs: number, rhs: number) -> number"
+            ]
+          },
+          {
+            "name": "max",
+            "qualified": "max",
+            "description": "Returns the larger of two numbers.",
+            "signatures": [
+              "pub fn max(lhs: number, rhs: number) -> number"
+            ]
+          },
+          {
+            "name": "clamp",
+            "qualified": "clamp",
+            "description": "Clamps a number to an inclusive range.",
+            "signatures": [
+              "pub fn clamp(value: number, lower: number, upper: number) -> number"
+            ]
+          },
+          {
+            "name": "signum",
+            "qualified": "signum",
+            "description": "Returns the sign of a number.",
+            "signatures": [
+              "pub fn signum(value: number) -> number"
+            ]
+          },
+          {
+            "name": "sign",
+            "qualified": "sign",
+            "description": "Returns -1, 0, or 1 depending on the sign of a number.",
+            "signatures": [
+              "pub fn sign(value: number) -> int"
+            ]
+          },
+          {
+            "name": "in_range",
+            "qualified": "in_range",
+            "description": "Returns whether a number lies within an inclusive range.",
+            "signatures": [
+              "pub fn in_range(value: number, lower: number, upper: number) -> bool"
+            ]
+          },
+          {
+            "name": "is_even",
+            "qualified": "is_even",
+            "description": "Returns whether a number is even.",
+            "signatures": [
+              "pub fn is_even(value: int) -> bool"
+            ]
+          },
+          {
+            "name": "is_odd",
+            "qualified": "is_odd",
+            "description": "Returns whether a number is odd.",
+            "signatures": [
+              "pub fn is_odd(value: int) -> bool"
+            ]
+          },
+          {
+            "name": "sum",
+            "qualified": "sum",
+            "description": "Returns the sum of numeric values.",
+            "signatures": [
+              "pub fn sum(values: [number]) -> number"
+            ]
+          },
+          {
+            "name": "floor",
+            "qualified": "floor",
+            "description": "Rounds a number down to the nearest integer value.",
+            "signatures": [
+              "pub fn floor(value: number) -> number"
+            ]
+          },
+          {
+            "name": "ceil",
+            "qualified": "ceil",
+            "description": "Rounds a number up to the nearest integer value.",
+            "signatures": [
+              "pub fn ceil(value: number) -> number"
+            ]
+          },
+          {
+            "name": "round",
+            "qualified": "round",
+            "description": "Rounds a number to the nearest integer value.",
+            "signatures": [
+              "pub fn round(value: number) -> number"
+            ]
+          },
+          {
+            "name": "trunc",
+            "qualified": "trunc",
+            "description": "Truncates the fractional part of a number.",
+            "signatures": [
+              "pub fn trunc(value: number) -> number"
+            ]
+          },
+          {
+            "name": "fract",
+            "qualified": "fract",
+            "description": "Returns the fractional part of a number.",
+            "signatures": [
+              "pub fn fract(value: number) -> float"
+            ]
+          },
+          {
+            "name": "sqrt",
+            "qualified": "sqrt",
+            "description": "Returns the square root of a number.",
+            "signatures": [
+              "pub fn sqrt(value: number) -> float"
+            ]
+          },
+          {
+            "name": "cbrt",
+            "qualified": "cbrt",
+            "description": "Returns the cube root of a number.",
+            "signatures": [
+              "pub fn cbrt(value: number) -> float"
+            ]
+          },
+          {
+            "name": "powf",
+            "qualified": "powf",
+            "description": "Raises a number to a floating-point power.",
+            "signatures": [
+              "pub fn powf(value: number, exponent: number) -> float"
+            ]
+          },
+          {
+            "name": "powi",
+            "qualified": "powi",
+            "description": "Raises a number to an integer power.",
+            "signatures": [
+              "pub fn powi(value: number, exponent: int) -> float"
+            ]
+          },
+          {
+            "name": "exp",
+            "qualified": "exp",
+            "description": "Returns e raised to the given power.",
+            "signatures": [
+              "pub fn exp(value: number) -> float"
+            ]
+          },
+          {
+            "name": "exp2",
+            "qualified": "exp2",
+            "description": "Returns 2 raised to the given power.",
+            "signatures": [
+              "pub fn exp2(value: number) -> float"
+            ]
+          },
+          {
+            "name": "ln",
+            "qualified": "ln",
+            "description": "Returns the natural logarithm of a number.",
+            "signatures": [
+              "pub fn ln(value: number) -> float"
+            ]
+          },
+          {
+            "name": "ln_1p",
+            "qualified": "ln_1p",
+            "description": "Returns the natural logarithm of one plus a number.",
+            "signatures": [
+              "pub fn ln_1p(value: number) -> float"
+            ]
+          },
+          {
+            "name": "log",
+            "qualified": "log",
+            "description": "Returns the logarithm of a number for the given base.",
+            "signatures": [
+              "pub fn log(value: number, base: number) -> float"
+            ]
+          },
+          {
+            "name": "log2",
+            "qualified": "log2",
+            "description": "Returns the base-2 logarithm of a number.",
+            "signatures": [
+              "pub fn log2(value: number) -> float"
+            ]
+          },
+          {
+            "name": "log10",
+            "qualified": "log10",
+            "description": "Returns the base-10 logarithm of a number.",
+            "signatures": [
+              "pub fn log10(value: number) -> float"
+            ]
+          },
+          {
+            "name": "sin",
+            "qualified": "sin",
+            "description": "Returns the sine of an angle in radians.",
+            "signatures": [
+              "pub fn sin(value: number) -> float"
+            ]
+          },
+          {
+            "name": "cos",
+            "qualified": "cos",
+            "description": "Returns the cosine of an angle in radians.",
+            "signatures": [
+              "pub fn cos(value: number) -> float"
+            ]
+          },
+          {
+            "name": "tan",
+            "qualified": "tan",
+            "description": "Returns the tangent of an angle in radians.",
+            "signatures": [
+              "pub fn tan(value: number) -> float"
+            ]
+          },
+          {
+            "name": "asin",
+            "qualified": "asin",
+            "description": "Returns the arcsine of a number.",
+            "signatures": [
+              "pub fn asin(value: number) -> float"
+            ]
+          },
+          {
+            "name": "acos",
+            "qualified": "acos",
+            "description": "Returns the arccosine of a number.",
+            "signatures": [
+              "pub fn acos(value: number) -> float"
+            ]
+          },
+          {
+            "name": "atan",
+            "qualified": "atan",
+            "description": "Returns the arctangent of a number.",
+            "signatures": [
+              "pub fn atan(value: number) -> float"
+            ]
+          },
+          {
+            "name": "atan2",
+            "qualified": "atan2",
+            "description": "Returns the four-quadrant arctangent of two numbers.",
+            "signatures": [
+              "pub fn atan2(y: number, x: number) -> float"
+            ]
+          },
+          {
+            "name": "sinh",
+            "qualified": "sinh",
+            "description": "Returns the hyperbolic sine of a number.",
+            "signatures": [
+              "pub fn sinh(value: number) -> float"
+            ]
+          },
+          {
+            "name": "cosh",
+            "qualified": "cosh",
+            "description": "Returns the hyperbolic cosine of a number.",
+            "signatures": [
+              "pub fn cosh(value: number) -> float"
+            ]
+          },
+          {
+            "name": "tanh",
+            "qualified": "tanh",
+            "description": "Returns the hyperbolic tangent of a number.",
+            "signatures": [
+              "pub fn tanh(value: number) -> float"
+            ]
+          },
+          {
+            "name": "hypot",
+            "qualified": "hypot",
+            "description": "Returns the hypotenuse length for two numbers.",
+            "signatures": [
+              "pub fn hypot(lhs: number, rhs: number) -> float"
+            ]
+          },
+          {
+            "name": "copysign",
+            "qualified": "copysign",
+            "description": "Returns the first number with the sign of the second number.",
+            "signatures": [
+              "pub fn copysign(value: number, sign_value: number) -> float"
+            ]
+          },
+          {
+            "name": "mul_add",
+            "qualified": "mul_add",
+            "description": "Computes a fused multiply-add operation.",
+            "signatures": [
+              "pub fn mul_add(a: number, b: number, c: number) -> float"
+            ]
+          },
+          {
+            "name": "to_degrees",
+            "qualified": "to_degrees",
+            "description": "Converts radians to degrees.",
+            "signatures": [
+              "pub fn to_degrees(value: number) -> float"
+            ]
+          },
+          {
+            "name": "to_radians",
+            "qualified": "to_radians",
+            "description": "Converts degrees to radians.",
+            "signatures": [
+              "pub fn to_radians(value: number) -> float"
+            ]
+          },
+          {
+            "name": "deg",
+            "qualified": "deg",
+            "description": "Converts radians to degrees.",
+            "signatures": [
+              "pub fn deg(value: number) -> float"
+            ]
+          },
+          {
+            "name": "rad",
+            "qualified": "rad",
+            "description": "Converts degrees to radians.",
+            "signatures": [
+              "pub fn rad(value: number) -> float"
+            ]
+          },
+          {
+            "name": "fmod",
+            "qualified": "fmod",
+            "description": "Returns the remainder of dividing lhs by rhs.",
+            "signatures": [
+              "pub fn fmod(lhs: number, rhs: number) -> number"
+            ]
+          },
+          {
+            "name": "is_nan",
+            "qualified": "is_nan",
+            "description": "Returns whether a number is NaN.",
+            "signatures": [
+              "pub fn is_nan(value: number) -> bool"
+            ]
+          },
+          {
+            "name": "is_infinite",
+            "qualified": "is_infinite",
+            "description": "Returns whether a number is infinite.",
+            "signatures": [
+              "pub fn is_infinite(value: number) -> bool"
+            ]
+          },
+          {
+            "name": "is_finite",
+            "qualified": "is_finite",
+            "description": "Returns whether a number is finite.",
+            "signatures": [
+              "pub fn is_finite(value: number) -> bool"
+            ]
+          }
+        ],
+        "types": []
+      },
+      {
+        "slug": "parse",
+        "title": "parse",
+        "qualified": "stdlib::rss::parse",
+        "description": "Validated integer and boolean parsing helpers.",
+        "import": "use stdlib::rss::parse;",
+        "functions": [
+          {
+            "name": "is_int_literal_base",
+            "qualified": "is_int_literal_base",
+            "description": "Returns whether a string is a valid integer literal for the given base.",
+            "signatures": [
+              "pub fn is_int_literal_base(value: string, base: int) -> bool"
+            ]
+          },
+          {
+            "name": "is_int_literal",
+            "qualified": "is_int_literal",
+            "description": "Returns whether a string is a base-10 integer literal.",
+            "signatures": [
+              "pub fn is_int_literal(value: string) -> bool"
+            ]
+          },
+          {
+            "name": "try_parse_int_base",
+            "qualified": "try_parse_int_base",
+            "description": "Parses an integer literal for the given base and returns null on failure.",
+            "signatures": [
+              "pub fn try_parse_int_base(value: string, base: int) -> int?"
+            ]
+          },
+          {
+            "name": "try_parse_int",
+            "qualified": "try_parse_int",
+            "description": "Parses a base-10 integer literal and returns null on failure.",
+            "signatures": [
+              "pub fn try_parse_int(value: string) -> int?"
+            ]
+          },
+          {
+            "name": "parse_int_base_or",
+            "qualified": "parse_int_base_or",
+            "description": "Parses an integer literal for the given base or returns a fallback.",
+            "signatures": [
+              "pub fn parse_int_base_or(value: string, base: int, fallback: int) -> int"
+            ]
+          },
+          {
+            "name": "parse_int_or",
+            "qualified": "parse_int_or",
+            "description": "Parses a base-10 integer literal or returns a fallback.",
+            "signatures": [
+              "pub fn parse_int_or(value: string, fallback: int) -> int"
+            ]
+          },
+          {
+            "name": "is_bool_literal",
+            "qualified": "is_bool_literal",
+            "description": "Returns whether a string is a boolean literal.",
+            "signatures": [
+              "pub fn is_bool_literal(value: string) -> bool"
+            ]
+          },
+          {
+            "name": "try_parse_bool",
+            "qualified": "try_parse_bool",
+            "description": "Parses a boolean literal and returns null on failure.",
+            "signatures": [
+              "pub fn try_parse_bool(value: string) -> bool?"
+            ]
+          },
+          {
+            "name": "parse_bool_or",
+            "qualified": "parse_bool_or",
+            "description": "Parses a boolean literal or returns a fallback.",
+            "signatures": [
+              "pub fn parse_bool_or(value: string, fallback: bool) -> bool"
+            ]
+          }
+        ],
+        "types": []
+      },
+      {
+        "slug": "path",
+        "title": "path",
+        "qualified": "stdlib::rss::path",
+        "description": "Portable path separator, joining, basename, directory, and extension helpers.",
+        "import": "use stdlib::rss::path;",
+        "functions": [
+          {
+            "name": "normalize_sep",
+            "qualified": "normalize_sep",
+            "description": "Replaces backslashes with forward slashes in a path.",
+            "signatures": [
+              "pub fn normalize_sep(path: string) -> string"
+            ]
+          },
+          {
+            "name": "join",
+            "qualified": "join",
+            "description": "Joins two path segments with a single separator.",
+            "signatures": [
+              "pub fn join(lhs: string, rhs: string) -> string"
+            ]
+          },
+          {
+            "name": "basename",
+            "qualified": "basename",
+            "description": "Returns the final path segment.",
+            "signatures": [
+              "pub fn basename(path: string) -> string"
+            ]
+          },
+          {
+            "name": "dirname",
+            "qualified": "dirname",
+            "description": "Returns the parent directory portion of a path.",
+            "signatures": [
+              "pub fn dirname(path: string) -> string"
+            ]
+          },
+          {
+            "name": "extname",
+            "qualified": "extname",
+            "description": "Returns the file extension of a path.",
+            "signatures": [
+              "pub fn extname(path: string) -> string"
+            ]
+          }
+        ],
+        "types": []
+      },
+      {
+        "slug": "strings",
+        "title": "strings",
+        "qualified": "stdlib::rss::strings",
+        "description": "String comparison, searching, splitting, trimming, and replacement helpers.",
+        "import": "use stdlib::rss::strings;",
+        "functions": [
+          {
+            "name": "equals",
+            "qualified": "equals",
+            "description": "Returns whether two strings are equal.",
+            "signatures": [
+              "pub fn equals(lhs: string, rhs: string) -> bool"
+            ]
+          },
+          {
+            "name": "is_empty",
+            "qualified": "is_empty",
+            "description": "Returns whether a string is empty.",
+            "signatures": [
+              "pub fn is_empty(value: string) -> bool"
+            ]
+          },
+          {
+            "name": "non_empty",
+            "qualified": "non_empty",
+            "description": "Returns whether a string is not empty.",
+            "signatures": [
+              "pub fn non_empty(value: string) -> bool"
+            ]
+          },
+          {
+            "name": "contains",
+            "qualified": "contains",
+            "description": "Returns whether a string contains a substring.",
+            "signatures": [
+              "pub fn contains(haystack: string, needle: string) -> bool"
+            ]
+          },
+          {
+            "name": "split",
+            "qualified": "split",
+            "description": "Splits a string on a separator.",
+            "signatures": [
+              "pub fn split(value: string, separator: string) -> [string]"
+            ]
+          },
+          {
+            "name": "trim",
+            "qualified": "trim",
+            "description": "Trims leading and trailing ASCII whitespace from a string.",
+            "signatures": [
+              "pub fn trim(value: string) -> string"
+            ]
+          },
+          {
+            "name": "replace",
+            "qualified": "replace",
+            "description": "Replaces all matching substrings in a string.",
+            "signatures": [
+              "pub fn replace(value: string, needle: string, replacement: string) -> string"
+            ]
+          }
+        ],
+        "types": []
+      }
+    ]
+  }
+}

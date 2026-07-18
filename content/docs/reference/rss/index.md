@@ -2,6 +2,11 @@
 
 This reference describes the RustScript frontend accepted by the current `pd-vm` parser. It distinguishes implemented RSS syntax from compatibility-language syntax and from function values that are still under development.
 
+## API reference
+
+- [Builtins](./builtins/) documents compiler and VM functions, including global calls and builtin namespaces.
+- [Stdlibs](./stdlibs/) documents every public function in the bundled pure-RustScript modules.
+
 ## Source files, comments, and terminators
 
 RSS source files use the `.rss` extension. Line comments start with `//`. Statements end with `;`. Blocks use `{` and `}`. The final expression in a function or expression block supplies that block's value; adding a trailing semicolon makes it a statement.

@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { access, readFile } from "node:fs/promises";
 import test from "node:test";
 import { execFileSync } from "node:child_process";
+import { Window } from "happy-dom";
 
 const root = new URL("..", import.meta.url);
 const content = new URL("../content/docs/", import.meta.url);
@@ -89,6 +90,43 @@ test("documentation generators highlight Rust and RustScript fences", async () =
 
   const rustScriptBlog = await readFile(new URL("../public/blog/e01-protocol-dag-and-session-reuse/index.html", import.meta.url), "utf8");
   assert.match(rustScriptBlog, /<code class="language-rustscript"><span class="tok-kw">use<\/span> http;/);
+});
+
+test("API reference covers every catalog entry and renders nested module navigation", async () => {
+  run("node", ["scripts/generate-api-reference.mjs"]);
+  const catalog = JSON.parse(await readFile(new URL("_meta/runtime-api.json", content), "utf8"));
+  const builtinCount = catalog.builtins.modules.reduce((total, module) => total + module.functions.length, 0);
+  const stdlibCount = catalog.stdlibs.modules.reduce((total, module) => total + module.functions.length, 0);
+  assert.equal(builtinCount, 99);
+  assert.equal(stdlibCount, 129);
+  assert.deepEqual(catalog.stdlibs.modules.map(({ slug }) => slug), [
+    "bytes", "collections", "io", "iter", "lrucache", "math", "parse", "path", "strings",
+  ]);
+
+  run("node", ["scripts/build-docs.mjs"]);
+  for (const [section, modules] of [["builtins", catalog.builtins.modules], ["stdlibs", catalog.stdlibs.modules]]) {
+    await access(new URL(`../public/docs/reference/rss/${section}/index.html`, import.meta.url));
+    for (const module of modules) {
+      const html = await readFile(new URL(`../public/docs/reference/rss/${section}/${module.slug}/index.html`, import.meta.url), "utf8");
+      for (const callable of module.functions) {
+        const anchor = callable.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+        assert.ok(html.includes(`<h3 id="${anchor}"><code>${callable.name}</code></h3>`), `${section}/${module.slug} missing ${callable.name}`);
+      }
+    }
+  }
+
+  const globalHtml = await readFile(new URL("../public/docs/reference/rss/builtins/global/index.html", import.meta.url), "utf8");
+  const window = new Window();
+  window.document.write(globalHtml);
+  const syntaxLink = [...window.document.querySelectorAll(".docs-nav-item > a")].find((link) => link.textContent === "Syntax Cheatsheet");
+  assert.ok(syntaxLink);
+  const syntaxChildren = [...syntaxLink.parentElement.children].find((element) => element.classList.contains("docs-nav-children"));
+  const sectionItems = [...syntaxChildren.children];
+  assert.deepEqual(sectionItems.map((item) => item.firstElementChild.textContent), ["Builtins", "Stdlibs"]);
+  const builtinsChildren = [...sectionItems[0].children].find((element) => element.classList.contains("docs-nav-children"));
+  assert.equal(builtinsChildren.firstElementChild.firstElementChild.textContent, "Global functions");
+  assert.equal(builtinsChildren.firstElementChild.firstElementChild.getAttribute("aria-current"), "page");
+  window.close();
 });
 
 test("documentation generator emits the main routes", async () => {
