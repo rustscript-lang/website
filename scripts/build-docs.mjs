@@ -229,6 +229,8 @@ const navigationOrder = [
   "/docs/reference/micro-rustscript/firmware-and-development/",
   "/docs/reference/ironrust/",
   "/docs/reference/ironrust/compilation-and-packaging/",
+  "/docs/reference/ironrust/winforms-example/",
+  "/docs/reference/ironrust/internals/",
   "/docs/reference/ironrust/operations/",
   "/docs/reference/flint/",
   "/docs/reference/flint/cli-and-execution/",

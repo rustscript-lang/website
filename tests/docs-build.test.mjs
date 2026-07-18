@@ -129,6 +129,63 @@ test("API reference covers every catalog entry and renders nested module navigat
   window.close();
 });
 
+test("IronRust documents the checked-in WinForms example and its implementation path", async () => {
+  run("node", ["scripts/build-docs.mjs"]);
+
+  const exampleHtml = await readFile(new URL("../public/docs/reference/ironrust/winforms-example/index.html", import.meta.url), "utf8");
+  const exampleWindow = new Window();
+  exampleWindow.document.write(exampleHtml);
+  const exampleText = exampleWindow.document.body.textContent;
+  for (const expected of [
+    "examples/dotnet-typed-winforms.rss",
+    "--profile winforms",
+    "System::Windows::EventLoop",
+    "Ui::BindClick",
+    "Ui::BindDialog",
+    "Ui::BindClosing",
+    "Ui::Wait",
+    "Ui::ShowDialog",
+    "Ui::Close",
+  ]) {
+    assert.ok(exampleText.includes(expected), `WinForms guide missing ${expected}`);
+  }
+  exampleWindow.close();
+
+  const internalsHtml = await readFile(new URL("../public/docs/reference/ironrust/internals/index.html", import.meta.url), "utf8");
+  const window = new Window();
+  window.document.write(internalsHtml);
+  const internalsText = window.document.body.textContent;
+  for (const expected of [
+    "PdVmDotNetSourceCompiler",
+    "PdVmNativeCompiler",
+    "PdVmVmbcReader",
+    "PdVmClrCompiler",
+    "PdVmProgramBase",
+    "IPdVmProgram",
+    "PdVmAssemblyLoader",
+    "PdVmExecution",
+    "PdVmDotNetHost",
+    "PdVmWinFormsDispatcher",
+    "PdVmWinFormsEventLoop",
+    "ConcurrentQueue",
+    "AutoResetEvent",
+  ]) {
+    assert.ok(internalsText.includes(expected), `IronRust internals missing ${expected}`);
+  }
+
+  const ironRustLink = [...window.document.querySelectorAll(".docs-nav-item > a")]
+    .find((link) => link.textContent === "IronRust");
+  assert.ok(ironRustLink);
+  const children = [...ironRustLink.parentElement.children]
+    .find((element) => element.classList.contains("docs-nav-children"));
+  assert.deepEqual(
+    [...children.children].map((item) => item.firstElementChild.textContent),
+    ["Compilation and packaging", "WinForms example", "Internals", "Operations"],
+  );
+  assert.equal(children.children[2].firstElementChild.getAttribute("aria-current"), "page");
+  window.close();
+});
+
 test("documentation generator emits the main routes", async () => {
   run("node", ["scripts/build-docs.mjs"]);
   for (const route of [
