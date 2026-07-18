@@ -1,4 +1,4 @@
-import { highlightRust, highlightRustScript, isRustFence, isRustScriptFence } from "./code-highlighting.mjs";
+import { highlightRust, highlightRustScript, highlightToml, isRustFence, isRustScriptFence, isTomlFence } from "./code-highlighting.mjs";
 import { copyFile, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
@@ -98,6 +98,9 @@ function renderCodeFence(lang, code) {
   }
   if (isRustFence(lang)) {
     return `<pre class="rss-code"><code class="language-${safeLang}">${highlightRust(code)}</code></pre>`;
+  }
+  if (isTomlFence(lang)) {
+    return `<pre class="rss-code"><code class="language-${safeLang}">${highlightToml(code)}</code></pre>`;
   }
   return `<pre><code class="language-${safeLang}">${escapeHtml(code)}</code></pre>`;
 }

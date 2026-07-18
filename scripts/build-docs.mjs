@@ -1,4 +1,4 @@
-import { highlightRust, highlightRustScript, isRustFence, isRustScriptFence } from "./code-highlighting.mjs";
+import { highlightRust, highlightRustScript, highlightToml, isRustFence, isRustScriptFence, isTomlFence } from "./code-highlighting.mjs";
 import { copyFile, mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
@@ -106,7 +106,9 @@ function renderMarkdown(markdown) {
             ? highlightRustScript(code)
             : isRustFence(fence.language)
               ? highlightRust(code)
-              : escapeHtml(code);
+              : isTomlFence(fence.language)
+                ? highlightToml(code)
+                : escapeHtml(code);
           blocks.push(`<pre class="rss-code"><code class="language-${escapeHtml(fence.language)}">${codeHtml}</code></pre>`);
         }
         fence = null;

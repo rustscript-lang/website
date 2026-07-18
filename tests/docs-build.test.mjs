@@ -78,6 +78,47 @@ test("documentation examples are tracked source files with recorded successful v
   }
 });
 
+test("Use in Rust projects renders verified Rust and highlighted TOML", async () => {
+  run("node", ["scripts/build-blog.mjs"]);
+  run("node", ["scripts/build-docs.mjs"]);
+
+  const html = await readFile(new URL("../public/docs/learn/embed-pd-vm/index.html", import.meta.url), "utf8");
+  const window = new Window();
+  window.document.write(html);
+
+  assert.equal(window.document.querySelector("article h1")?.textContent, "Use in Rust projects");
+  assert.equal(
+    [...window.document.querySelectorAll('.docs-nav-item > a')]
+      .find((link) => link.getAttribute("href") === "/docs/learn/embed-pd-vm/")?.textContent,
+    "Use in Rust projects",
+  );
+  assert.equal(
+    window.document.querySelector('a[href="/docs/learn/embed-pd-vm/"]')?.getAttribute("aria-current"),
+    "page",
+  );
+
+  const rust = window.document.querySelector('code.language-rust');
+  assert.ok(rust);
+  assert.ok(rust.querySelector('.tok-kw'));
+  assert.match(rust.textContent, /compile_source/);
+  assert.match(rust.textContent, /Vm::new/);
+  assert.match(rust.textContent, /VmStatus::Halted/);
+  assert.match(rust.textContent, /Value::Int\(42\)/);
+
+  const toml = window.document.querySelector('code.language-toml');
+  assert.ok(toml);
+  assert.ok(toml.querySelector('.tok-fn'));
+  assert.ok(toml.querySelector('.tok-str'));
+  assert.match(toml.textContent, /rustscript = "0\.22\.2"/);
+  assert.match(toml.innerHTML, /<span class="tok-fn">rustscript<\/span>/);
+  assert.match(toml.innerHTML, /<span class="tok-str">"0\.22\.2"<\/span>/);
+  assert.doesNotMatch(html, /CompileSourceFileOptions::with_source_plugin/);
+  assert.match(window.document.querySelector("article")?.textContent ?? "", /CompileSourceFileOptions/);
+  assert.match(window.document.querySelector("article")?.textContent ?? "", /with_source_plugin\(\.\.\.\)/);
+
+  window.close();
+});
+
 test("documentation generators highlight Rust and RustScript fences", async () => {
   run("node", ["scripts/build-blog.mjs"]);
   run("node", ["scripts/build-docs.mjs"]);
