@@ -78,6 +78,60 @@ test("documentation examples are tracked source files with recorded successful v
   }
 });
 
+test("documentation sidebar expands only the current route path", async () => {
+  run("node", ["scripts/build-blog.mjs"]);
+  run("node", ["scripts/build-docs.mjs"]);
+
+  const cases = [
+    {
+      route: "../public/docs/index.html",
+      openGroup: null,
+      openBranches: [],
+      active: "RustScript Documentation",
+    },
+    {
+      route: "../public/docs/learn/embed-pd-vm/index.html",
+      openGroup: "Getting Started",
+      openBranches: [],
+      active: "Use in Rust projects",
+    },
+    {
+      route: "../public/docs/reference/rss/builtins/global/index.html",
+      openGroup: "Reference",
+      openBranches: ["Syntax Cheatsheet", "Builtins"],
+      active: "Global functions",
+    },
+    {
+      route: "../public/docs/reference/ironrust/internals/index.html",
+      openGroup: "Ecosystem",
+      openBranches: ["IronRust"],
+      active: "Internals",
+    },
+  ];
+
+  for (const expected of cases) {
+    const html = await readFile(new URL(expected.route, import.meta.url), "utf8");
+    const window = new Window();
+    window.document.write(html);
+
+    const groups = [...window.document.querySelectorAll("details.docs-nav-section")];
+    assert.deepEqual(groups.map((group) => group.firstElementChild.textContent.trim()), [
+      "Getting Started", "Reference", "Ecosystem", "Contribute", "About",
+    ]);
+    assert.deepEqual(
+      groups.filter((group) => group.hasAttribute("open")).map((group) => group.firstElementChild.textContent.trim()),
+      expected.openGroup ? [expected.openGroup] : [],
+    );
+    assert.deepEqual(
+      [...window.document.querySelectorAll("details.docs-nav-branch[open] > summary > a")]
+        .map((link) => link.textContent.trim()),
+      expected.openBranches,
+    );
+    assert.equal(window.document.querySelector('[aria-current="page"]')?.textContent.trim(), expected.active);
+    window.close();
+  }
+});
+
 test("Use in Rust projects renders verified Rust and highlighted TOML", async () => {
   run("node", ["scripts/build-blog.mjs"]);
   run("node", ["scripts/build-docs.mjs"]);
@@ -159,9 +213,10 @@ test("API reference covers every catalog entry and renders nested module navigat
   const globalHtml = await readFile(new URL("../public/docs/reference/rss/builtins/global/index.html", import.meta.url), "utf8");
   const window = new Window();
   window.document.write(globalHtml);
-  const syntaxLink = [...window.document.querySelectorAll(".docs-nav-item > a")].find((link) => link.textContent === "Syntax Cheatsheet");
+  const syntaxLink = [...window.document.querySelectorAll(".docs-nav-item a")].find((link) => link.textContent === "Syntax Cheatsheet");
   assert.ok(syntaxLink);
-  const syntaxChildren = [...syntaxLink.parentElement.children].find((element) => element.classList.contains("docs-nav-children"));
+  const syntaxBranch = syntaxLink.closest("details.docs-nav-branch");
+  const syntaxChildren = [...syntaxBranch.children].find((element) => element.classList.contains("docs-nav-children"));
   const sectionItems = [...syntaxChildren.children];
   assert.deepEqual(sectionItems.map((item) => item.firstElementChild.textContent), ["Builtins", "Stdlibs"]);
   const builtinsChildren = [...sectionItems[0].children].find((element) => element.classList.contains("docs-nav-children"));
@@ -214,10 +269,11 @@ test("IronRust documents the checked-in WinForms example and its implementation 
     assert.ok(internalsText.includes(expected), `IronRust internals missing ${expected}`);
   }
 
-  const ironRustLink = [...window.document.querySelectorAll(".docs-nav-item > a")]
+  const ironRustLink = [...window.document.querySelectorAll(".docs-nav-item a")]
     .find((link) => link.textContent === "IronRust");
   assert.ok(ironRustLink);
-  const children = [...ironRustLink.parentElement.children]
+  const ironRustBranch = ironRustLink.closest("details.docs-nav-branch");
+  const children = [...ironRustBranch.children]
     .find((element) => element.classList.contains("docs-nav-children"));
   assert.deepEqual(
     [...children.children].map((item) => item.firstElementChild.textContent),
@@ -263,11 +319,11 @@ test("documentation generator emits the main routes", async () => {
   assert.match(rssHtml, /aria-label="Documentation navigation"/);
   assert.match(rssHtml, /href="\/docs\/reference\/rss\/" aria-current="page">Syntax Cheatsheet<\/a>/);
   assert.match(rssHtml, /<h1 id="syntax-cheatsheet">Syntax Cheatsheet<\/h1>/);
-  assert.match(rssHtml, /<h2>Getting Started<\/h2>/);
-  assert.doesNotMatch(rssHtml, /<h2>Learn<\/h2>/);
-  assert.match(rssHtml, /<h2>Ecosystem<\/h2>/);
-  assert.match(rssHtml, /<div class="docs-nav-item"><a href="\/docs\/reference\/pd-edge\/">pd-edge<\/a><div class="docs-nav-children">[\s\S]*href="\/docs\/reference\/pd-edge\/full-dag\/">Full DAG Graphs<\/a>/);
-  assert.match(rssHtml, /<div class="docs-nav-item"><a href="\/docs\/reference\/rustscript\/">RustScript<\/a><div class="docs-nav-children">[\s\S]*href="\/docs\/reference\/rustscript\/development\/">Development and tooling<\/a>/);
+  assert.match(rssHtml, /<details class="docs-nav-section"><summary>Getting Started<\/summary>/);
+  assert.doesNotMatch(rssHtml, /<summary>Learn<\/summary>/);
+  assert.match(rssHtml, /<details class="docs-nav-section"><summary>Ecosystem<\/summary>/);
+  assert.match(rssHtml, /<details class="docs-nav-item docs-nav-branch"><summary><a href="\/docs\/reference\/pd-edge\/">pd-edge<\/a><\/summary><div class="docs-nav-children">[\s\S]*href="\/docs\/reference\/pd-edge\/full-dag\/">Full DAG Graphs<\/a>/);
+  assert.match(rssHtml, /<details class="docs-nav-item docs-nav-branch"><summary><a href="\/docs\/reference\/rustscript\/">RustScript<\/a><\/summary><div class="docs-nav-children">[\s\S]*href="\/docs\/reference\/rustscript\/development\/">Development and tooling<\/a>/);
   assert.doesNotMatch(rssHtml, />[^<]*reference<\/h1>/i);
   assert.match(rssHtml, /<table class="docs-table">/);
   assert.match(rssHtml, /<span class="tok-kw">use<\/span>/);

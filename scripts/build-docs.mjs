@@ -266,20 +266,24 @@ function documentationSidebar(pages, currentHref) {
     const rightIndex = navigationOrder.indexOf(right.href);
     return (leftIndex < 0 ? Number.MAX_SAFE_INTEGER : leftIndex) - (rightIndex < 0 ? Number.MAX_SAFE_INTEGER : rightIndex);
   });
+  const containsCurrent = (page) => page.href === currentHref
+    || (childrenByHref.get(page.href) ?? []).some(containsCurrent);
   const renderLink = (page) => `<a href="${page.href}"${page.href === currentHref ? ' aria-current="page"' : ""}>${escapeHtml(page.title.replace(/`/g, ""))}</a>`;
   const renderItem = (page) => {
     const children = sortPages(childrenByHref.get(page.href) ?? []);
-    const nested = children.length > 0 ? `<div class="docs-nav-children">${children.map(renderItem).join("")}</div>` : "";
-    return `<div class="docs-nav-item">${renderLink(page)}${nested}</div>`;
+    if (children.length === 0) return `<div class="docs-nav-item">${renderLink(page)}</div>`;
+    const open = containsCurrent(page) ? " open" : "";
+    return `<details class="docs-nav-item docs-nav-branch"${open}><summary>${renderLink(page)}</summary><div class="docs-nav-children">${children.map(renderItem).join("")}</div></details>`;
   };
   const rootPages = pages.filter((page) => !parentFor(page));
   const groups = navigationGroups.map((group) => {
     const groupPages = sortPages(rootPages.filter(group.include));
     if (groupPages.length === 0) return "";
-    return `<section class="docs-nav-section"><h2>${group.label}</h2>${groupPages.map(renderItem).join("")}</section>`;
+    const open = groupPages.some(containsCurrent) ? " open" : "";
+    return `<details class="docs-nav-section"${open}><summary>${group.label}</summary><div class="docs-nav-section-items">${groupPages.map(renderItem).join("")}</div></details>`;
   }).join("");
   const overviewLink = overview ? `<a class="docs-nav-overview" href="${overview.href}"${overview.href === currentHref ? ' aria-current="page"' : ""}>${escapeHtml(overview.title)}</a>` : "";
-  return `<aside class="docs-sidebar"><details open><summary>Documentation navigation</summary><nav aria-label="Documentation navigation">${overviewLink}${groups}</nav></details></aside>`;
+  return `<aside class="docs-sidebar"><details class="docs-sidebar-disclosure" open><summary>Documentation navigation</summary><nav aria-label="Documentation navigation">${overviewLink}${groups}</nav></details></aside>`;
 }
 
 function layout({ title, body, breadcrumb, sidebar, hasMermaid }) {
@@ -296,17 +300,23 @@ function layout({ title, body, breadcrumb, sidebar, hasMermaid }) {
       .docs-layout { display: grid; grid-template-columns: minmax(13.5rem, 17rem) minmax(0, 48rem); justify-content: center; gap: clamp(2rem, 5vw, 5.5rem); align-items: start; }
       .docs-sidebar { position: sticky; top: 6.25rem; max-height: calc(100vh - 7.5rem); overflow-y: auto; padding: 0 1.5rem 1.5rem 0; border-right: 1px solid var(--border); }
       .docs-sidebar details { margin: 0; }
-      .docs-sidebar summary { display: none; }
-      .docs-sidebar nav { display: grid; gap: 1.45rem; }
+      .docs-sidebar-disclosure > summary { display: none; }
+      .docs-sidebar nav { display: grid; gap: 0.22rem; }
       .docs-sidebar a { display: block; padding: 0.34rem 0.62rem; border-left: 2px solid transparent; color: var(--muted); font-size: 0.88rem; line-height: 1.35; text-decoration: none; }
       .docs-sidebar a:hover { color: var(--ink); background: var(--card-hover); }
       .docs-sidebar a[aria-current="page"] { border-left-color: var(--accent-strong); color: var(--accent-strong); font-weight: 700; background: rgba(167, 83, 66, 0.1); }
       .docs-sidebar .docs-nav-overview { margin-bottom: 0.3rem; color: var(--ink); font-weight: 700; }
-      .docs-nav-section { display: grid; gap: 0.12rem; }
+      .docs-nav-section > summary, .docs-nav-branch > summary { list-style: none; cursor: pointer; }
+      .docs-nav-section > summary::-webkit-details-marker, .docs-nav-branch > summary::-webkit-details-marker { display: none; }
+      .docs-nav-section > summary { display: flex; align-items: center; gap: 0.4rem; padding: 0.42rem 0.62rem; color: var(--ink); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+      .docs-nav-section > summary::before, .docs-nav-branch > summary::before { content: ""; width: 0; height: 0; flex: 0 0 auto; border-top: 0.25rem solid transparent; border-bottom: 0.25rem solid transparent; border-left: 0.35rem solid currentColor; transition: transform 120ms ease; }
+      .docs-nav-section[open] > summary::before, .docs-nav-branch[open] > summary::before { transform: rotate(90deg); }
+      .docs-nav-section-items { display: grid; gap: 0.12rem; padding-bottom: 0.35rem; }
       .docs-nav-item { display: grid; gap: 0.12rem; }
+      .docs-nav-branch > summary { display: flex; align-items: center; color: var(--muted); }
+      .docs-nav-branch > summary > a { min-width: 0; flex: 1; }
       .docs-nav-children { display: grid; gap: 0.08rem; margin: 0.05rem 0 0.2rem 0.82rem; padding-left: 0.36rem; border-left: 1px solid var(--border); }
       .docs-nav-children a { font-size: 0.8rem; }
-      .docs-nav-section h2 { margin: 0 0 0.35rem 0.62rem; color: var(--ink); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
       .docs-page { min-width: 0; }
       .doc-shell.docs-page { max-width: none; border: 0; border-radius: 0; background: transparent; box-shadow: none; padding: 0; }
       .doc-shell.docs-page h1 { margin: 0 0 0.625rem; font-size: clamp(1.3rem, 3vw, 2.8rem); line-height: 1.08; letter-spacing: -0.045em; }
@@ -345,7 +355,7 @@ function layout({ title, body, breadcrumb, sidebar, hasMermaid }) {
         .docs-main { width: min(100% - 1.25rem, 48rem); padding-top: 1.25rem; }
         .docs-layout { display: block; }
         .docs-sidebar { position: static; max-height: none; overflow: visible; margin-bottom: 1.75rem; padding: 0; border: 1px solid var(--border); border-radius: 8px; background: var(--surface-strong); }
-        .docs-sidebar summary { display: block; padding: 0.9rem 1rem; color: var(--ink); cursor: pointer; font-size: 0.9rem; font-weight: 700; }
+        .docs-sidebar-disclosure > summary { display: block; padding: 0.9rem 1rem; color: var(--ink); cursor: pointer; font-size: 0.9rem; font-weight: 700; }
         .docs-sidebar nav { padding: 0 0.5rem 0.75rem; }
       }
     </style>
