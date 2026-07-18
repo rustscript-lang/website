@@ -1,4 +1,5 @@
 import { highlightRust, highlightRustScript, highlightToml, isRustFence, isRustScriptFence, isTomlFence } from "./code-highlighting.mjs";
+import { inlineMarkdown } from "./markdown-inline.mjs";
 import { copyFile, mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
@@ -50,22 +51,6 @@ async function listMarkdownFiles(dir) {
     }
   }
   return files.sort((a, b) => a.localeCompare(b));
-}
-
-function externalLinkAttrs(href) {
-  return /^https?:\/\//i.test(href) ? ' target="_blank" rel="noopener noreferrer"' : "";
-}
-
-function inlineMarkdown(value) {
-  let html = escapeHtml(value);
-  html = html.replace(/`([^`]+)`/g, "<code>$1</code>");
-  html = html.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
-  html = html.replace(/\*([^*]+)\*/g, "<em>$1</em>");
-  html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_match, label, href) => {
-    const safeHref = escapeHtml(href);
-    return `<a href="${safeHref}"${externalLinkAttrs(href)}>${label}</a>`;
-  });
-  return html;
 }
 
 function renderMarkdown(markdown) {

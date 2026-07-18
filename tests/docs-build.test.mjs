@@ -180,6 +180,17 @@ test("documentation generators highlight Rust and RustScript fences", async () =
 
 test("RustScript project documentation is split by task and implementation area", async () => {
   run("node", ["scripts/build-docs.mjs"]);
+
+  const overviewHtml = await readFile(new URL("../public/docs/reference/rustscript/index.html", import.meta.url), "utf8");
+  const overviewWindow = new Window();
+  overviewWindow.document.write(overviewHtml);
+  const cratesBadge = overviewWindow.document.querySelector('article img[alt="rustscript on crates.io"]');
+  assert.ok(cratesBadge);
+  assert.equal(cratesBadge.getAttribute("src"), "https://img.shields.io/crates/v/rustscript.svg");
+  assert.equal(cratesBadge.closest("a")?.getAttribute("href"), "https://crates.io/crates/rustscript");
+  assert.doesNotMatch(overviewWindow.document.querySelector("article")?.textContent ?? "", /\]\(https:\/\/crates\.io\/crates\/rustscript\)/);
+  overviewWindow.close();
+
   const expectedPages = [
     ["pd-vm-run", "pd-vm-run"],
     ["debugger", "Debugger"],
