@@ -7,9 +7,10 @@ const script = readFileSync(new URL("../src/mermaid-init.js", import.meta.url), 
 
 async function createDiagramPage() {
   const window = new Window({ url: "https://rustscript.org/docs/reference/pd-edge/full-dag/" });
-  window.document.write('<!doctype html><html data-theme="light"><body><div class="mermaid" role="img" aria-label="Mermaid diagram"><svg viewBox="0 0 800 500"></svg></div></body></html>');
+  window.document.write('<!doctype html><html data-theme="light"><body><div class="mermaid" role="img" aria-label="Mermaid diagram"><svg id="diagram-root" viewBox="0 0 800 500"><g><rect width="800" height="500"></rect></g></svg></div></body></html>');
+  let initOptions;
   window.mermaid = {
-    initialize() {},
+    initialize(options) { initOptions = options; },
     run: async () => {},
   };
 
@@ -19,40 +20,63 @@ async function createDiagramPage() {
   await Promise.resolve();
   await Promise.resolve();
 
-  const viewport = window.document.querySelector(".mermaid-viewport");
-  return { window, viewport, host: window.document.querySelector(".mermaid") };
+  return { window, host: window.document.querySelector(".mermaid"), initOptions };
 }
 
-test("Mermaid diagrams support wheel zoom, pointer panning, and reset", async () => {
-  const { window, viewport, host } = await createDiagramPage();
-  const svg = host.querySelector("svg");
-  const reset = host.querySelector("[data-mermaid-zoom-reset]");
+function pointer(window, type, { button = 0, clientX, clientY }) {
+  const event = new window.Event(type, { bubbles: true, cancelable: true });
+  Object.defineProperties(event, { button: { value: button }, clientX: { value: clientX }, clientY: { value: clientY }, pointerId: { value: 1 } });
+  return event;
+}
 
+test("Mermaid diagrams stay static inline and open a vector lightbox", async () => {
+  const { window, host, initOptions } = await createDiagramPage();
+  const inlineSvg = host.querySelector("svg");
+  const expand = host.querySelector("[data-mermaid-expand]");
+
+  assert.equal(initOptions.flowchart.htmlLabels, false);
+
+  assert.ok(expand);
+  assert.equal(host.querySelector(".mermaid-viewport"), null);
+  assert.equal(inlineSvg.style.transform, "");
+
+  expand.click();
+  const lightbox = window.document.querySelector("[data-mermaid-lightbox]");
+  const viewport = lightbox?.querySelector(".mermaid-lightbox-viewport");
+  const lightboxSvg = viewport?.querySelector("svg");
+
+  assert.ok(lightbox);
+  assert.equal(lightbox.getAttribute("role"), "dialog");
   assert.ok(viewport);
-  viewport.getBoundingClientRect = () => ({ left: 0, top: 0, width: 400, height: 300 });
-  assert.ok(reset);
-  assert.equal(host.querySelector("[data-mermaid-zoom-value]").textContent, "100%");
+  assert.ok(lightboxSvg);
+  assert.notEqual(lightboxSvg, inlineSvg);
+  assert.equal(inlineSvg.id, "diagram-root");
+  assert.notEqual(lightboxSvg.id, inlineSvg.id);
+  assert.equal(new Set([...window.document.querySelectorAll("[id]")].map((element) => element.id)).size, window.document.querySelectorAll("[id]").length);
+  assert.equal(lightboxSvg.getAttribute("viewBox"), "0 0 800 500");
+  assert.equal(window.document.body.style.overflow, "hidden");
 
+  viewport.getBoundingClientRect = () => ({ left: 0, top: 0, width: 400, height: 250 });
   const wheel = new window.Event("wheel", { bubbles: true, cancelable: true });
-  Object.defineProperties(wheel, { clientX: { value: 0 }, clientY: { value: 0 }, deltaY: { value: -180 } });
+  Object.defineProperties(wheel, { clientX: { value: 200 }, clientY: { value: 125 }, deltaY: { value: -180 } });
   viewport.dispatchEvent(wheel);
   assert.equal(wheel.defaultPrevented, true);
-  assert.match(svg.style.transform, /scale\(1\.[0-9]+\)/);
-  assert.notEqual(host.querySelector("[data-mermaid-zoom-value]").textContent, "100%");
+  assert.notEqual(lightboxSvg.getAttribute("viewBox"), "0 0 800 500");
+  assert.notEqual(lightbox.querySelector("[data-mermaid-zoom-value]").textContent, "100%");
 
-  const pointer = (type, { button = 0, clientX, clientY }) => {
-    const event = new window.Event(type, { bubbles: true, cancelable: true });
-    Object.defineProperties(event, { button: { value: button }, clientX: { value: clientX }, clientY: { value: clientY }, pointerId: { value: 1 } });
-    return event;
-  };
-  viewport.dispatchEvent(pointer("pointerdown", { clientX: 80, clientY: 60 }));
-  viewport.dispatchEvent(pointer("pointermove", { clientX: 130, clientY: 95 }));
-  viewport.dispatchEvent(pointer("pointerup", { clientX: 130, clientY: 95 }));
-  assert.match(svg.style.transform, /translate\(50px, 35px\)/);
+  const zoomedViewBox = lightboxSvg.getAttribute("viewBox");
+  viewport.dispatchEvent(pointer(window, "pointerdown", { clientX: 80, clientY: 60 }));
+  viewport.dispatchEvent(pointer(window, "pointermove", { clientX: 130, clientY: 95 }));
+  viewport.dispatchEvent(pointer(window, "pointerup", { clientX: 130, clientY: 95 }));
+  assert.notEqual(lightboxSvg.getAttribute("viewBox"), zoomedViewBox);
 
-  reset.click();
-  assert.equal(svg.style.transform, "translate(0px, 0px) scale(1)");
-  assert.equal(host.querySelector("[data-mermaid-zoom-value]").textContent, "100%");
+  lightbox.querySelector("[data-mermaid-zoom-reset]").click();
+  assert.equal(lightboxSvg.getAttribute("viewBox"), "0 0 800 500");
+  assert.equal(lightbox.querySelector("[data-mermaid-zoom-value]").textContent, "100%");
+
+  lightbox.querySelector("[data-mermaid-close]").click();
+  assert.equal(window.document.querySelector("[data-mermaid-lightbox]"), null);
+  assert.equal(window.document.body.style.overflow, "");
 
   window.close();
 });

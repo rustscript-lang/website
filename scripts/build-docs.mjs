@@ -296,14 +296,22 @@ function layout({ title, body, breadcrumb, sidebar, hasMermaid }) {
       .doc-shell.docs-page p { max-width: 72ch; }
       .docs-page .doc-breadcrumb { margin-bottom: 1.65rem; font-size: 0.82rem; }
       .doc-shell.docs-page pre { border-radius: 8px; box-shadow: none; }
-      .mermaid { margin: 1.5rem 0; border: 1px solid var(--border); border-radius: 8px; background: var(--surface-strong); }
-      .mermaid-controls { display: flex; align-items: center; gap: 0.4rem; padding: 0.55rem 0.65rem; border-bottom: 1px solid var(--border); }
-      .mermaid-controls button { min-width: 2rem; padding: 0.28rem 0.5rem; border: 1px solid var(--border); border-radius: 5px; background: transparent; color: var(--ink); font: inherit; font-size: 0.78rem; cursor: pointer; }
-      .mermaid-controls button:hover { background: var(--card-hover); }
-      .mermaid-controls output { min-width: 3.4rem; color: var(--muted); font-size: 0.78rem; font-variant-numeric: tabular-nums; text-align: center; }
-      .mermaid-viewport { min-height: 20rem; overflow: hidden; padding: 1rem; cursor: grab; touch-action: none; }
-      .mermaid-viewport.is-panning { cursor: grabbing; user-select: none; }
-      .mermaid-viewport svg { display: block; width: max-content; min-width: 100%; max-width: none; height: auto; margin: 0; will-change: transform; }
+      .mermaid { position: relative; overflow: hidden; margin: 1.5rem 0; padding: 1rem; border: 1px solid var(--border); border-radius: 8px; background: var(--surface-strong); }
+      .mermaid-inline-svg { display: block; width: 100%; max-width: 100%; height: auto; margin: 0 auto; }
+      .mermaid-expand { position: absolute; right: 0.65rem; bottom: 0.65rem; display: grid; width: 2.35rem; height: 2.35rem; padding: 0; place-items: center; border: 1px solid var(--border); border-radius: 7px; color: var(--ink); background: var(--surface-strong); box-shadow: 0 8px 24px rgba(34, 24, 20, 0.16); cursor: pointer; }
+      .mermaid-expand:hover { color: var(--accent-strong); background: var(--card-hover); }
+      .mermaid-expand:focus-visible, .mermaid-lightbox button:focus-visible { outline: 2px solid var(--accent-strong); outline-offset: 2px; }
+      .mermaid-expand svg, .mermaid-lightbox button svg { width: 1.15rem; height: 1.15rem; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+      .mermaid-lightbox { position: fixed; inset: 0; z-index: 1000; display: grid; padding: clamp(0.75rem, 2.5vw, 2rem); place-items: center; background: rgba(18, 16, 15, 0.76); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+      .mermaid-lightbox-panel { display: grid; grid-template-rows: auto minmax(0, 1fr); width: min(96vw, 100rem); height: min(92vh, 64rem); overflow: hidden; border: 1px solid var(--border); border-radius: 12px; background: var(--bg); box-shadow: 0 28px 90px rgba(0, 0, 0, 0.38); }
+      .mermaid-lightbox-toolbar { display: flex; align-items: center; gap: 0.45rem; padding: 0.6rem 0.7rem; border-bottom: 1px solid var(--border); background: var(--surface-strong); }
+      .mermaid-lightbox-toolbar button { display: grid; min-width: 2.2rem; height: 2.2rem; padding: 0 0.6rem; place-items: center; border: 1px solid var(--border); border-radius: 6px; color: var(--ink); background: transparent; font: inherit; font-size: 0.78rem; cursor: pointer; }
+      .mermaid-lightbox-toolbar button:hover { color: var(--accent-strong); background: var(--card-hover); }
+      .mermaid-lightbox-toolbar output { min-width: 3.5rem; color: var(--muted); font-size: 0.78rem; font-variant-numeric: tabular-nums; text-align: center; }
+      .mermaid-lightbox-reset { margin-left: auto; }
+      .mermaid-lightbox-viewport { min-width: 0; min-height: 0; overflow: hidden; padding: clamp(0.75rem, 2vw, 1.5rem); cursor: grab; touch-action: none; background-color: var(--bg); background-image: radial-gradient(circle at center, rgba(167, 83, 66, 0.1) 1px, transparent 1px); background-size: 18px 18px; }
+      .mermaid-lightbox-viewport.is-panning { cursor: grabbing; user-select: none; }
+      .mermaid-lightbox-svg { display: block; width: 100%; height: 100%; max-width: none; margin: 0; }
       .mermaid-render-failed { margin: 1.5rem 0; padding: 1rem; border: 1px solid var(--border); border-radius: 8px; color: var(--muted); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; text-align: left; white-space: pre; }
       .docs-table-wrap { overflow-x: auto; margin: 1.25rem 0; border: 1px solid var(--border); border-radius: 8px; }
       .docs-table { width: 100%; min-width: 32rem; border-collapse: collapse; }

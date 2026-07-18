@@ -112,6 +112,10 @@ test("documentation generator emits the main routes", async () => {
   assert.match(fullDagHtml, /<div class="mermaid" role="img" aria-label="Mermaid diagram">[\s\S]*flowchart LR/);
   assert.match(fullDagHtml, /<script defer src="\/assets\/mermaid\.min\.js"><\/script>/);
   assert.match(fullDagHtml, /<script defer src="\/assets\/mermaid-init\.js"><\/script>/);
+  assert.match(fullDagHtml, /\.mermaid-expand\s*\{/);
+  assert.match(fullDagHtml, /\.mermaid-lightbox\s*\{/);
+  assert.match(fullDagHtml, /\.mermaid-lightbox-viewport\s*\{/);
+  assert.doesNotMatch(fullDagHtml, /\.mermaid-controls\s*\{/);
   await access(new URL("../public/assets/mermaid.min.js", import.meta.url));
   await access(new URL("../public/assets/mermaid-init.js", import.meta.url));
 
