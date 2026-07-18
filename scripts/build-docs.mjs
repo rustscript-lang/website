@@ -197,8 +197,14 @@ const navigationOrder = [
   "/docs/learn/embed-pd-vm/",
   "/docs/learn/runtimes/",
   "/docs/reference/rustscript/",
-  "/docs/reference/rustscript/development/",
-  "/docs/reference/rustscript/internals/",
+  "/docs/reference/rustscript/pd-vm-run/",
+  "/docs/reference/rustscript/debugger/",
+  "/docs/reference/rustscript/cooperative-scheduling/",
+  "/docs/reference/rustscript/playground/",
+  "/docs/reference/rustscript/bytecode/",
+  "/docs/reference/rustscript/vm-api/",
+  "/docs/reference/rustscript/compiler/",
+  "/docs/reference/rustscript/jit-aot/",
   "/docs/reference/rss/",
   "/docs/reference/rss/builtins/",
   "/docs/reference/rss/builtins/global/",
@@ -320,14 +326,15 @@ function layout({ title, body, breadcrumb, sidebar, hasMermaid }) {
       .docs-nav-children a { font-size: 0.8rem; }
       .docs-page { min-width: 0; }
       .doc-shell.docs-page { max-width: none; border: 0; border-radius: 0; background: transparent; box-shadow: none; padding: 0; }
-      .doc-shell.docs-page h1 { margin: 0 0 0.625rem; font-size: clamp(1.3rem, 3vw, 2.8rem); line-height: 1.08; letter-spacing: -0.045em; }
-      .doc-shell.docs-page h2 { margin-top: 1.5rem; font-size: clamp(0.9rem, 2vw, 1.5rem); line-height: 1.18; }
-      .doc-shell.docs-page h3 { margin-top: 1rem; font-size: 0.725rem; }
+      .doc-shell.docs-page h1 { margin: 0 0 0.625rem; font-size: clamp(1.5rem, 3vw, 2.8rem); line-height: 1.08; letter-spacing: -0.045em; }
+      .doc-shell.docs-page h2 { margin-top: 1.5rem; font-size: clamp(1.35rem, 2vw, 1.5rem); line-height: 1.18; }
+      .doc-shell.docs-page h3 { margin-top: 1rem; font-size: 1.2rem; line-height: 1.3; }
       .doc-shell.docs-page h4 { margin-top: 0.85rem; font-size: 0.5rem; }
       .doc-shell.docs-page h5 { margin-top: 0.75rem; font-size: 0.42rem; }
       .doc-shell.docs-page h6 { margin-top: 0.65rem; font-size: 0.36rem; }
       .doc-shell.docs-page p, .doc-shell.docs-page li { color: var(--muted); font-size: 1rem; line-height: 1.76; }
       .doc-shell.docs-page p { max-width: 72ch; }
+      .doc-shell.docs-page :not(pre) > code { overflow-wrap: anywhere; white-space: normal; }
       .docs-page .doc-breadcrumb { margin-bottom: 1.65rem; font-size: 0.82rem; }
       .doc-shell.docs-page pre { border-radius: 8px; box-shadow: none; }
       .mermaid { position: relative; overflow: hidden; margin: 1.5rem 0; padding: 1rem; border: 1px solid var(--border); border-radius: 8px; background: var(--surface-strong); }

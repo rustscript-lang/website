@@ -10,11 +10,6 @@ const examples = JSON.parse(await readFile(new URL("_meta/examples.json", conten
 
 const projectDocumentationBundles = [
   {
-    repository: "rustscript",
-    revision: "f1a6c3d",
-    pages: ["reference/rustscript.md", "reference/rustscript/development.md", "reference/rustscript/internals.md"],
-  },
-  {
     repository: "pd-edge",
     revision: "3468170^",
     pages: ["reference/pd-edge.md", "reference/pd-edge/operations.md", "reference/pd-edge/layered-dags.md", "reference/pd-edge/distribution.md"],
@@ -173,7 +168,7 @@ test("documentation generators highlight Rust and RustScript fences", async () =
   run("node", ["scripts/build-blog.mjs"]);
   run("node", ["scripts/build-docs.mjs"]);
 
-  const rustDocs = await readFile(new URL("../public/docs/reference/rustscript/development/index.html", import.meta.url), "utf8");
+  const rustDocs = await readFile(new URL("../public/docs/reference/rustscript/vm-api/index.html", import.meta.url), "utf8");
   assert.match(rustDocs, /<code class="language-rust"><span class="tok-kw">let<\/span> <span class="tok-kw">mut<\/span> vm/);
 
   const rustBlog = await readFile(new URL("../public/blog/v05-async-suspension/index.html", import.meta.url), "utf8");
@@ -181,6 +176,62 @@ test("documentation generators highlight Rust and RustScript fences", async () =
 
   const rustScriptBlog = await readFile(new URL("../public/blog/e01-protocol-dag-and-session-reuse/index.html", import.meta.url), "utf8");
   assert.match(rustScriptBlog, /<code class="language-rustscript"><span class="tok-kw">use<\/span> http;/);
+});
+
+test("RustScript project documentation is split by task and implementation area", async () => {
+  run("node", ["scripts/build-docs.mjs"]);
+  const expectedPages = [
+    ["pd-vm-run", "pd-vm-run"],
+    ["debugger", "Debugger"],
+    ["cooperative-scheduling", "Cooperative Scheduling"],
+    ["playground", "Playground"],
+    ["bytecode", "Bytecode"],
+    ["vm-api", "VM API"],
+    ["compiler", "Compiler"],
+    ["jit-aot", "JIT and AOT"],
+  ];
+  const rendered = new Map();
+  for (const [slug, title] of expectedPages) {
+    const html = await readFile(new URL(`../public/docs/reference/rustscript/${slug}/index.html`, import.meta.url), "utf8");
+    assert.match(html, new RegExp(`<h1[^>]*>${title}<\\/h1>`));
+    rendered.set(slug, html);
+  }
+
+  assert.match(rendered.get("pd-vm-run"), /<p>Download <code>pd-vm-run<\/code> from <a href="https:\/\/github\.com\/rustscript-lang\/rustscript\/releases"[^>]*>/);
+  assert.doesNotMatch([...rendered.values()].join("\n"), /cargo run/);
+  assert.match(rendered.get("debugger"), /--debug --tcp/);
+  assert.match(rendered.get("cooperative-scheduling"), /set_fuel/);
+  assert.match(rendered.get("cooperative-scheduling"), /set_epoch_deadline/);
+  assert.match(rendered.get("playground"), /https:\/\/playground\.rustscript\.org\//);
+  assert.match(rendered.get("playground"), /lint_source_json/);
+  assert.match(rendered.get("playground"), /run_source_json/);
+  assert.match(rendered.get("bytecode"), /Program/);
+  assert.match(rendered.get("bytecode"), /OpCode/);
+  assert.match(rendered.get("vm-api"), /<h2 id="api-reference">API Reference<\/h2>/);
+  assert.match(rendered.get("vm-api"), /<h3 id="construction-and-program-ownership">Construction and program ownership<\/h3>/);
+  assert.match(rendered.get("vm-api"), /<h3 id="execution-lifecycle">Execution lifecycle<\/h3>/);
+  assert.match(rendered.get("compiler"), /Frontend-independent IR/);
+  assert.match(rendered.get("compiler"), /lowering/);
+  assert.match(rendered.get("jit-aot"), /Trace JIT/);
+  assert.match(rendered.get("jit-aot"), /NYI/);
+
+  const hostFunctions = await readFile(new URL("../public/docs/reference/host-functions/index.html", import.meta.url), "utf8");
+  assert.match(hostFunctions, /Generated <code>#\[pd_host_function\]<\/code> binding selection/);
+  await assert.rejects(access(new URL("../public/docs/reference/rustscript/development/index.html", import.meta.url)));
+  await assert.rejects(access(new URL("../public/docs/reference/rustscript/internals/index.html", import.meta.url)));
+
+  const window = new Window();
+  window.document.write(rendered.get("vm-api"));
+  const rustScriptLink = [...window.document.querySelectorAll(".docs-nav-item a")]
+    .find((link) => link.textContent === "RustScript");
+  const rustScriptBranch = rustScriptLink.closest("details.docs-nav-branch");
+  const children = [...rustScriptBranch.children]
+    .find((element) => element.classList.contains("docs-nav-children"));
+  assert.deepEqual(
+    [...children.children].map((item) => item.firstElementChild.textContent),
+    expectedPages.map(([, title]) => title),
+  );
+  window.close();
 });
 
 test("API reference covers every catalog entry and renders nested module navigation", async () => {
@@ -298,7 +349,14 @@ test("documentation generator emits the main routes", async () => {
     "docs/reference/pd-edge/operations/index.html",
     "docs/reference/pd-edge/full-dag/index.html",
     "docs/reference/rustscript/index.html",
-    "docs/reference/rustscript/development/index.html",
+    "docs/reference/rustscript/pd-vm-run/index.html",
+    "docs/reference/rustscript/debugger/index.html",
+    "docs/reference/rustscript/cooperative-scheduling/index.html",
+    "docs/reference/rustscript/playground/index.html",
+    "docs/reference/rustscript/bytecode/index.html",
+    "docs/reference/rustscript/vm-api/index.html",
+    "docs/reference/rustscript/compiler/index.html",
+    "docs/reference/rustscript/jit-aot/index.html",
     "docs/contribute/architecture/index.html",
   ]) {
     const html = await readFile(new URL(`../public/${route}`, import.meta.url), "utf8");
@@ -328,7 +386,11 @@ test("documentation generator emits the main routes", async () => {
   assert.doesNotMatch(rssHtml, /<summary>Learn<\/summary>/);
   assert.match(rssHtml, /<details class="docs-nav-section" open><summary>Ecosystem<\/summary>/);
   assert.match(rssHtml, /<details class="docs-nav-item docs-nav-branch"><summary><a href="\/docs\/reference\/pd-edge\/">pd-edge<\/a><\/summary><div class="docs-nav-children">[\s\S]*href="\/docs\/reference\/pd-edge\/full-dag\/">Full DAG Graphs<\/a>/);
-  assert.match(rssHtml, /<details class="docs-nav-item docs-nav-branch"><summary><a href="\/docs\/reference\/rustscript\/">RustScript<\/a><\/summary><div class="docs-nav-children">[\s\S]*href="\/docs\/reference\/rustscript\/development\/">Development and tooling<\/a>/);
+  assert.match(rssHtml, /<details class="docs-nav-item docs-nav-branch"><summary><a href="\/docs\/reference\/rustscript\/">RustScript<\/a><\/summary><div class="docs-nav-children">[\s\S]*href="\/docs\/reference\/rustscript\/pd-vm-run\/">pd-vm-run<\/a>[\s\S]*href="\/docs\/reference\/rustscript\/jit-aot\/">JIT and AOT<\/a>/);
+  assert.match(rssHtml, /\.doc-shell\.docs-page h1 \{[^}]*font-size: clamp\(1\.5rem, 3vw, 2\.8rem\);/);
+  assert.match(rssHtml, /\.doc-shell\.docs-page h2 \{[^}]*font-size: clamp\(1\.35rem, 2vw, 1\.5rem\);/);
+  assert.match(rssHtml, /\.doc-shell\.docs-page h3 \{[^}]*font-size: 1\.2rem;/);
+  assert.match(rssHtml, /\.doc-shell\.docs-page :not\(pre\) > code \{[^}]*overflow-wrap: anywhere;[^}]*white-space: normal;/);
   assert.match(rssHtml, /\.docs-nav-section > summary \{[^}]*padding: 0\.42rem 0\.62rem 0\.42rem 0\.25rem;/);
   assert.match(rssHtml, /\.docs-nav-item > a, \.docs-nav-branch > summary > a \{[^}]*padding-left: 1\.35rem;/);
   assert.match(rssHtml, /\.docs-nav-branch > summary::before \{[^}]*position: absolute;[^}]*left: 0\.45rem;/);

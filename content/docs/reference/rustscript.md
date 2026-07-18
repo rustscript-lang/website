@@ -32,36 +32,23 @@ cargo build --workspace --release
 
 `pd-vm` is a stack-based virtual machine plus compiler toolchain. It includes the RustScript (`.rss`) frontend and exposes a source-plugin API for compatibility languages such as JavaScript and Lua.
 
-## Contents
+## Documentation
 
-- [Overview](#overview)
-- [TODO](#todo)
-- [How To Use](#how-to-use)
-  - [Run Programs](#run-programs)
-  - [REPL](#repl)
-  - [Debugging](#debugging)
-  - [Recording and Replay](#recording-and-replay)
-  - [Bytecode and VMBC](#bytecode-and-vmbc)
-  - [JIT](#jit)
-  - [Regex Cache](#regex-cache)
-  - [Script Call Depth](#script-call-depth)
-  - [Fuel Metering](#fuel-metering)
-  - [Epoch Interruption](#epoch-interruption)
-  - [Wasm Lint](#wasm-lint)
-  - [Wasm Runtime Playground](#wasm-runtime-playground)
-  - [`no_std` Embedded Runtime](#no_std-embedded-runtime)
-  - [Web Playground](#web-playground)
-  - [Test and Perf Commands](#test-and-perf-commands)
-- [Internals](#internals)
-  - [VM Internals](#vm-internals)
-  - [Compiler Internals](#compiler-internals)
-    - [Pipeline Layers](#pipeline-layers)
-    - [Compiler APIs](#compiler-apis)
-    - [Assembler API](#assembler-api)
-    - [Builtins and Bridged call Opcode](#builtins-and-bridged-call-opcode)
-    - [Current Compiler Subset Limitations](#current-compiler-subset-limitations)
-  - [JIT Internals](#jit-internals)
-- [Compiler frontend syntax and feature support](src/compiler/frontends/README.md)
+### Tools and runtime use
+
+- [pd-vm-run](./pd-vm-run/) — released binary, REPL, formatting, VMBC, recordings, and runtime flags.
+- [Debugger](./debugger/) — stdio/TCP debugging and recording replay commands.
+- [Cooperative Scheduling](./cooperative-scheduling/) — fuel, epoch, yield reasons, and resume rules.
+- [Playground](./playground/) — Monaco, wasm lint, and browser execution.
+
+### Implementation reference
+
+- [Bytecode](./bytecode/) — `Program`, `TypeMap`, opcodes, VMBC, assembler, and embedded execution.
+- [VM API](./vm-api/) — categorized Rust APIs for VM lifecycle, `Store`, callbacks, host operations, limits, and diagnostics.
+- [Compiler](./compiler/) — frontend-independent IR, type validation, lifetime/liveness lowering, and bytecode lowering.
+- [JIT and AOT](./jit-aot/) — native backends, artifacts, coverage, diagnostics, and NYI boundaries.
+
+- [Compiler frontend syntax and feature support](https://github.com/rustscript-lang/rustscript/tree/master/src/compiler/frontends)
 
 
 ## Overview
