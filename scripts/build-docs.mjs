@@ -313,9 +313,9 @@ function layout({ title, body, breadcrumb, sidebar, hasMermaid }) {
       .docs-nav-section[open] > summary::before, .docs-nav-branch[open] > summary::before { transform: rotate(90deg); }
       .docs-nav-section-items { display: grid; gap: 0.12rem; padding-bottom: 0.35rem; }
       .docs-nav-item { display: grid; gap: 0.12rem; }
-      .docs-nav-branch > summary { display: flex; align-items: center; color: var(--muted); }
+      .docs-nav-branch > summary { display: flex; align-items: center; gap: 0.4rem; color: var(--muted); }
       .docs-nav-branch > summary > a { min-width: 0; flex: 1; }
-      .docs-nav-children { display: grid; gap: 0.08rem; margin: 0.05rem 0 0.2rem 0.82rem; padding-left: 0.36rem; border-left: 1px solid var(--border); }
+      .docs-nav-children { display: grid; gap: 0.08rem; margin: 0.05rem 0 0.2rem 2rem; padding-left: 0.5rem; border-left: 1px solid var(--border); }
       .docs-nav-children a { font-size: 0.8rem; }
       .docs-page { min-width: 0; }
       .doc-shell.docs-page { max-width: none; border: 0; border-radius: 0; background: transparent; box-shadow: none; padding: 0; }
