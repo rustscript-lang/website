@@ -49,6 +49,32 @@ Trace JIT follows a LuaJIT-style hot-loop model:
 
 A backward `brfalse` can remain inside a trace as a loop back-edge when its target already exists in the recorded trace. Backward targets outside the trace become side exits.
 
+### Short script-function inlining
+
+When the recorder encounters `callvalue` while compiling a hot parent trace, it can merge one short script function into the parent's SSA trace. Inlining has no separate call-count threshold: the parent loop, exit, or continuation must first become hot. The default hot-loop threshold is 8.
+
+The call site is eligible only when all of these conditions hold:
+
+- The caller is the root frame. Calls made from a callable frame are not currently inlined.
+- The callable value can be traced to a root local with exactly one static callable binding.
+- The callable prototype observed in that local at trace entry matches the statically selected prototype. A changed target follows the regular `callvalue` path.
+- The target is an uncaptured `FunctionItem` backed by a RustScript `ScriptFunction`; closures, captured functions, and host callables are excluded.
+- The call arity, prototype arity, and parameter-slot metadata agree.
+- The target is not recursive, and the recorder is not already inside another inlined function. Current inline depth is one.
+- The callee and parent together fit within `max_trace_len`, whose default is 256 decoded operations.
+
+The callee body must also satisfy these bounds:
+
+- At most 32 decoded instructions, including the final `ret`.
+- At most 8 distinct local slots read or written.
+- Exactly one `ret`, at the end of the function region.
+- Forward `br` and `brfalse` targets may stay within the region. Backward branches, and therefore callee loops, are rejected.
+- Nested `callvalue` is rejected. A bytecode `call` is accepted only for a recognized builtin with valid arity; final recorder and native-lowering support is still required.
+
+If the callable has no schema, it needs no argument-schema guard. With a callable schema, parameter count must match and every parameter must either be proven by the recorded SSA representation or support a runtime type guard. Current guards cover `int`, `float`, `bool`, `string`, `bytes`, arrays, and map/object-like values. `Unknown` and generic parameters impose no guard. `null`, `number`, `optional`, and callable parameter schemas currently reject inlining. A failed runtime guard exits at the original `callvalue` instruction so the interpreter performs the call.
+
+Call-site target profiles and inline counters are exposed for diagnostics, but profile observation counts do not add another admission threshold. Native trace entry and inherited-state handoff are also suppressed while the active frame has shared `Borrow` or `BorrowMut` capture cells, since those cells are authoritative over raw local snapshots.
+
 Configure or inspect tracing with:
 
 - `vm.set_jit_config(...)`
