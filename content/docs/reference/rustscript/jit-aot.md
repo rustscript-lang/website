@@ -53,6 +53,8 @@ A backward `brfalse` can remain inside a trace as a loop back-edge when its targ
 
 When the recorder encounters `callvalue` while compiling a hot parent trace, it can merge one short script function into the parent's SSA trace. Inlining has no separate call-count threshold: the parent loop, exit, or continuation must first become hot. The default hot-loop threshold is 8.
 
+There is no dedicated function-inlining switch or inline-specific hotness threshold. Setting `JitConfig.enabled` to `false` disables the entire Trace JIT, including function inlining. `hot_loop_threshold` controls when the parent trace becomes eligible, while `max_trace_len` only supplies the shared trace budget. The one-level inline depth, 32-instruction limit, and 8-local limit below are fixed implementation bounds rather than public `JitConfig` fields. The command-line runner likewise has no inline-specific flag.
+
 The call site is eligible only when all of these conditions hold:
 
 - The caller is the root frame. Calls made from a callable frame are not currently inlined.
