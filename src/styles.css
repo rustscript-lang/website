@@ -578,7 +578,9 @@ pre {
   border: 0;
   border-radius: 50%;
   color: rgba(248, 238, 232, 0.68);
-  background: transparent;
+  background: none;
+  box-shadow: none;
+  -webkit-tap-highlight-color: transparent;
   text-decoration: none;
   transition: color 160ms ease, transform 160ms ease;
 }

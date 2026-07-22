@@ -68,7 +68,11 @@ test("each example exposes its matching GitHub destination from the lower-right 
   assert.match(html, /exampleJumpLink\.setAttribute\("aria-label", `Open \$\{ex\.label\} on GitHub`\)/);
   assert.match(css, /\.example-jump-link\s*\{[^}]*margin-left:\s*auto;/s);
   assert.match(css, /\.example-jump-link\s*\{[^}]*\bborder:\s*0;/s);
-  assert.match(css, /\.example-jump-link\s*\{[^}]*\bbackground:\s*transparent;/s);
+  assert.match(html, /<path d="M7 17 17 7M12 7h5v5" \/>/);
+  assert.doesNotMatch(html, /M14 5h5v5M19 5l-8 8/);
+  assert.match(css, /\.example-jump-link\s*\{[^}]*\bbackground:\s*none;/s);
+  assert.match(css, /\.example-jump-link\s*\{[^}]*\bbox-shadow:\s*none;/s);
+  assert.match(css, /\.example-jump-link\s*\{[^}]*-webkit-tap-highlight-color:\s*transparent;/s);
   assert.doesNotMatch(css, /\.example-jump-link:hover\s*\{[^}]*\bborder(?:-color)?:/s);
   assert.doesNotMatch(css, /\.example-jump-link:hover\s*\{[^}]*\bbackground:/s);
 });
