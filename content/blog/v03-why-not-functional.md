@@ -62,13 +62,17 @@ Instead of relying on persistent language-level data structures, the runtime kee
 
 The compiler IR already includes optional-value and match-oriented forms. That gives the frontend a direct way to express common proxy logic such as missing metadata, variant handling, and branch-heavy routing without requiring a fully functional runtime model.
 
+### Higher-order behavior uses explicit callable values
+
+Named functions, builtins, host functions, and closures are first-class callable values. They can be passed, returned, selected by control flow, stored in arrays or maps, and invoked through `callvalue`. Script invocation enters a real frame, supports direct and mutual recursion, and preserves escaping closure environments. Hosts can resolve exported callables into typed `ScriptCallback` handles for direct or queued invocation.
+
 ### Operational simplicity stays in the foreground
 
 The current design keeps suspension, pooling, replay, and debugging aligned with the VM's concrete state model. That is a major advantage in an embedded proxy runtime, where observability and control matter as much as source-language style.
 
 ## Where This Still Falls Short
 
-- **Higher-order composition is narrower.** The runtime is more conservative about first-class callable behavior than a fully functional language would be.
+- **Callable typing is explicit and bounded.** Higher-order code uses compatible `fn(...) -> ...` schemas; callable values cannot be map keys or serialized constants, and inference stops when a compatible signature can no longer be identified.
 - **The data model is not a full functional type model.** Optional and match forms exist, but the runtime does not expose a broad algebraic data type system.
 - **The ownership discipline is practical, not formal.** pd-vm gets useful constraints from the compiler and runtime structure, but not the stronger semantic guarantees of a pure functional language.
 - **Structural sharing is limited.** Shared values are cheap to clone, but they are not persistent collections in the functional-language sense.

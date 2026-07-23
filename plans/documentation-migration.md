@@ -4,7 +4,7 @@
 
 **Architecture:** Add source Markdown under `content/docs/` and a deterministic `scripts/build-docs.mjs` generator that emits static `/docs/` pages during `bun run build`. Keep a checked-in source map that associates each documentation section with the README heading and repository revision from which its prose facts are derived. Code samples are copied only from tracked repository files, retain their source path and revision, and are executed or compiled before publication.
 
-**Source boundary:** Narrative facts come from the top-level README files in `rustscript`, `pd-edge`, `pd-controller`, `flint`, `micro-rustscript`, and `IronRust`. RSS syntax and sample validity are verified against the current `rustscript` parser, compiler tests, standard-library examples, and executable `.rss` files. The language reference marks unfinished function-value support as development status and links only to verified behavior.
+**Source boundary:** Narrative facts come from the top-level README files in `rustscript`, `pd-edge`, `pd-controller`, `flint`, `micro-rustscript`, and `IronRust`. RSS syntax and sample validity are verified against the current `rustscript` parser, compiler tests, standard-library examples, and executable `.rss` files. The language reference documents first-class function values, closures, call frames, and callbacks only where current compiler and runtime tests verify the behavior.
 
 **Terminology:** Use established terms: RustScript, RSS, `pd-vm`, VMBC, host function, edge data plane, controller, runtime, compiler, interpreter, JIT, AOT, WebAssembly, `no_std`, CLR, function value, closure, and call frame. Do not create substitute product names or informal architecture labels.
 
@@ -113,7 +113,7 @@ Each generated page receives a breadcrumb, user/reference/contributor navigation
 5. Cover expressions and statements: blocks, calls, method/postfix expressions, assignment, `if`, `match`, `for`, `while`, ranges, `return`, `break`, `continue`, pipe closures, and expression result rules.
 6. Cover collections and patterns with real accepted examples.
 7. Cover host calls, built-ins, formatting, and error boundaries without presenting host-specific APIs as language syntax.
-8. Add `function-values.md` as an explicit development-status reference. Describe the currently verified distinction between direct callable analysis and runtime function values; document only behavior proved by the current branch’s tests and characterization programs. Do not present function values as a released stable language feature.
+8. Add a callable-values reference covering function items, closures, callable schemas, real call frames, recursion, collections, and callback export behavior proved by current compiler and runtime tests.
 9. Write a coverage test that checks every parser-recognized syntax family has one documented section and every code example declared valid has a verification record.
 
 **Verification:** run the RSS samples through `pd-vm`, run the focused compiler tests that establish each grammar family, and fail the documentation coverage test for untracked sample blocks.
@@ -163,7 +163,7 @@ Each generated page receives a breadcrumb, user/reference/contributor navigation
 - `/docs/` provides separate user guides, RSS/reference pages, and contributor documentation.
 - Every prose section maps to one of the six source README files and an exact revision.
 - Every displayed executable snippet has a real repository path, revision, and successful verification command.
-- RSS reference covers all syntax accepted by the current parser and identifies function values as development status until verified release behavior exists.
+- RSS reference covers all syntax accepted by the current parser and documents verified first-class callable, closure, frame, and callback behavior.
 - The five non-core source project READMEs contain only an introduction, quick start, and documentation link after migration.
 - `rustscript/README.md` remains unchanged.
 - Website and each README repository are committed and pushed independently after their focused checks pass.

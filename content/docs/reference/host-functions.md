@@ -30,6 +30,22 @@ The following rules keep a script portable:
 | IronRust | typed `System::...` imports |
 | Flint | `flint::cli`, `flint::runtime`, `flint::llama`, `flint::tensor` and related namespaces |
 
+## Host functions as callable values
+
+A host function referenced without immediate invocation becomes a callable value when its schema is known. It can be passed, returned, selected, or stored, then invoked through the same `callvalue` path as a named script function or closure. Direct host calls continue to use the bound `call` path.
+
+```rss
+fn host_transform(value: int) -> int;
+let transform: fn(int) -> int = host_transform;
+transform(41);
+```
+
+## Script callbacks exposed to the host
+
+Exported script functions and existing callable values can cross the embedding boundary as typed `ScriptCallback` handles. The host may invoke a callback synchronously, start it and drive its `VmStatus`, or enqueue a prepared invocation for serialized execution. Arity and schemas are validated where metadata is available. Callback handles are bound to one store and program generation; reset or program replacement invalidates registrations from the previous generation.
+
+See [VM API](/docs/reference/rustscript/vm-api/#script-callback-api) for callback resolution, invocation, queueing, and invalidation methods.
+
 ## Generated `#[pd_host_function]` binding selection
 
 Default host functions declared with `#[pd_host_function]` select a generated binding from their Rust signature:

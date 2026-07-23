@@ -52,6 +52,14 @@ The important distinction is operational:
 
 That separation keeps core VM behavior small while letting `pd-edge` expose a much larger runtime surface through imports.
 
+## Host Functions as Callable Values
+
+Direct host imports continue to use `call`, but a builtin or host function referenced without immediate invocation becomes a callable value with a compatible schema. It can be passed, returned, selected, or stored like a script function or closure, then invoked through `callvalue`. The callable prototype keeps the host target and arity explicit while the binding plan still resolves the concrete runtime implementation.
+
+## Callbacks into RustScript
+
+The embedding API also supports the reverse direction. An exported function or existing callable value can be validated as a typed `ScriptCallback`. Hosts may invoke it synchronously, start it and drive the returned `VmStatus`, or prepare and enqueue it for serialized execution. Callback arguments and results are checked against callable metadata, and replacing or resetting the program invalidates handles tied to the previous program generation.
+
 ## Benefits of the Design
 
 ### 1. Decoupled evolution

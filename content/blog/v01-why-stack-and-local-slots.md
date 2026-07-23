@@ -14,7 +14,7 @@ pd-vm runs inside `pd-edge`, a proxy runtime that may execute user logic on ever
 4. **Bytecode should stay compact for distribution.**
 5. **The same program should scale from interpretation to native compilation.**
 
-Those requirements favor a very small execution contract: instruction pointer, operand stack, and local storage.
+Those requirements favor a small execution contract: instruction pointer, operand stack, an explicit script call-frame chain, and frame-relative local storage.
 
 ## Why Not Register-Based?
 
@@ -31,7 +31,7 @@ For a VM embedded in a proxy runtime, compactness and simple suspension matter m
 A pure stack machine is compact, but it makes durable program state awkward:
 
 - **Repeated variable access becomes clumsy.** Named state turns into `dup`, `swap`, and stack-shape juggling.
-- **Closures need stable storage.** Hidden locals are much simpler than heap-managed environments.
+- **Closures and recursion need stable frame state.** Frame-relative locals and explicit capture environments are simpler to inspect than an implicit language stack.
 - **Suspension is harder to inspect.** Separating temporaries from durable variables makes pause and resume behavior easier to reason about.
 
 Local slots keep the operand stack short-lived and expression-oriented.
@@ -48,11 +48,13 @@ pd-vm uses a language-agnostic execution IR instead. It gives up the elegance of
 
 ## The Design
 
-pd-vm uses a compact bytecode with 25 opcodes. The important split is structural:
+pd-vm uses compact bytecode with a small opcode set. The important split is structural:
 
 - **Operand stack** holds transient expression state.
 - **Local slots** hold durable per-frame state.
 - **Host state** stays outside the VM in the embedding runtime.
+
+`callvalue` invokes a named function, closure, or host function value. A script target pushes a real frame with frame-relative locals, capture bindings, and a typed continuation; `ret` restores the caller or completes the root invocation.
 
 `ldloc` reads a local onto the stack. `stloc` writes the top-of-stack value back into a slot. Arithmetic and comparisons operate on stack values. That is enough to keep the interpreter small while still giving the compiler stable storage.
 
@@ -66,7 +68,7 @@ The VM can clear locals and drain the stack without a tracing collector. In `pd-
 
 ### 2. Clean suspension
 
-When a host call blocks on external work, the continuation is already in the right shape: instruction pointer, stack, and locals. There is no separate coroutine stack and no register remapping step.
+When a host call blocks on external work, the continuation is already in the right shape: instruction pointer, operand stack, active script frames, frame-relative locals, and pending host-operation state. There is no separate coroutine stack and no register remapping step.
 
 ### 3. A practical multi-frontend target
 

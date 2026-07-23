@@ -166,3 +166,13 @@ let first = |value| value + 1;
 let second = |value| value + 1;
 [selected(40), add_one == add_one, first == first, first == second];
 ```
+
+## Exported callbacks
+
+`pub fn` declarations produce exported callable metadata. An embedding host can resolve the function by name, validate its callable schema, and invoke it directly or enqueue it as a typed callback. Callback handles belong to one program generation and become invalid when that program is reset or replaced.
+
+```rss
+pub fn on_event(value: int) -> int {
+    value + 1
+}
+```

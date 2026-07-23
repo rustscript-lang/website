@@ -9,8 +9,10 @@
 | Host function | A capability registered by an embedding runtime and called from RSS. |
 | Edge data plane | pd-edge runtime that handles traffic and executes edge programs. |
 | Controller | pd-controller service that manages edges, programs, and debug sessions. |
-| Function value | A callable represented as a runtime value; currently under active development. |
-| Closure | A callable expression that can capture an enclosing environment. |
+| Function value | A first-class callable runtime value for a named function, builtin, host function, or closure; it can be passed, returned, selected, stored, and invoked. |
+| Closure | A callable value that captures an enclosing environment using copy, borrow, mutable-borrow, or move semantics. |
+| Call frame | The runtime state for one script invocation, including frame-relative locals, capture bindings, and a typed return continuation. |
+| Callback | A typed host-facing handle for an exported or runtime callable; callbacks may run directly or through a queue and are tied to one program generation. |
 | JIT | Just-in-time compilation for hot execution paths. |
 | AOT | Ahead-of-time compilation of an artifact. |
 | `no_std` | Rust environment without the standard library. |

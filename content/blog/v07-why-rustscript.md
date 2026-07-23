@@ -133,7 +133,7 @@ There is a practical benefit that was not part of the original design but became
 The reason is corpus proximity. Large language models trained on significant amounts of Rust code have internalized Rust's ownership patterns, borrow semantics, and idiomatic structures. When asked to write RustScript for pd-vm — which lives in the same repository as the Rust runtime — the model:
 
 1. **Naturally uses ownership-aware patterns.** It writes `let b = a;` as a move and `let b = a.copy();` when it needs the source to survive. It does not try to share mutable state through aliasing.
-2. **Avoids GC-dependent patterns.** Rust-trained models do not reach for garbage-collected idioms like long-lived closures over mutable state or circular references. Those patterns can be natural in compatibility-language frontends but counterproductive for a GC-free runtime.
+2. **Uses explicit callable lifecycles.** Closure captures naturally follow copy, borrow, mutable-borrow, or move intent. Escaping closures retain explicit environments, while host callback handles remain tied to one program generation instead of relying on an unbounded collector-owned object graph.
 3. **Matches the surrounding code style.** The pd-vm runtime is Rust. The compiler is Rust. The test harness is Rust. When the scripting language is also Rust-shaped, the model does not need to context-switch between two different programming idioms within the same codebase.
 4. **Produces more accurate type annotations.** Because the model knows Rust's type annotation syntax, it generates valid RustScript type hints that feed into the compiler's inference pipeline rather than leaving locals at `Unknown`.
 
@@ -142,7 +142,7 @@ This is not a theoretical benefit. In practice, AI-assisted development within t
 ## Where This Falls Short
 
 - **The ownership model is a DX layer, not a safety guarantee.** There are no lifetime parameters, no generic constraints, and no deep borrow tracking into nested data structures. Users expecting Rust-grade safety will find this is closer to TypeScript's relationship with JavaScript: useful lints, not formal verification.
-- **Functions are currently inlined, not first-class.** RustScript inherits the VM's current limitation: no recursive calls, no storing functions in collections. This restricts what users can write regardless of how good the ownership tracking is.
+- **Callable typing is intentionally bounded.** Named functions, builtins, host functions, and closures are first-class values backed by real call frames; they can be passed, returned, selected, stored in arrays or maps, and used recursively. Callable values still cannot be map keys or serialized constants, and generic inference requires an identifiable compatible signature.
 - **The split identity requires clear documentation.** Users need to understand that RustScript's syntax is Rust-like but its semantics are "ownership-informed scripting." The compile-time checks catch the common mistakes — use-after-move, mutation through aliases, uninitialized access — but they are not exhaustive.
 
 ## Conclusion

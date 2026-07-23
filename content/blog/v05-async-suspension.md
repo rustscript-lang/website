@@ -77,7 +77,7 @@ Coroutines would allow suspension from more places, but they would also require 
 - more complicated resume mechanics
 - tighter compiler coupling to yield-capable control flow
 
-pd-vm keeps suspension narrower on purpose. The continuation is just VM state the runtime already owns: instruction pointer, operand stack, locals, and optional pending host-op bookkeeping.
+pd-vm keeps suspension narrower on purpose. The continuation is VM state the runtime already owns: instruction pointer, operand stack, the active script call-frame chain with frame-relative locals and typed return continuations, and optional pending host-op bookkeeping.
 
 That choice keeps the embedding surface simpler and makes pause, resume, pooling, and debugging more direct.
 
