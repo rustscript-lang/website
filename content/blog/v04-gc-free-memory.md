@@ -24,6 +24,7 @@ enum Value {
     Bytes(Arc<Vec<u8>>),
     Array(Arc<Vec<Value>>),
     Map(Arc<VmMap>),
+    Callable(Arc<CallableValue>),
 }
 ```
 
@@ -57,11 +58,11 @@ The result is value-like behavior from the script's perspective:
 - mutation does not leak across aliases
 - ownership stays explicit in the runtime model
 
-## Closure Captures Stay Simple
+## Closure Environments Stay Explicit
 
-Closures capture values into stable storage rather than relying on heap-managed environment graphs. That avoids a large class of runtime complexity around mutable cells, dangling references, and collector-visible captured environments.
+Closures retain captures in reference-counted callable environments. Aliases of one closure share the same environment, while separate factory evaluations allocate independent environments. Capture modes preserve copy, borrow, mutable-borrow, and move behavior; shared mutable captures use synchronized cells.
 
-The compiler does more work here so the VM can do less.
+Callable capture ownership cycles are rejected, so reference-counted cleanup remains deterministic without a tracing collector.
 
 ## Program Sharing and VM Reuse
 

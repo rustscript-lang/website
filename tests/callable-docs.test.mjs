@@ -22,6 +22,11 @@ test("published content describes the current callable and callback runtime", as
   assert.doesNotMatch(combined, /no storing functions in collections/i);
   assert.doesNotMatch(combined, /callable-development-status/i);
   assert.doesNotMatch(combined, /function value[^\n]*active development/i);
+  assert.doesNotMatch(combined, /Callable-as-value support/i);
+  assert.doesNotMatch(combined, /AOT is whole-program and planned/i);
+  assert.doesNotMatch(combined, /stack plus locals is already a compact continuation format/i);
+  assert.doesNotMatch(combined, /closures capture values into hidden local slots/i);
+  assert.doesNotMatch(combined, /Program` owns callable prototypes and callbacks/i);
 
   const terminology = await readFile(new URL("../content/docs/terminology.md", import.meta.url), "utf8");
   const contributor = await readFile(new URL("../content/docs/contribute/vm-and-compiler.md", import.meta.url), "utf8");

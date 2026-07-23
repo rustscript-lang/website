@@ -64,4 +64,3 @@ than optional hints.
 - [ ] Rust-like Option/Result support.
 - [ ] Epoch check should be only on loop start or function call, instead of per interval.
 - [ ] host call fuel budgeting.
-- [ ] Callable-as-value support.

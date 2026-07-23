@@ -36,10 +36,10 @@ SSA is excellent for optimization, but it is the wrong baseline runtime represen
 Stack bytecode is compact because operand flow is implicit. SSA makes that flow explicit, which is valuable for optimization but more expensive to carry in the baseline interpreter.
 
 **2. It complicates control-flow joins.**  
-SSA needs block parameters or phi resolution. A stack machine can keep the continuation model much smaller and simpler.
+SSA needs block parameters or phi resolution. A stack machine with frame-relative locals, an explicit script-frame stack, and typed continuation metadata keeps the resumable execution model compact and inspectable.
 
 **3. It does not help suspension.**  
-The interpreter must pause and resume around host calls, fuel, and epoch deadlines. Stack plus locals is already a compact continuation format. An SSA register file is not.
+The interpreter must pause and resume around host calls, fuel, and epoch deadlines. Operand state and frame-relative locals, together with the script-frame stack and typed continuations, already form a compact continuation format. An SSA register file adds no advantage at that boundary.
 
 **4. It solves the wrong problem at this tier.**  
 The interpreter's job is quick startup, correctness, and simple embedding. SSA becomes useful only once the runtime has decided to optimize.
@@ -72,7 +72,7 @@ This is a targeted optimization tier: specialize the hot path without forcing th
 
 The AOT path lowers the entire program into control-flow blocks, then into typed SSA form. That creates a native artifact that can run without interpreter participation on the hot path while still preserving VM-aware resume points for host calls and yields.
 
-The important difference from trace JIT is scope. AOT is whole-program and planned; trace JIT is local and profile-driven.
+The important difference from trace JIT is scope. AOT compiles or loads a whole-program native artifact before execution; trace JIT is local and profile-driven.
 
 ## Why Cranelift?
 

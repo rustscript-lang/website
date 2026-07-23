@@ -14,7 +14,7 @@ A `Program` carries the executable and its runtime metadata:
 - `type_map: Option<TypeMap>`
 - script-function, callable-prototype, function-region, and root-binding tables
 
-`Program` owns callable prototypes and callbacks derived from them. Replacing a program invalidates callbacks tied to the previous program.
+`Program` owns callable prototypes and exported-callable metadata. `Store` owns callback registrations and invalidates them on reset, VM replacement, shutdown, or unsubscribe.
 
 ## TypeMap
 

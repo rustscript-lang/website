@@ -31,7 +31,7 @@ For a VM embedded in a proxy runtime, compactness and simple suspension matter m
 A pure stack machine is compact, but it makes durable program state awkward:
 
 - **Repeated variable access becomes clumsy.** Named state turns into `dup`, `swap`, and stack-shape juggling.
-- **Closures and recursion need stable frame state.** Frame-relative locals and explicit capture environments are simpler to inspect than an implicit language stack.
+- **Closures and recursion need stable frame state.** Closures retain capture cells in reference-counted callable environments; each invocation binds them into frame-relative local slots.
 - **Suspension is harder to inspect.** Separating temporaries from durable variables makes pause and resume behavior easier to reason about.
 
 Local slots keep the operand stack short-lived and expression-oriented.

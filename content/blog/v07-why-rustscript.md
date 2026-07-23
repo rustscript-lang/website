@@ -92,7 +92,7 @@ RustScript's ownership annotations make liveness analysis more precise because t
 
 ## Closure Captures: Copy, Borrow, Move
 
-pd-vm closures capture values into hidden local slots at the time the closure is created. The source-level capture expression determines the `CaptureBindingMode`:
+Creating a pd-vm closure materializes a reference-counted callable environment containing capture cells. Invoking it installs arguments and environment captures into a new script frame's local slots. The source-level capture expression determines each `CaptureBindingMode`:
 
 ```rustscript
 let data = [1, 2, 3];
@@ -113,7 +113,7 @@ The capture binding modes are:
 | **BorrowMut** | `&mut x` in capture position | Non-consuming; mutation tracked |
 | **Move** | `x` (default for non-copyable) | Outer local consumed |
 
-Compatibility frontends can choose to degrade captures to `Copy` mode. The capture slot still gets a value, but the outer scope keeps its own copy unconditionally.
+Compatibility frontends can choose to degrade captures to `Copy` mode. The callable environment receives a copied capture value, while the outer scope keeps its own value unconditionally.
 
 ## Type Inference and the Ownership Surface
 
@@ -133,7 +133,7 @@ There is a practical benefit that was not part of the original design but became
 The reason is corpus proximity. Large language models trained on significant amounts of Rust code have internalized Rust's ownership patterns, borrow semantics, and idiomatic structures. When asked to write RustScript for pd-vm — which lives in the same repository as the Rust runtime — the model:
 
 1. **Naturally uses ownership-aware patterns.** It writes `let b = a;` as a move and `let b = a.copy();` when it needs the source to survive. It does not try to share mutable state through aliasing.
-2. **Uses explicit callable lifecycles.** Closure captures naturally follow copy, borrow, mutable-borrow, or move intent. Escaping closures retain explicit environments, while host callback handles remain tied to one program generation instead of relying on an unbounded collector-owned object graph.
+2. **Uses explicit callable lifecycles.** Escaping closures and shared mutable capture state are supported through explicit environments and capture modes. Callable capture ownership cycles are rejected, while host callback handles remain tied to one program generation.
 3. **Matches the surrounding code style.** The pd-vm runtime is Rust. The compiler is Rust. The test harness is Rust. When the scripting language is also Rust-shaped, the model does not need to context-switch between two different programming idioms within the same codebase.
 4. **Produces more accurate type annotations.** Because the model knows Rust's type annotation syntax, it generates valid RustScript type hints that feed into the compiler's inference pipeline rather than leaving locals at `Unknown`.
 

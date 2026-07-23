@@ -42,7 +42,7 @@ Proxy scripts are short-lived, request-scoped, and latency-sensitive. A runtime 
 
 ### Debugging and suspension should stay direct
 
-For this VM, it is useful that execution state is visible as instruction pointer, locals, and stack. That model maps cleanly onto suspension, replay, and debugging in a proxy environment.
+For this VM, execution state remains directly visible as an instruction pointer, operand and frame-local storage, active script frames, and typed continuations. That model maps cleanly onto suspension, replay, and debugging in a proxy environment.
 
 ## How pd-vm and pd-edge Cover the Same Needs
 
