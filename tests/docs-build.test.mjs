@@ -36,6 +36,53 @@ function stripDocsTitle(markdown) {
   return markdown.replace(/^<!-- docs-title: .+ -->\n\n/, "");
 }
 
+// Website bundle pages keep the source README prose byte-for-byte, but
+// repo-relative links that only resolve inside the source repository are
+// rewritten to absolute URLs (or the site's own migrated page) so they work
+// on the deployed site. This table is the migration contract for those
+// rewrites; keep it in sync with the canonical pages when editing bundles.
+const repoLinkFixes = {
+  "pd-edge": [
+    ["[`src/abi_impl/http/state.rs`](src/abi_impl/http/state.rs)", "[`src/abi_impl/http/state.rs`](https://github.com/rustscript-lang/pd-edge/blob/master/src/abi_impl/http/state.rs)"],
+    ["[`src/abi_impl/http1/mod.rs`](src/abi_impl/http1/mod.rs)", "[`src/abi_impl/http/outbound_http1.rs`](https://github.com/rustscript-lang/pd-edge/blob/master/src/abi_impl/http/outbound_http1.rs)"],
+    ["[`src/abi_impl/http2/mod.rs`](src/abi_impl/http2/mod.rs)", "[`src/abi_impl/http2/mod.rs`](https://github.com/rustscript-lang/pd-edge/blob/master/src/abi_impl/http2/mod.rs)"],
+    ["[`src/abi_impl/transport/state.rs`](src/abi_impl/transport/state.rs)", "[`src/abi_impl/transport/state.rs`](https://github.com/rustscript-lang/pd-edge/blob/master/src/abi_impl/transport/state.rs)"],
+    ["[`src/abi_impl/transport/udp.rs`](src/abi_impl/transport/udp.rs)", "[`src/abi_impl/transport/udp.rs`](https://github.com/rustscript-lang/pd-edge/blob/master/src/abi_impl/transport/udp.rs)"],
+    ["[`src/abi_impl/websocket/state.rs`](src/abi_impl/websocket/state.rs)", "[`src/abi_impl/websocket/state.rs`](https://github.com/rustscript-lang/pd-edge/blob/master/src/abi_impl/websocket/state.rs)"],
+    ["[`src/abi_impl/mqtt/`](src/abi_impl/mqtt/)", "[`src/abi_impl/mqtt/`](https://github.com/rustscript-lang/pd-edge/tree/master/src/abi_impl/mqtt/)"],
+    ["[`src/abi_impl/webrtc/mod.rs`](src/abi_impl/webrtc/mod.rs)", "[`src/abi_impl/webrtc/mod.rs`](https://github.com/rustscript-lang/pd-edge/blob/master/src/abi_impl/webrtc/mod.rs)"],
+    ["[`docs/full-dag.md`](docs/full-dag.md)", "[`Full DAG Graphs`](../full-dag/)"],
+    ["[`src/abi_impl/transport/`](src/abi_impl/transport/)", "[`src/abi_impl/transport/`](https://github.com/rustscript-lang/pd-edge/tree/master/src/abi_impl/transport/)"],
+    ["[`src/abi_impl/http/helpers.rs`](src/abi_impl/http/helpers.rs)", "[`src/abi_impl/http/helpers.rs`](https://github.com/rustscript-lang/pd-edge/blob/master/src/abi_impl/http/helpers.rs)"],
+    ["[`src/abi_impl/http/`](src/abi_impl/http/)", "[`src/abi_impl/http/`](https://github.com/rustscript-lang/pd-edge/tree/master/src/abi_impl/http/)"],
+    ["[`src/abi_impl/websocket/`](src/abi_impl/websocket/)", "[`src/abi_impl/websocket/`](https://github.com/rustscript-lang/pd-edge/tree/master/src/abi_impl/websocket/)"],
+    ["[`src/abi_impl/webrtc/`](src/abi_impl/webrtc/)", "[`src/abi_impl/webrtc/`](https://github.com/rustscript-lang/pd-edge/tree/master/src/abi_impl/webrtc/)"],
+    ["[`src/runtime/http_plane/proxy_path.rs`](src/runtime/http_plane/proxy_path.rs)", "[`src/runtime/http_plane/proxy_path.rs`](https://github.com/rustscript-lang/pd-edge/blob/master/src/runtime/http_plane/proxy_path.rs)"],
+    ["[`pd-edge-abi/abi.json`](../pd-edge-abi/abi.json)", "[`pd-edge-abi/abi.json`](https://github.com/rustscript-lang/pd-edge/blob/master/pd-edge-abi/abi.json)"],
+    ["[`docs/HTTP_PROXY_PERF_REPORT_2026-03-14.md`](docs/HTTP_PROXY_PERF_REPORT_2026-03-14.md)", "[`docs/HTTP_PROXY_PERF_REPORT_2026-03-14.md`](https://github.com/rustscript-lang/pd-edge/blob/master/docs/HTTP_PROXY_PERF_REPORT_2026-03-14.md)"],
+    ["[`docs/HTTP_PROXY_PERF_REPORT_2026-03-15.md`](docs/HTTP_PROXY_PERF_REPORT_2026-03-15.md)", "[`docs/HTTP_PROXY_PERF_REPORT_2026-03-15.md`](https://github.com/rustscript-lang/pd-edge/blob/master/docs/HTTP_PROXY_PERF_REPORT_2026-03-15.md)"],
+  ],
+  "pd-controller": [
+    ["![pd-controller edge overview](screenshots/edge.jpg)", "![pd-controller edge overview](https://raw.githubusercontent.com/rustscript-lang/pd-controller/master/screenshots/edge.jpg)"],
+    ["![pd-controller program management](screenshots/program.jpg)", "![pd-controller program management](https://raw.githubusercontent.com/rustscript-lang/pd-controller/master/screenshots/program.jpg)"],
+    ["![pd-controller debugger](screenshots/debugger.jpg)", "![pd-controller debugger](https://raw.githubusercontent.com/rustscript-lang/pd-controller/master/screenshots/debugger.jpg)"],
+  ],
+  "micro-rustscript": [
+    ["[Framework API reference](docs/framework-api.md)", "[Framework API reference](https://github.com/rustscript-lang/micro-rustscript/blob/master/docs/framework-api.md)"],
+  ],
+  "flint": [
+    ["[Examples](https://github.com/rustscript-lang/flint/tree/main/examples)", "[Examples](https://github.com/rustscript-lang/flint/tree/master/examples)"],
+    ["[RustScript model programs](https://github.com/rustscript-lang/flint/tree/main/scripts)", "[RustScript model programs](https://github.com/rustscript-lang/flint/tree/master/scripts)"],
+  ],
+};
+
+function applyRepoLinkFixes(markdown, repository) {
+  for (const [from, to] of repoLinkFixes[repository] ?? []) {
+    markdown = markdown.replaceAll(from, to);
+  }
+  return markdown;
+}
+
 function run(command, args) {
   execFileSync(command, args, { cwd: root, stdio: "pipe" });
 }
@@ -49,7 +96,7 @@ test("project documentation bundles preserve every README byte", async () => {
     const documentation = (await Promise.all(
       pages.map(async (page) => stripDocsTitle(await readFile(new URL(page, content), "utf8"))),
     )).join("");
-    assert.equal(documentation, original, repository);
+    assert.equal(applyRepoLinkFixes(original, repository), documentation, repository);
   }
 });
 

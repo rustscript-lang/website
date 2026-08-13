@@ -119,6 +119,6 @@ The host function ABI is the main contract between pd-vm and `pd-edge`: imports 
 
 ## Related
 
-- [Async Suspension Without Coroutines](./v05-async-suspension.md)
-- [Why pd-vm Uses a Stack + Local-Slots Architecture](./v01-why-stack-and-local-slots.md)
-- [The Protocol DAG](./e01-protocol-dag-and-session-reuse.md)
+- [Async Suspension Without Coroutines](../v05-async-suspension/)
+- [Why pd-vm Uses a Stack + Local-Slots Architecture](../v01-why-stack-and-local-slots/)
+- [The Protocol DAG](../e01-protocol-dag-and-session-reuse/)

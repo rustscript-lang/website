@@ -5,14 +5,14 @@
 
 Current state:
 
-- HTTP is implemented today as an explicit graph in [`src/abi_impl/http/state.rs`](src/abi_impl/http/state.rs).
-- Carrier-specific internals now split explicitly into [`src/abi_impl/http1/mod.rs`](src/abi_impl/http1/mod.rs) and [`src/abi_impl/http2/mod.rs`](src/abi_impl/http2/mod.rs). The generic exchange DAG remains in [`src/abi_impl/http/state.rs`](src/abi_impl/http/state.rs).
+- HTTP is implemented today as an explicit graph in [`src/abi_impl/http/state.rs`](https://github.com/rustscript-lang/pd-edge/blob/master/src/abi_impl/http/state.rs).
+- Carrier-specific internals now split explicitly into [`src/abi_impl/http/outbound_http1.rs`](https://github.com/rustscript-lang/pd-edge/blob/master/src/abi_impl/http/outbound_http1.rs) and [`src/abi_impl/http2/mod.rs`](https://github.com/rustscript-lang/pd-edge/blob/master/src/abi_impl/http2/mod.rs). The generic exchange DAG remains in [`src/abi_impl/http/state.rs`](https://github.com/rustscript-lang/pd-edge/blob/master/src/abi_impl/http/state.rs).
 - HTTP/2 support now has explicit runtime-owned carrier state under the generic HTTP exchange DAG. When feature `http2` is enabled, outbound exchanges can negotiate `h2` through a shared upstream session pool, and the data-plane server also tracks downstream HTTP/2 sessions outside per-request VM contexts while VM code stays on `http::exchange::*`.
-- TCP, TLS, and UDP transport state live in [`src/abi_impl/transport/state.rs`](src/abi_impl/transport/state.rs), with UDP host ABI in [`src/abi_impl/transport/udp.rs`](src/abi_impl/transport/udp.rs).
-- WebSocket is implemented today as an explicit child DAG over outbound HTTP-upgrade handles in [`src/abi_impl/websocket/state.rs`](src/abi_impl/websocket/state.rs).
-- MQTT is implemented today as an explicit session DAG over outbound TCP and TLS carriers in [`src/abi_impl/mqtt/`](src/abi_impl/mqtt/). MQTT-over-WebSocket is planned as the next carrier attachment, not fused into the current TCP/TLS path.
-- WebRTC is implemented today as a request-scoped peer-connection/data-channel DAG in [`src/abi_impl/webrtc/mod.rs`](src/abi_impl/webrtc/mod.rs).
-- Full cross-protocol graph: [`docs/full-dag.md`](docs/full-dag.md).
+- TCP, TLS, and UDP transport state live in [`src/abi_impl/transport/state.rs`](https://github.com/rustscript-lang/pd-edge/blob/master/src/abi_impl/transport/state.rs), with UDP host ABI in [`src/abi_impl/transport/udp.rs`](https://github.com/rustscript-lang/pd-edge/blob/master/src/abi_impl/transport/udp.rs).
+- WebSocket is implemented today as an explicit child DAG over outbound HTTP-upgrade handles in [`src/abi_impl/websocket/state.rs`](https://github.com/rustscript-lang/pd-edge/blob/master/src/abi_impl/websocket/state.rs).
+- MQTT is implemented today as an explicit session DAG over outbound TCP and TLS carriers in [`src/abi_impl/mqtt/`](https://github.com/rustscript-lang/pd-edge/tree/master/src/abi_impl/mqtt/). MQTT-over-WebSocket is planned as the next carrier attachment, not fused into the current TCP/TLS path.
+- WebRTC is implemented today as a request-scoped peer-connection/data-channel DAG in [`src/abi_impl/webrtc/mod.rs`](https://github.com/rustscript-lang/pd-edge/blob/master/src/abi_impl/webrtc/mod.rs).
+- Full cross-protocol graph: [`Full DAG Graphs`](../full-dag/).
 - `http`, `http2`, `tls`, `websocket`, `mqtt`, and `webrtc` are feature-gated DAG families. The default build enables `http`, `tls`, and `websocket`.
 - `SharedState` now carries both a shared upstream HTTP session pool and a downstream HTTP/2 session store so carrier-specific state is not owned solely by per-request `ProxyVmContext`.
 - TCP, UDP, TLS, outbound HTTP exchanges, WebSocket connections, MQTT connections, and WebRTC connections are exposed to programs through handle-based host calls:
@@ -175,7 +175,7 @@ TLS session reuse is exactly why advancement must be generic. The system should 
 
 ### HTTP DAG
 
-HTTP is the application DAG over the plaintext stream. Today it is represented in [`src/abi_impl/http/state.rs`](src/abi_impl/http/state.rs) as the generic request/response exchange layer, while HTTP/1.1 and HTTP/2 are carrier realizations beneath it.
+HTTP is the application DAG over the plaintext stream. Today it is represented in [`src/abi_impl/http/state.rs`](https://github.com/rustscript-lang/pd-edge/blob/master/src/abi_impl/http/state.rs) as the generic request/response exchange layer, while HTTP/1.1 and HTTP/2 are carrier realizations beneath it.
 
 Rules:
 
@@ -395,7 +395,7 @@ The clean model is to treat downstream and upstream as separate DAG instances wi
 - downstream UDP and downstream WebRTC handles currently exist only as reserved placeholders in the one-shot HTTP runtime
 - downstream auto-promotion is legal only while the VM has not consumed raw downstream transport or downstream TLS prelude state; upstream has no comparable listener-goal auto-promotion path
 - runtime orchestration connects these DAG instances, but that control flow is not itself a DAG edge or goal
-- [`docs/full-dag.md`](docs/full-dag.md) now shows those two views as separate downstream and upstream/exchange graphs rather than one merged graph
+- [`Full DAG Graphs`](../full-dag/) now shows those two views as separate downstream and upstream/exchange graphs rather than one merged graph
 
 ```mermaid
 flowchart LR
@@ -448,11 +448,11 @@ Current downstream versus upstream difference:
 
 Node ownership in current code:
 
-- TCP, TLS, and UDP transport nodes and state: [`src/abi_impl/transport/`](src/abi_impl/transport/)
-- HTTP nodes and resolver: [`src/abi_impl/http/state.rs`](src/abi_impl/http/state.rs)
-- HTTP validation and map conversion helpers: [`src/abi_impl/http/helpers.rs`](src/abi_impl/http/helpers.rs)
-- HTTP host-call entrypoints that mutate or read nodes: [`src/abi_impl/http/`](src/abi_impl/http/)
-- WebSocket nodes and frame IO: [`src/abi_impl/websocket/`](src/abi_impl/websocket/)
-- MQTT nodes, packet codec, and session IO: [`src/abi_impl/mqtt/`](src/abi_impl/mqtt/)
-- WebRTC nodes, signaling state, and data-channel IO: [`src/abi_impl/webrtc/`](src/abi_impl/webrtc/)
-- data-plane orchestration and exchange resolution: [`src/runtime/http_plane/proxy_path.rs`](src/runtime/http_plane/proxy_path.rs)
+- TCP, TLS, and UDP transport nodes and state: [`src/abi_impl/transport/`](https://github.com/rustscript-lang/pd-edge/tree/master/src/abi_impl/transport/)
+- HTTP nodes and resolver: [`src/abi_impl/http/state.rs`](https://github.com/rustscript-lang/pd-edge/blob/master/src/abi_impl/http/state.rs)
+- HTTP validation and map conversion helpers: [`src/abi_impl/http/helpers.rs`](https://github.com/rustscript-lang/pd-edge/blob/master/src/abi_impl/http/helpers.rs)
+- HTTP host-call entrypoints that mutate or read nodes: [`src/abi_impl/http/`](https://github.com/rustscript-lang/pd-edge/tree/master/src/abi_impl/http/)
+- WebSocket nodes and frame IO: [`src/abi_impl/websocket/`](https://github.com/rustscript-lang/pd-edge/tree/master/src/abi_impl/websocket/)
+- MQTT nodes, packet codec, and session IO: [`src/abi_impl/mqtt/`](https://github.com/rustscript-lang/pd-edge/tree/master/src/abi_impl/mqtt/)
+- WebRTC nodes, signaling state, and data-channel IO: [`src/abi_impl/webrtc/`](https://github.com/rustscript-lang/pd-edge/tree/master/src/abi_impl/webrtc/)
+- data-plane orchestration and exchange resolution: [`src/runtime/http_plane/proxy_path.rs`](https://github.com/rustscript-lang/pd-edge/blob/master/src/runtime/http_plane/proxy_path.rs)

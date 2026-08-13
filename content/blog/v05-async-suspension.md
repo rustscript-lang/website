@@ -137,6 +137,6 @@ pd-vm does not need coroutines to integrate with async I/O. It uses a narrower a
 
 ## Related
 
-- [Why pd-vm Uses a Stack + Local-Slots Architecture](./v01-why-stack-and-local-slots.md)
-- [The Protocol DAG](./e01-protocol-dag-and-session-reuse.md)
-- [Host Function ABI](./v06-host-function-abi.md)
+- [Why pd-vm Uses a Stack + Local-Slots Architecture](../v01-why-stack-and-local-slots/)
+- [The Protocol DAG](../e01-protocol-dag-and-session-reuse/)
+- [Host Function ABI](../v06-host-function-abi/)

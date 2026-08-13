@@ -366,7 +366,7 @@ inside generic tensor operations rather than a model-sized host function.
 ## Links
 
 - [Flint repository](https://github.com/rustscript-lang/flint)
-- [Examples](https://github.com/rustscript-lang/flint/tree/main/examples)
-- [RustScript model programs](https://github.com/rustscript-lang/flint/tree/main/scripts)
+- [Examples](https://github.com/rustscript-lang/flint/tree/master/examples)
+- [RustScript model programs](https://github.com/rustscript-lang/flint/tree/master/scripts)
 - [RustScript](https://github.com/rustscript-lang/rustscript)
 - [Koharu](https://github.com/mayocream/koharu)

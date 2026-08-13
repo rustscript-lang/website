@@ -131,6 +131,6 @@ The protocol DAG lets `pd-edge` model transport and application-layer progress w
 
 ## Related
 
-- [Async Suspension Without Coroutines](./v05-async-suspension.md)
-- [Host Function ABI](./v06-host-function-abi.md)
-- [Why We Didn't Choose a Functional Language](./v03-why-not-functional.md)
+- [Async Suspension Without Coroutines](../v05-async-suspension/)
+- [Host Function ABI](../v06-host-function-abi/)
+- [Why We Didn't Choose a Functional Language](../v03-why-not-functional/)

@@ -100,6 +100,6 @@ SSA is not the baseline runtime format in pd-vm. It is the optimization bridge f
 
 ## Related
 
-- [Why pd-vm Uses a Stack + Local-Slots Architecture](./v01-why-stack-and-local-slots.md)
-- [Async Suspension Without Coroutines](./v05-async-suspension.md)
-- [Host Function ABI](./v06-host-function-abi.md)
+- [Why pd-vm Uses a Stack + Local-Slots Architecture](../v01-why-stack-and-local-slots/)
+- [Async Suspension Without Coroutines](../v05-async-suspension/)
+- [Host Function ABI](../v06-host-function-abi/)

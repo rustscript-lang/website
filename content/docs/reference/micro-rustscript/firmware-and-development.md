@@ -37,7 +37,7 @@ controller functions. ESP32-S31 currently provides digital GPIO, core MCU timing
 output, Wi-Fi, and BLE controller functions. The Arduino host target provides a small GPIO,
 `delay_ms`, and serial-output simulation subset.
 
-See **[Framework API reference](docs/framework-api.md)** for the complete support matrix, RSS
+See **[Framework API reference](https://github.com/rustscript-lang/micro-rustscript/blob/master/docs/framework-api.md)** for the complete support matrix, RSS
 signatures, argument limits, return behavior, asynchronous Wi-Fi semantics, BLE scope, and C host
 callback contract.
 

@@ -95,6 +95,6 @@ The stack + local-slots model is not unusual. What makes it the right choice her
 
 ## Related
 
-- [JIT, AOT, and Why We Lower to SSA](./v02-jit-aot-and-ssa.md)
-- [GC-Free Scripting](./v04-gc-free-memory.md)
-- [Async Suspension Without Coroutines](./v05-async-suspension.md)
+- [JIT, AOT, and Why We Lower to SSA](../v02-jit-aot-and-ssa/)
+- [GC-Free Scripting](../v04-gc-free-memory/)
+- [Async Suspension Without Coroutines](../v05-async-suspension/)

@@ -85,7 +85,7 @@ The result is less language-idealized than a functional runtime. It is also a be
 
 ## Related
 
-- [Why pd-vm Uses a Stack + Local-Slots Architecture](./v01-why-stack-and-local-slots.md)
-- [GC-Free Scripting](./v04-gc-free-memory.md)
-- [Async Suspension Without Coroutines](./v05-async-suspension.md)
-- [The Protocol DAG](./e01-protocol-dag-and-session-reuse.md)
+- [Why pd-vm Uses a Stack + Local-Slots Architecture](../v01-why-stack-and-local-slots/)
+- [GC-Free Scripting](../v04-gc-free-memory/)
+- [Async Suspension Without Coroutines](../v05-async-suspension/)
+- [The Protocol DAG](../e01-protocol-dag-and-session-reuse/)

@@ -48,15 +48,15 @@ It implements:
 
 ### Edge overview
 
-![pd-controller edge overview](screenshots/edge.jpg)
+![pd-controller edge overview](https://raw.githubusercontent.com/rustscript-lang/pd-controller/master/screenshots/edge.jpg)
 
 ### Program management
 
-![pd-controller program management](screenshots/program.jpg)
+![pd-controller program management](https://raw.githubusercontent.com/rustscript-lang/pd-controller/master/screenshots/program.jpg)
 
 ### Debugger
 
-![pd-controller debugger](screenshots/debugger.jpg)
+![pd-controller debugger](https://raw.githubusercontent.com/rustscript-lang/pd-controller/master/screenshots/debugger.jpg)
 
 ## Run
 

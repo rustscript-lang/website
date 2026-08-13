@@ -7,7 +7,7 @@ Host-call ABI metadata is centralized in `pd-edge-abi`:
 
 - Rust constants + metadata: `edge_abi::FUNCTIONS`
 - ABI version: `edge_abi::ABI_VERSION`
-- Manifest: [`pd-edge-abi/abi.json`](../pd-edge-abi/abi.json)
+- Manifest: [`pd-edge-abi/abi.json`](https://github.com/rustscript-lang/pd-edge/blob/master/pd-edge-abi/abi.json)
 
 For embedding with a VM:
 

@@ -97,6 +97,6 @@ For request-scoped proxy scripts, that trade is favorable: no GC pauses, predict
 
 ## Related
 
-- [Why pd-vm Uses a Stack + Local-Slots Architecture](./v01-why-stack-and-local-slots.md)
-- [Why We Didn't Choose a Functional Language](./v03-why-not-functional.md)
-- [Async Suspension Without Coroutines](./v05-async-suspension.md)
+- [Why pd-vm Uses a Stack + Local-Slots Architecture](../v01-why-stack-and-local-slots/)
+- [Why We Didn't Choose a Functional Language](../v03-why-not-functional/)
+- [Async Suspension Without Coroutines](../v05-async-suspension/)
