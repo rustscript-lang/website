@@ -117,7 +117,7 @@ Script call frames default to a limit of 1,024. Use:
 
 A zero limit is rejected. Exceeding the limit returns `VmError::CallStackOverflow`.
 
-Compiled regular expressions used by `re::match`, `re::find`, `re::replace`, `re::split`, and `re::captures` live in hidden per-VM host state owned by the regex host module. `Vm` has no inherent regex-cache field or API. Configuration and statistics are the `RegexCacheVmExt` methods; bring the trait into scope with `use vm::RegexCacheVmExt`.
+Compiled regular expressions used by `re::match`, `re::find`, `re::replace`, `re::split`, and `re::captures` live in hidden per-VM host state owned by the regex host module. `Vm` has no inherent regex-cache field or API. The cache is configured through `RegexCacheVmExt`; bring the trait into scope with `use vm::RegexCacheVmExt`. It never appears in guest arity, schema, catalog fingerprint, or VMBC, and it survives `Vm::reset_for_reuse`.
 
 ```rust
 let mut vm = Vm::new(program);

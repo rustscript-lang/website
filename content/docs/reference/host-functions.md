@@ -28,7 +28,7 @@ One host function declaration produces, in a single macro expansion:
 
 | Part | Meaning |
 |---|---|
-| `schema` | The guest ABI: parameter names, types, passing modes, and return type. This is the only fingerprint input. |
+| `schema` | The guest ABI: parameter names, types, passing modes, and return type. Guest schemas and resource declarations feed the catalog fingerprint. |
 | `binding` | The dispatch class (`Static`, `StaticStack`, `StaticStackRuntimeOwned`, `StaticArgs`, `StaticNonYieldingArgs`, `Owned`). |
 | `adapter` | The concrete adapter or owned-dispatch factory installed into a registry. |
 | `effects` | Guest resource effects and hidden host-state read/write effects. Runtime-only metadata; excluded from the fingerprint. |
@@ -69,7 +69,7 @@ impl vm::HostExtension for DemoExtension {
 
 Installation is transactional and fail-closed. Function schemas, resource declarations, named-struct bodies, binding/adapter agreement, and hidden host-state requirements are validated first. A later failure rolls back every adapter the call installed. Conflicting resource keys or state providers fail before the registry changes.
 
-`install_from_catalog(registry, catalog)` is the descriptor path when the embedder supplies its own catalog snapshot. Every descriptor must match exactly one import in that snapshot.
+`install_from_catalog(registry, catalog)` is the descriptor path when the embedder supplies its own catalog snapshot. Every descriptor must match exactly one import in that snapshot. Each installed import is granted the host-import capability it needs, so a restricted registry (`HostFunctionRegistry::restricted`) keeps its deny-by-default policy for every import the module does not declare.
 
 ## Typed resource effects
 
@@ -121,9 +121,9 @@ The guest parameter and return schemas, plus the resource declarations, come fro
 
 ## Hidden host state
 
-Per-VM and per-scope dependencies that guests must never see are hidden parameters. They do not count toward guest arity, never appear in the schema or fingerprint, and are resolved through the generic host-state table.
+Per-VM dependencies that guests must never see are hidden parameters. They do not count toward guest arity, never appear in the schema, catalog fingerprint, or VMBC, and are resolved through the generic host-state table. `HostStateLifetime` is VM-only: the instance survives `Vm::reset_for_reuse` and execution-scope close, stays isolated between VMs, and drops with the VM.
 
-`HostStateRef<T>` produces a read effect. `HostStateMut<T>` produces a write effect. Both carry a lifecycle (per VM or per scope) and an initializer (required or lazy default), which the module validates when it installs. Hidden state cannot be combined with resource parameters in one function, and cannot cross an async boundary.
+`HostStateRef<T>` is a shared borrow guard and produces a read effect. `HostStateMut<T>` is an exclusive borrow guard and produces a write effect. The wrappers do not carry a lifecycle or initializer. State is created lazily by `HostState::initialize()` on first use unless the embedder preconfigures it with `HostContext::set_host_state` before first use. Hidden state cannot be combined with resource parameters in one function, and cannot cross an async boundary.
 
 The regex host module stores `RegexCache` this way. Interpreter `re::*` functions take `HostStateMut<RegexCache>` instead of `&mut Vm`. Configuration and statistics are `RegexCacheVmExt` methods on `Vm`; see [VM API](/docs/reference/rustscript/vm-api/).
 
