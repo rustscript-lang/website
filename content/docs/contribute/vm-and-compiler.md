@@ -2,7 +2,7 @@
 
 ## VM
 
-`pd-vm` executes compiled bytecode. Its runtime supports synchronous and asynchronous execution, real script call frames, first-class callable values, exported and queued callbacks, debugger-facing state, recording and replay, type metadata, regex caching, fuel, epoch interruption, and trace-JIT hooks.
+`pd-vm` executes compiled bytecode. Its runtime supports synchronous and asynchronous execution, real script call frames, first-class callable values, exported and queued callbacks, debugger-facing state, recording and replay, type metadata, generic host-private state, fuel, epoch interruption, and trace-JIT hooks.
 
 ## Compiler
 

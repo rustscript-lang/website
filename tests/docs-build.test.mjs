@@ -274,6 +274,17 @@ test("RustScript project documentation is split by task and implementation area"
   assert.match(rendered.get("jit-aot"), /NYI/);
 
   const hostFunctions = await readFile(new URL("../public/docs/reference/host-functions/index.html", import.meta.url), "utf8");
+  assert.match(hostFunctions, /HostFunctionDescriptor/);
+  assert.match(hostFunctions, /HostModuleDescriptor/);
+  assert.match(hostFunctions, /ResourceRef/);
+  assert.match(hostFunctions, /ResourceMut/);
+  assert.match(hostFunctions, /ResourceOwned/);
+  assert.match(hostFunctions, /HostStateMut/);
+  assert.match(hostFunctions, /HostNamedStruct/);
+  assert.match(hostFunctions, /Compatibility window/);
+  assert.match(hostFunctions, /HostApiBuilder/);
+  assert.match(rendered.get("vm-api"), /RegexCacheVmExt/);
+  assert.doesNotMatch(rendered.get("vm-api"), /Each VM also owns an LRU cache/);
   assert.match(hostFunctions, /Generated <code>#\[pd_host_function\]<\/code> binding selection/);
   await assert.rejects(access(new URL("../public/docs/reference/rustscript/development/index.html", import.meta.url)));
   await assert.rejects(access(new URL("../public/docs/reference/rustscript/internals/index.html", import.meta.url)));
