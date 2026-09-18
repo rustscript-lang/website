@@ -47,11 +47,11 @@ Running it with `cargo run` prints `RustScript result: [Int(42)]`.
 An embedding application follows this boundary:
 
 1. Compile RSS source with `pd-vm`.
-2. Register only the host functions the application wants to expose.
+2. Install only the host modules the application wants to expose, using an ordered `HostModuleDescriptor`.
 3. Create a VM or store with the compiled program.
 4. Run or resume execution and handle the returned status.
 
-The [host functions](/docs/reference/host-functions/) document namespaces, signatures, and capability boundaries. Use [runtime controls](/docs/reference/runtime-controls/) for fuel, epoch interruption, recording, VMBC, JIT, WebAssembly, and `no_std` modes.
+The [host functions](/docs/reference/host-functions/) document descriptors, typed resource effects, hidden host state, named structs, namespaces, and the compatibility window. Use [runtime controls](/docs/reference/runtime-controls/) for fuel, epoch interruption, recording, VMBC, JIT, WebAssembly, and `no_std` modes.
 
 ## Compatibility frontends
 

@@ -117,18 +117,20 @@ Script call frames default to a limit of 1,024. Use:
 
 A zero limit is rejected. Exceeding the limit returns `VmError::CallStackOverflow`.
 
-Each VM also owns an LRU cache for compiled regular expressions used by `re::match`, `re::find`, `re::replace`, `re::split`, and `re::captures`:
+Compiled regular expressions used by `re::match`, `re::find`, `re::replace`, `re::split`, and `re::captures` live in hidden per-VM host state owned by the regex host module. `Vm` has no inherent regex-cache field or API. The cache is configured through `RegexCacheVmExt`; bring the trait into scope with `use vm::RegexCacheVmExt`. It never appears in guest arity, schema, catalog fingerprint, or VMBC, and it survives `Vm::reset_for_reuse`.
 
 ```rust
 let mut vm = Vm::new(program);
 assert_eq!(vm.regex_cache_capacity(), 512);
-vm.set_regex_cache_capacity(128);
+vm.set_regex_cache_capacity(128)
+    .expect("regex cache is available");
 
 // Zero clears entries and disables the cache.
-vm.set_regex_cache_capacity(0);
+vm.set_regex_cache_capacity(0)
+    .expect("regex cache is available");
 ```
 
-Inspect cache state with `regex_cache_entry_count()`, `regex_cache_compile_count()`, and `regex_cache_hit_count()`.
+Inspect cache state with `regex_cache_entry_count()`, `regex_cache_compile_count()`, and `regex_cache_hit_count()`. The default capacity is 512 until the cache is initialized.
 
 ### Runtime output and diagnostics
 

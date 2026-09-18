@@ -44,7 +44,7 @@ cargo build --workspace --release
 ### Implementation reference
 
 - [Bytecode](./bytecode/) — `Program`, `TypeMap`, opcodes, VMBC, assembler, and embedded execution.
-- [VM API](./vm-api/) — categorized Rust APIs for VM lifecycle, `Store`, callbacks, host operations, limits, and diagnostics.
+- [VM API](./vm-api/) — categorized Rust APIs for VM lifecycle, `Store`, callbacks, host operations, limits, diagnostics, and host-private state.
 - [Compiler](./compiler/) — frontend-independent IR, type validation, lifetime/liveness lowering, and bytecode lowering.
 - [JIT and AOT](./jit-aot/) — native backends, artifacts, coverage, diagnostics, and NYI boundaries.
 

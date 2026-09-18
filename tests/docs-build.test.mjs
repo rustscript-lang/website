@@ -274,6 +274,17 @@ test("RustScript project documentation is split by task and implementation area"
   assert.match(rendered.get("jit-aot"), /NYI/);
 
   const hostFunctions = await readFile(new URL("../public/docs/reference/host-functions/index.html", import.meta.url), "utf8");
+  assert.match(hostFunctions, /HostFunctionDescriptor/);
+  assert.match(hostFunctions, /HostModuleDescriptor/);
+  assert.match(hostFunctions, /ResourceRef/);
+  assert.match(hostFunctions, /ResourceMut/);
+  assert.match(hostFunctions, /ResourceOwned/);
+  assert.match(hostFunctions, /HostStateMut/);
+  assert.match(hostFunctions, /HostNamedStruct/);
+  assert.match(hostFunctions, /Compatibility window/);
+  assert.match(hostFunctions, /HostApiBuilder/);
+  assert.match(rendered.get("vm-api"), /RegexCacheVmExt/);
+  assert.doesNotMatch(rendered.get("vm-api"), /Each VM also owns an LRU cache/);
   assert.match(hostFunctions, /Generated <code>#\[pd_host_function\]<\/code> binding selection/);
   await assert.rejects(access(new URL("../public/docs/reference/rustscript/development/index.html", import.meta.url)));
   await assert.rejects(access(new URL("../public/docs/reference/rustscript/internals/index.html", import.meta.url)));
@@ -290,6 +301,48 @@ test("RustScript project documentation is split by task and implementation area"
     expectedPages.map(([, title]) => title),
   );
   window.close();
+});
+
+test("published host-function pages describe per-VM host state and catalog fingerprints", async () => {
+  run("node", ["scripts/build-docs.mjs"]);
+
+  const hostWindow = new Window();
+  hostWindow.document.write(await readFile(new URL("../public/docs/reference/host-functions/index.html", import.meta.url), "utf8"));
+  const hostText = hostWindow.document.querySelector("article")?.textContent ?? "";
+  assert.match(hostText, /Per-VM dependencies that guests must never see/);
+  assert.match(hostText, /HostState::initialize\(\)/);
+  assert.match(hostText, /HostContext::set_host_state/);
+  assert.match(hostText, /never appear in the schema, catalog fingerprint, or VMBC/);
+  assert.match(hostText, /survives Vm::reset_for_reuse/);
+  assert.match(hostText, /drops with the VM/);
+  assert.match(hostText, /borrow guard/);
+  assert.match(hostText, /do not carry a lifecycle or initializer/);
+  assert.match(hostText, /resource declarations/);
+  assert.match(hostText, /deny-by-default/);
+  assert.match(hostText, /HostFunctionRegistry::restricted/);
+  assert.doesNotMatch(hostText, /per[- ]scope/i);
+  assert.doesNotMatch(hostText, /required initializer|required or lazy default|the only fingerprint input/i);
+  hostWindow.close();
+
+  const terminologyWindow = new Window();
+  terminologyWindow.document.write(await readFile(new URL("../public/docs/terminology/index.html", import.meta.url), "utf8"));
+  const terminologyText = terminologyWindow.document.querySelector("article")?.textContent ?? "";
+  assert.match(terminologyText, /Per-VM host-private state/);
+  assert.match(terminologyText, /catalog fingerprint/);
+  assert.match(terminologyText, /VMBC/);
+  assert.match(terminologyText, /reset_for_reuse/);
+  assert.match(terminologyText, /drops with the VM/);
+  assert.doesNotMatch(terminologyText, /per[- ]scope/i);
+  terminologyWindow.close();
+
+  const vmWindow = new Window();
+  vmWindow.document.write(await readFile(new URL("../public/docs/reference/rustscript/vm-api/index.html", import.meta.url), "utf8"));
+  const vmText = vmWindow.document.querySelector("article")?.textContent ?? "";
+  assert.match(vmText, /hidden per-VM host state/);
+  assert.match(vmText, /RegexCacheVmExt/);
+  assert.match(vmText, /survives Vm::reset_for_reuse/);
+  assert.match(vmText, /never appears in guest arity, schema, catalog fingerprint, or VMBC/);
+  vmWindow.close();
 });
 
 test("Syntax Cheatsheet is split into complete highlighted RSS topic pages", async () => {

@@ -7,6 +7,9 @@
 | `pd-vm` | The RustScript virtual machine and compiler crate. |
 | VMBC | The portable bytecode artifact format. |
 | Host function | A capability registered by an embedding runtime and called from RSS. |
+| Host function descriptor | The generated schema, binding, adapter, resource types, and runtime-only effects for one `#[pd_host_function]`. |
+| Host module descriptor | An explicit ordered list of host functions and extra resource declarations that installs as one catalog. |
+| Host state | Per-VM host-private state injected as a hidden parameter. It is excluded from guest arity, schema, catalog fingerprint, and VMBC; it survives `Vm::reset_for_reuse` and drops with the VM. |
 | Edge data plane | pd-edge runtime that handles traffic and executes edge programs. |
 | Controller | pd-controller service that manages edges, programs, and debug sessions. |
 | Function value | A first-class callable runtime value for a named function, builtin, host function, or closure; it can be passed, returned, selected, stored, and invoked. |
