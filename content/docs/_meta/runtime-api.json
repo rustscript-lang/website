@@ -397,7 +397,7 @@
           {
             "name": "encode",
             "qualified": "json::encode",
-            "description": "Encodes the value as a JSON string through the named schema `T`. The RSS boundary requires the `::<T>` form; an untyped value is rejected at compile time.",
+            "description": "Encodes the value as a JSON string through the schema inferred from the checked argument, or through the named schema `T` when written as `encode::<T>`. A value with no concrete encodable schema, such as a dynamic map, is rejected at compile time.",
             "signatures": [
               "fn encode::<T>(value: T) -> string"
             ]

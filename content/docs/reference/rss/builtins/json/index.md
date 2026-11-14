@@ -16,7 +16,7 @@ use json;
 
 | Function | Description |
 | --- | --- |
-| [`encode`](#encode) | Encodes the value as a JSON string through the named schema `T`. The RSS boundary requires the `::<T>` form; an untyped value is rejected at compile time. |
+| [`encode`](#encode) | Encodes the value as a JSON string through the schema inferred from the checked argument, or through the named schema `T` when written as `encode::<T>`. A value with no concrete encodable schema, such as a dynamic map, is rejected at compile time. |
 | [`decode`](#decode) | Decodes a JSON document and projects the decoded tree onto the named schema `T`. Duplicate object keys are rejected. A malformed document is a fatal host error rather than a `Result`, so callers cannot branch on decode failure; the `::<T>` type argument is required at the RSS boundary. |
 
 ## Function details
@@ -27,7 +27,7 @@ use json;
 fn encode::<T>(value: T) -> string
 ```
 
-Encodes the value as a JSON string through the named schema `T`. The RSS boundary requires the `::<T>` form; an untyped value is rejected at compile time.
+Encodes the value as a JSON string through the schema inferred from the checked argument, or through the named schema `T` when written as `encode::<T>`. A value with no concrete encodable schema, such as a dynamic map, is rejected at compile time.
 
 ### `decode`
 
