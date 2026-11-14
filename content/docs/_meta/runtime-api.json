@@ -397,18 +397,16 @@
           {
             "name": "encode",
             "qualified": "json::encode",
-            "description": "Encodes the value as a JSON string. The `::<T>` form encodes through the named schema `T`.",
+            "description": "Encodes the value as a JSON string through the named schema `T`. The RSS boundary requires the `::<T>` form; an untyped value is rejected at compile time.",
             "signatures": [
-              "fn encode(value: any) -> string",
               "fn encode::<T>(value: T) -> string"
             ]
           },
           {
             "name": "decode",
             "qualified": "json::decode",
-            "description": "Decodes a JSON document. The `::<T>` form projects the decoded tree onto the named schema `T`. Duplicate object keys are rejected. A malformed document is a fatal host error rather than a `Result`, so callers cannot branch on decode failure yet.",
+            "description": "Decodes a JSON document and projects the decoded tree onto the named schema `T`. Duplicate object keys are rejected. A malformed document is a fatal host error rather than a `Result`, so callers cannot branch on decode failure; the `::<T>` type argument is required at the RSS boundary.",
             "signatures": [
-              "fn decode(text: string) -> unknown",
               "fn decode::<T>(text: string) -> T"
             ]
           }

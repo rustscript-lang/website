@@ -95,7 +95,7 @@ test("WinForms carousel uses direct RSS callable event handlers", () => {
   const code = page.window.document.getElementById("example-code").textContent;
 
   for (const expected of [
-    "fn on_close() -> null",
+    "fn on_close() -> ()",
     "Ui::BindClosing(form, || on_close())",
     "Ui::Show(form)",
   ]) {
