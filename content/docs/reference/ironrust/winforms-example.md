@@ -2,6 +2,8 @@
 
 The checked-in `examples/dotnet-typed-winforms.rss` program is a Notepad-style Windows application written in RustScript. It is the complete application, not a C# shell around a script.
 
+This page reproduces the program at the core revision IronRust pins, where a Unit-returning function is spelled `-> null`. The current core spells the same contract `-> ()` and has no `null` literal; IronRust has not migrated to it yet, so the checked-in example is presented as it ships rather than rewritten to a spelling its toolchain does not accept.
+
 The source creates and controls:
 
 - a `Form` and `RichTextBox`

@@ -16,25 +16,23 @@ use json;
 
 | Function | Description |
 | --- | --- |
-| [`encode`](#encode) | Encodes a `Value` into a JSON string. |
-| [`decode`](#decode) | Decodes a JSON string into a `Value`. |
+| [`encode`](#encode) | Encodes the value as a JSON string through the schema inferred from the checked argument, or through the named schema `T` when written as `encode::<T>`. A value with no concrete encodable schema, such as a dynamic map, is rejected at compile time. |
+| [`decode`](#decode) | Decodes a JSON document and projects the decoded tree onto the named schema `T`. Duplicate object keys are rejected. A malformed document is a fatal host error rather than a `Result`, so callers cannot branch on decode failure; the `::<T>` type argument is required at the RSS boundary. |
 
 ## Function details
 
 ### `encode`
 
 ```rss
-fn encode(value: any) -> string
+fn encode::<T>(value: T) -> string
 ```
 
-Encodes a `Value` into a JSON string.
+Encodes the value as a JSON string through the schema inferred from the checked argument, or through the named schema `T` when written as `encode::<T>`. A value with no concrete encodable schema, such as a dynamic map, is rejected at compile time.
 
 ### `decode`
 
 ```rss
-fn decode(text: string) -> unknown
+fn decode::<T>(text: string) -> T
 ```
 
-Decodes a JSON string into a `Value`.
-Note: This function enforces a strict unique-keys contract for JSON objects.
-If the JSON string contains duplicate keys, it will return an error instead of letting the last key win.
+Decodes a JSON document and projects the decoded tree onto the named schema `T`. Duplicate object keys are rejected. A malformed document is a fatal host error rather than a `Result`, so callers cannot branch on decode failure; the `::<T>` type argument is required at the RSS boundary.

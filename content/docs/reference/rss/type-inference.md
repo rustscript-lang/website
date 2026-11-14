@@ -67,17 +67,32 @@ let selected: int = if use_primary => {
 };
 ```
 
-## Optional refinement
+## `Option` refinement
 
-A non-null path or `Some(value)` pattern refines `T?` to `T` inside the selected expression.
+An `Option<T>`, `Result<T, E>`, or bare `()` annotation fixes a schema that inference cannot pick on its own. Matching a constructor arm refines the payload to its concrete schema inside that arm, while the absent arm contributes no payload type.
 
 ```rss
-let candidate: int? = 41;
-let answer: int = match candidate {
-    Some(value) => value + 1,
-    None => 0,
-    _ => 0,
+fn describe(candidate: Option<int>) -> string {
+    match candidate {
+        Option::Some(value) => "present " + value,
+        Option::None => "absent",
+    }
+}
+let present: Option<int> = Option::Some(41);
+let absent: Option<int> = Option::None;
+let promoted: Option<int> = present.map(|value| value + 1);
+describe(promoted) + describe(absent);
+```
+
+`Option::Some` infers its payload schema from the payload it carries, but `Option::None` has no payload to infer from, so it needs an annotation or another contextual type; a bare `Result::Ok(7)` is in the same position. Missing type arguments are rejected rather than invented as `unknown`.
+
+```rss
+let failure: Result<int, string> = Result::Err("missing field");
+let status: string = match failure {
+    Result::Ok(code) => "ok",
+    Result::Err(reason) => reason,
 };
+status;
 ```
 
 ## Explicit generic calls

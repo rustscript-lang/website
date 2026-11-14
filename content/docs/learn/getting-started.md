@@ -27,9 +27,8 @@ let closure_value = add(5);
 
 let profile: Profile = {stats: {score: closure_value}};
 let matched = match profile?.stats?.score {
-    None => 0,
-    Some(score) => if score == 12 => { closure_value } else => { 0 },
-    _ => 0,
+    Option::None => 0,
+    Option::Some(score) => if score == 12 => { closure_value } else => { 0 },
 };
 ```
 

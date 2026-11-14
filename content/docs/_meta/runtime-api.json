@@ -69,7 +69,7 @@
           {
             "name": "get",
             "qualified": "get",
-            "description": "Read a string entry.",
+            "description": "Read a string, array, byte, or map entry. An absent map key or an out-of-range index is a fatal runtime error, not an absent value; test presence with `has` or project with `?.[]`.",
             "signatures": [
               "fn get(text: string, index: int) -> string",
               "fn get(items: array, index: int) -> unknown",
@@ -80,7 +80,7 @@
           {
             "name": "has",
             "qualified": "has",
-            "description": "Check whether an array contains a valid index.",
+            "description": "Check whether an array, byte sequence, or map contains a valid index or key.",
             "signatures": [
               "fn has(items: array, index: int) -> bool",
               "fn has(items: bytes, index: int) -> bool",
@@ -125,9 +125,9 @@
           {
             "name": "assert",
             "qualified": "assert",
-            "description": "Abort execution if the condition is false.",
+            "description": "Aborts execution when the condition is false. The call yields no usable value and is written as a statement, not bound to a variable.",
             "signatures": [
-              "fn assert(condition: bool) -> null"
+              "fn assert(condition: bool) -> unknown"
             ]
           },
           {
@@ -273,57 +273,57 @@
           {
             "name": "open",
             "qualified": "io::open",
-            "description": "Opens a file handle for runtime I/O.",
+            "description": "Opens a file handle as an `io.file` resource, or returns the OS error text.",
             "signatures": [
-              "fn open(path: string, mode: string) -> int"
+              "fn open(path: string, mode: string) -> Result<io.file, string>"
             ]
           },
           {
             "name": "popen",
             "qualified": "io::popen",
-            "description": "Starts a child process and returns a process-backed handle.",
+            "description": "Starts a child process and returns a process-backed `io.file` resource, or the OS error text.",
             "signatures": [
-              "fn popen(command: string, mode: string) -> int"
+              "fn popen(command: string, mode: string) -> Result<io.file, string>"
             ]
           },
           {
             "name": "read_all",
             "qualified": "io::read_all",
-            "description": "Reads all remaining text from an I/O handle.",
+            "description": "Reads all remaining text from an I/O handle, or returns the OS error text.",
             "signatures": [
-              "fn read_all(handle_id: int) -> string"
+              "fn read_all(handle: io.file) -> Result<string, string>"
             ]
           },
           {
             "name": "read_line",
             "qualified": "io::read_line",
-            "description": "Reads a single line of text from an I/O handle.",
+            "description": "Reads a single line from an I/O handle. End of file is `Result::Ok(Option::None)`; a present but empty line is `Result::Ok(Option::Some(\"\"))`.",
             "signatures": [
-              "fn read_line(handle_id: int) -> string"
+              "fn read_line(handle: io.file) -> Result<Option<string>, string>"
             ]
           },
           {
             "name": "write",
             "qualified": "io::write",
-            "description": "Writes text to an I/O handle.",
+            "description": "Writes text to an I/O handle and returns the number of bytes written, or the OS error text.",
             "signatures": [
-              "fn write(handle_id: int, text: string) -> int"
+              "fn write(handle: io.file, text: string) -> Result<int, string>"
             ]
           },
           {
             "name": "flush",
             "qualified": "io::flush",
-            "description": "Flushes buffered output for an I/O handle.",
+            "description": "Flushes buffered output for an I/O handle, or returns the OS error text.",
             "signatures": [
-              "fn flush(handle_id: int) -> bool"
+              "fn flush(handle: io.file) -> Result<(), string>"
             ]
           },
           {
             "name": "close",
             "qualified": "io::close",
-            "description": "Closes an I/O handle.",
+            "description": "Closes an I/O handle, consuming the resource, or returns the OS error text. A close failure is reported instead of being swallowed.",
             "signatures": [
-              "fn close(handle_id: int) -> bool"
+              "fn close(handle: io.file) -> Result<(), string>"
             ]
           },
           {
@@ -355,10 +355,9 @@
           {
             "name": "find",
             "qualified": "re::find",
-            "description": "Returns the first substring matched by a regular expression.",
+            "description": "Returns the first substring matched by a regular expression as `Option<string>`. A missing match is `Option::None`; an empty match stays `Option::Some(\"\")`.",
             "signatures": [
-              "fn find(pattern: string, text: string) -> string",
-              "null"
+              "fn find(pattern: string, text: string) -> Option<string>"
             ]
           },
           {
@@ -374,15 +373,15 @@
             "qualified": "re::split",
             "description": "Splits a string on regular-expression matches.",
             "signatures": [
-              "fn split(pattern: string, text: string) -> array"
+              "fn split(pattern: string, text: string) -> [string]"
             ]
           },
           {
             "name": "captures",
             "qualified": "re::captures",
-            "description": "Returns the capture groups produced by the first regular-expression match.",
+            "description": "Returns the capture groups of the first match. Group 0 and every participating group are `Option::Some`; an unmatched optional group is `Option::None`, and a missing match is an empty array.",
             "signatures": [
-              "fn captures(pattern: string, text: string) -> array"
+              "fn captures(pattern: string, text: string) -> [Option<string>]"
             ]
           }
         ]
@@ -398,17 +397,17 @@
           {
             "name": "encode",
             "qualified": "json::encode",
-            "description": "Encodes a `Value` into a JSON string.",
+            "description": "Encodes the value as a JSON string through the schema inferred from the checked argument, or through the named schema `T` when written as `encode::<T>`. A value with no concrete encodable schema, such as a dynamic map, is rejected at compile time.",
             "signatures": [
-              "fn encode(value: any) -> string"
+              "fn encode::<T>(value: T) -> string"
             ]
           },
           {
             "name": "decode",
             "qualified": "json::decode",
-            "description": "Decodes a JSON string into a `Value`.\nNote: This function enforces a strict unique-keys contract for JSON objects.\nIf the JSON string contains duplicate keys, it will return an error instead of letting the last key win.",
+            "description": "Decodes a JSON document and projects the decoded tree onto the named schema `T`. Duplicate object keys are rejected. A malformed document is a fatal host error rather than a `Result`, so callers cannot branch on decode failure; the `::<T>` type argument is required at the RSS boundary.",
             "signatures": [
-              "fn decode(text: string) -> unknown"
+              "fn decode::<T>(text: string) -> T"
             ]
           }
         ]
@@ -939,9 +938,9 @@
           {
             "name": "index_of",
             "qualified": "index_of",
-            "description": "Returns the first index of needle in buf, or -1 when it is absent.",
+            "description": "Returns the first index of needle in buf as `Option<int>`, or `Option::None` when it is absent.",
             "signatures": [
-              "pub fn index_of(buf: bytes, needle: bytes) -> int"
+              "pub fn index_of(buf: bytes, needle: bytes) -> Option<int>"
             ]
           },
           {
@@ -1005,9 +1004,9 @@
           {
             "name": "index_of",
             "qualified": "index_of",
-            "description": "Returns the first index of a value in an array, or -1 when it is absent.",
+            "description": "Returns the first index of a value in an array as `Option<int>`, or `Option::None` when it is absent.",
             "signatures": [
-              "pub fn index_of<T>(values: [T], needle: T) -> int"
+              "pub fn index_of<T>(values: [T], needle: T) -> Option<int>"
             ]
           },
           {
@@ -1087,33 +1086,33 @@
           {
             "name": "read_text",
             "qualified": "read_text",
-            "description": "Reads an entire file into a string.",
+            "description": "Reads an entire file into a string, or returns the IO error.",
             "signatures": [
-              "pub fn read_text(path: string) -> string"
+              "pub fn read_text(path: string) -> Result<string, string>"
             ]
           },
           {
             "name": "write_text",
             "qualified": "write_text",
-            "description": "Writes text to a file, replacing any existing contents.",
+            "description": "Writes text to a file, replacing any existing contents, and returns the bytes written or the IO error.",
             "signatures": [
-              "pub fn write_text(path: string, text: string) -> int"
+              "pub fn write_text(path: string, text: string) -> Result<int, string>"
             ]
           },
           {
             "name": "append_text",
             "qualified": "append_text",
-            "description": "Appends text to the end of a file.",
+            "description": "Appends text to the end of a file and returns the bytes written or the IO error.",
             "signatures": [
-              "pub fn append_text(path: string, text: string) -> int"
+              "pub fn append_text(path: string, text: string) -> Result<int, string>"
             ]
           },
           {
             "name": "read_lines",
             "qualified": "read_lines",
-            "description": "Reads a file and splits it into newline-delimited lines.",
+            "description": "Reads a file and splits it into newline-delimited lines, or returns the IO error.",
             "signatures": [
-              "pub fn read_lines(path: string) -> [string]"
+              "pub fn read_lines(path: string) -> Result<[string], string>"
             ]
           }
         ],
@@ -1233,9 +1232,9 @@
           {
             "name": "each",
             "qualified": "each",
-            "description": "Calls a function for each value in an array and returns null.",
+            "description": "Calls a function for each value in an array and returns Unit.",
             "signatures": [
-              "pub fn each<T, U>(values: [T], func: fn(T) -> U) -> null"
+              "pub fn each<T, U>(values: [T], func: fn(T) -> U) -> ()"
             ]
           }
         ],
@@ -1291,15 +1290,15 @@
           {
             "name": "peek",
             "qualified": "peek",
-            "description": "Returns the cached value without updating recency.",
+            "description": "Returns the cached value without updating recency, or `Option::None` when the key is absent.",
             "signatures": [
-              "pub fn peek<K, V>(cache: LruCacheState<K, V>, key: K) -> LruPeekResult<V>"
+              "pub fn peek<K, V>(cache: LruCacheState<K, V>, key: K) -> Option<V>"
             ]
           },
           {
             "name": "get",
             "qualified": "get",
-            "description": "Returns the cached value and promotes it to the most recently used position.",
+            "description": "Promotes the key to the most recently used position and returns the updated cache state with `value: Option<V>`; a missing key yields `Option::None` and leaves the state unchanged.",
             "signatures": [
               "pub fn get<K, V>(cache: LruCacheState<K, V>, key: K) -> LruGetResult<K, V>"
             ]
@@ -1363,17 +1362,17 @@
           {
             "name": "oldest",
             "qualified": "oldest",
-            "description": "Returns the oldest cache entry report.",
+            "description": "Returns the oldest cache entry, or `Option::None` when the cache is empty.",
             "signatures": [
-              "pub fn oldest<K, V>(cache: LruCacheState<K, V>) -> LruEntryReport<K, V>"
+              "pub fn oldest<K, V>(cache: LruCacheState<K, V>) -> Option<LruEntryRow<K, V>>"
             ]
           },
           {
             "name": "newest",
             "qualified": "newest",
-            "description": "Returns the newest cache entry report.",
+            "description": "Returns the newest cache entry, or `Option::None` when the cache is empty.",
             "signatures": [
-              "pub fn newest<K, V>(cache: LruCacheState<K, V>) -> LruEntryReport<K, V>"
+              "pub fn newest<K, V>(cache: LruCacheState<K, V>) -> Option<LruEntryRow<K, V>>"
             ]
           }
         ],
@@ -1384,19 +1383,9 @@
             "declaration": "struct LruCacheState<K, V> {\n    capacity: int,\n    size: int,\n    next_id: int,\n    head: int,\n    tail: int,\n    lookup: map<int>,\n    nodes: map<LruNode<K, V>>\n}"
           },
           {
-            "name": "LruPeekResult",
-            "description": "Result of a non-promoting cache lookup.",
-            "declaration": "struct LruPeekResult<V> {\n    found: bool,\n    value: V\n}"
-          },
-          {
             "name": "LruGetResult",
-            "description": "Result of a promoting cache lookup, including the updated cache state.",
-            "declaration": "struct LruGetResult<K, V> {\n    cache: LruCacheState<K, V>,\n    found: bool,\n    value: V\n}"
-          },
-          {
-            "name": "LruEntryReport",
-            "description": "Optional oldest or newest cache entry.",
-            "declaration": "struct LruEntryReport<K, V> {\n    found: bool,\n    key: K,\n    value: V\n}"
+            "description": "Result of a promoting cache lookup: the updated cache state and an optional payload.",
+            "declaration": "struct LruGetResult<K, V> {\n    cache: LruCacheState<K, V>,\n    value: Option<V>\n}"
           },
           {
             "name": "LruEntryRow",
@@ -1873,17 +1862,17 @@
           {
             "name": "try_parse_int_base",
             "qualified": "try_parse_int_base",
-            "description": "Parses an integer literal for the given base and returns null on failure.",
+            "description": "Parses an integer literal for the given base as `Option<int>`, or `Option::None` when it is invalid.",
             "signatures": [
-              "pub fn try_parse_int_base(value: string, base: int) -> int?"
+              "pub fn try_parse_int_base(value: string, base: int) -> Option<int>"
             ]
           },
           {
             "name": "try_parse_int",
             "qualified": "try_parse_int",
-            "description": "Parses a base-10 integer literal and returns null on failure.",
+            "description": "Parses a base-10 integer literal as `Option<int>`, or `Option::None` when it is invalid.",
             "signatures": [
-              "pub fn try_parse_int(value: string) -> int?"
+              "pub fn try_parse_int(value: string) -> Option<int>"
             ]
           },
           {
@@ -1913,9 +1902,9 @@
           {
             "name": "try_parse_bool",
             "qualified": "try_parse_bool",
-            "description": "Parses a boolean literal and returns null on failure.",
+            "description": "Parses a boolean literal as `Option<bool>`, or `Option::None` when it is invalid.",
             "signatures": [
-              "pub fn try_parse_bool(value: string) -> bool?"
+              "pub fn try_parse_bool(value: string) -> Option<bool>"
             ]
           },
           {

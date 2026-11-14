@@ -42,7 +42,7 @@ Important behaviors include:
 - `+` becomes string concatenation when either operand is known to be a string.
 - Callable return types propagate through named calls, function-valued locals, closures, and callable parameters when the callee remains identifiable.
 - Known incompatible `if`/`else` results and branch-local merges are compile errors.
-- Optional values retain their inner type after `unwrap_or`, a non-null refinement, or a `Some(name)` match arm.
+- `Option` and `Result` payloads retain their inner type after `unwrap_or`, a `?` propagation, or an `Option::Some(name)`/`Result::Ok(name)` match arm.
 
 This metadata drives diagnostics and monomorphic runtime paths. It is intentionally smaller than a complete source-language static type system.
 
@@ -105,9 +105,9 @@ Host imports must be explicit in RSS, for example `use runtime;` or `use http;`.
 
 ### Types and control flow
 
-- RustScript uses explicit nullable schemas such as `int?` and `Profile?`; non-optional declared locals and returns reject `null`.
-- Optional chaining requires a user-declared container schema.
-- `match` patterns currently cover int/string/null literals, `None`, `Some(name)`, `_`, and supported type constructors.
+- RustScript uses the explicit `Option<T>` and `Result<T, E>` schemas; there is no `T?` suffix and no `null` type. `None` has no payload to infer from, so `Option::None` and a bare `Result::Ok` need an annotation or another contextual type.
+- Fallible projection (`?.`, `?.[]`) requires a user-declared container schema, and propagation (`?`) is accepted only inside a function whose return type is a matching `Option` or `Result`.
+- `match` patterns currently cover int/string/bytes literals, `Option::Some(name)`/`Option::None`, `Result::Ok(name)`/`Result::Err(name)`, `_`, and supported type constructors. The bare `Some(name)`/`None` spellings remain only as the retired optional-slot mechanism and do not match a logical `Option`.
 - `break` and `continue` are valid only inside loops.
 
 ### Modules and plugins

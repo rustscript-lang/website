@@ -27,7 +27,7 @@ use stdlib::rss::iter;
 | [`map`](#map) | Applies a function to each value in an array. |
 | [`filter`](#filter) | Returns the values for which pred(value) is true. |
 | [`reduce`](#reduce) | Reduces an array by applying func(acc, value) from left to right. |
-| [`each`](#each) | Calls a function for each value in an array and returns null. |
+| [`each`](#each) | Calls a function for each value in an array and returns Unit. |
 
 ## Function details
 
@@ -138,7 +138,7 @@ Reduces an array by applying func(acc, value) from left to right.
 ### `each`
 
 ```rss
-pub fn each<T, U>(values: [T], func: fn(T) -> U) -> null
+pub fn each<T, U>(values: [T], func: fn(T) -> U) -> ()
 ```
 
-Calls a function for each value in an array and returns null.
+Calls a function for each value in an array and returns Unit.

@@ -151,6 +151,22 @@ pub fn get_config(vm: &mut Vm) -> VmResult<JitConfig> {
 
 The generated descriptor emits the full `Named { name, fields }` schema, and the module catalog derives the named struct from it. Do not model public host request, result, or event values as `Map(unknown)` or `unknown`.
 
+## Unit, Option, and Result in host schemas
+
+The guest schema is part of the catalog fingerprint, so a host function cannot leave "no value" or "no result" implicit. `HostTypeSchema` names the three contract shapes explicitly:
+
+| Rust return | Guest schema | Guest spelling |
+|---|---|---|
+| `()` or no return type | `HostTypeSchema::Unit` | `()` |
+| `GuestOption<T>` | `HostTypeSchema::Option(inner)` | `Option<T>` |
+| `GuestResult<T, E>` | `HostTypeSchema::Result { ok, err }` | `Result<T, E>` |
+
+`VmResult<...>` stays the outer channel: a guest `Option::None` or `Result::Err` is a normal returned value, while a fatal VM or host error remains a `VmResult` error and no guest value is produced. `GuestOption<T>` and `GuestResult<T, E>` are the guest unions; both encode a Boolean `tag` plus the active `payload`, so `Option::Some(0)`, `Option::Some(false)`, `Option::Some("")`, `Option::Some(())`, and `Option::None` stay distinct and payload truthiness never selects a variant.
+
+Use the `Result` channel for a *recoverable* outcome and a fatal error for a programming or configuration mistake. The `io` builtin follows that split: `io::open`, `io::popen`, `io::read_all`, `io::read_line`, `io::write`, `io::flush`, and `io::close` return `Result<..., string>` for operating-system failures, while an invalid or closed handle, a policy denial, a size limit, and an unsupported mode stay fatal errors. `io::read_line` shows why the two unions compose — end of file is `Result::Ok(Option::None)`, and a present but empty line is `Result::Ok(Option::Some(""))`.
+
+The `HostTypeSchema::Null` and `HostTypeSchema::Optional` variants remain for the compatibility window and for schemas declared through the retired nullable surface. Do not add them to a new host function: nullable absence is not part of the current guest contract, and a new declaration should publish `Unit`, `Option<T>`, or `Result<T, E>` instead.
+
 ## Runtime-specific namespaces
 
 | Runtime | Example namespaces |
@@ -160,6 +176,22 @@ The generated descriptor emits the full `Named { name, fields }` schema, and the
 | micro-rustscript | `gpio`, `i2c`, `mcu`, `serial`, `wifi`, `bluetooth` |
 | IronRust | typed `System::...` imports |
 | Flint | `flint::cli`, `flint::runtime`, `flint::llama`, `flint::tensor` and related namespaces |
+
+## Runtime migration status
+
+The Unit, Option, and Result contract is implemented on the pending core branch (`fc8b0c81`, pull request #39) and has not reached the core `master` branch yet. Consumers reach it through different dependency shapes, so the same contract implies different amounts of remaining work. This table records each consumer's manifest and source state today; it is not a migration promise.
+
+| Consumer | Core dependency | Status |
+|---|---|---|
+| Core RustScript | in tree | Implements the contract on the pending branch. Builtin `io`, `re`, and `json` schemas plus the `bytes`, `collections`, `io`, `iter`, `lrucache`, and `parse` stdlib modules publish `Unit`, `Option`, or `Result` returns, and this reference and the generated API pages describe that state. |
+| pd-edge | in-repository `pd-edge-abi`; `master` publishes `ABI_VERSION = 25` | In review. Pull request #3 raises the ABI to 26 and turns the HTTP header getters, `get_query_arg`, and the response/exchange trailer getters into `Result<Option<string>, string>`; `master` still describes the earlier surface. |
+| IronRust | pinned core revision plus a CLR-side VMBC reader | Not migrated. `master` reads VMBC version 13 and pins a core revision that predates the contract, so it rejects version 14 bytecode; the probe on `probe/core-pin-fc8b0c81` shows the native writer and the managed reader both need work. |
+| micro-rustscript | pinned core revision plus its own toolchain pin | In review. Pull request #2 moves the pin to `fc8b0c81` and raises the toolchain to 1.96; the production sources are unchanged. |
+| ngx-rustscript | pinned core revision | Not migrated. It already installs host functions through descriptors, but its pin precedes the contract: the probe on `probe/core-pin-fc8b0c81` compiles cleanly and then rejects 76 of 199 host return schemas at runtime, while its RSS sources still spell `null` and the runtime suites fail on the new contract. |
+| Flint, Bevy gameplay | git-pinned core revision (`b1d6cff`) | Not migrated. Both pin the pre-contract revision, so they need a pin bump plus host-bridge and example re-verification before the contract applies. |
+| Pingora gateway, egui UI, GPUI notepad | path dependencies on a local core checkout | Compile against whatever core checkout is present and therefore pick up the contract without a version bump, but no migration is claimed here: their host bridges and example scripts must be re-verified before they are described as migrated. |
+
+When a consumer migrates, the visible change is in its catalog: `Option<T>` and `Result<T, E>` replace nullable returns, `()` replaces "no value", and recoverable failures move from a fatal error into the `Result` error payload. A consumer that still documents `T?`, a `null` literal, or a sentinel value has not migrated.
 
 ## Host functions as callable values
 

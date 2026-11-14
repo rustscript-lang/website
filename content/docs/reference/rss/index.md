@@ -4,9 +4,9 @@ RSS is RustScript's native source language. This reference follows a Rust-like p
 
 ## Types and values
 
-- [Primitive Types and Literals](./primitive-types/) — `int`, `float`, `number`, `bool`, `string`, `bytes`, `null`, and literal forms.
-- [Type Inference and Annotations](./type-inference/) — inferred locals, explicit schemas, numeric widening, branch merging, and contextual callable inference.
-- [Collections, Structs, and Optional Values](./collections-and-structs/) — arrays, maps, tuple schemas, structs, generics, `T?`, optional chaining, and slices.
+- [Primitive Types and Literals](./primitive-types/) — `int`, `float`, `number`, `bool`, `string`, `bytes`, Unit `()`, `Option<T>`, `Result<T, E>`, and literal forms.
+- [Type Inference and Annotations](./type-inference/) — inferred locals, explicit schemas, numeric widening, branch merging, `Option` refinement, and contextual callable inference.
+- [Collections, Structs, and Optional Values](./collections-and-structs/) — arrays, maps, tuple schemas, structs, generics, `Option` and `Result` values, fallible projection, and slices.
 
 ## State and expressions
 

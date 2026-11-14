@@ -55,7 +55,7 @@ normal + grouped;
 
 ```rss
 let language = "Rust" + "Script";
-let version = language + " " + 1;
+let version = language + " " + "4";
 version;
 ```
 
@@ -97,26 +97,58 @@ point.x + point.y;
 
 ## Index access
 
-`value[index]` reads arrays, maps, strings, and bytes according to the container contract.
+`value[index]` reads arrays, maps, strings, and bytes according to the container contract. Array and byte indexes must be in range and non-negative; a map key that was never written is a fatal `map key not found` error rather than an absent value, so test it with `has` or project it with `?.[]` when absence is expected.
 
 ```rss
 let values = [10, 20, 30];
 let labels = {answer: 42};
-values[1] + labels["answer"];
+let present = labels.has("answer");
+let fallback = if present => { labels["answer"] } else => { 0 };
+values[1] + fallback;
 ```
 
-## Optional access
+## Fallible projection
 
-`?.` and `?.[]` propagate `null` instead of failing at an absent optional step.
+`receiver?.field` and `receiver?.[index]` are fallible projection. They evaluate to an `Option` of the projected value: a missing map key, an out-of-range array or string index, or a receiver that is already `Option::None` produces `Option::None` instead of failing. Neither form propagates out of the enclosing function.
 
 ```rss
 struct State {
     values: array<int>,
 }
-let state: State? = null;
-let value = state?.values?.[0];
-value == null;
+let state: State = {values: [41]};
+let present: Option<int> = state?.values?.[0];
+let missing: Option<int> = state?.values?.[5];
+let answered: int = match present {
+    Option::Some(value) => value,
+    Option::None => 0,
+};
+answered + missing.unwrap_or(-1);
 ```
+
+The receiver set is narrow: field projection admits a struct schema or a declared `map<T>`, index projection additionally admits a declared array, `string`, or `bytes`, and a chain rooted in such a local is admitted like the local itself. Everything else — `int`, `number`, a `Result`, an unresolved generic parameter — is refused by the checker, and a binding without a declared schema fails with `optional access requires a user-declared schema in RustScript`.
+
+## Propagation
+
+`?` is postfix propagation, not a type suffix. On an `Option` operand it passes a `Some` payload through and exits the current `Option`-returning function on `Option::None`; on a `Result` operand it passes an `Ok` payload through and returns the original `Err`. Error types must match exactly — use `map_err` or `ok_or` for an explicit conversion, because no implicit error conversion is inserted.
+
+```rss
+fn parse_number(text: string) -> Result<int, string> {
+    if text == "42" => {
+        Result::Ok(42)
+    } else => {
+        Result::Err("not 42")
+    }
+}
+
+fn doubled(text: string) -> Result<int, string> {
+    let value = parse_number(text)?;
+    Result::Ok(value * 2)
+}
+
+doubled("42").unwrap_or(-1) + doubled("other").unwrap_or(0);
+```
+
+Arguments, statements, and side effects after a propagating `?` do not run, and a `?` inside a closure exits that closure rather than its caller. `?` is rejected in a root script, in a function whose return type is not a matching `Option` or `Result`, on an operand of another type, on an optional `Result`, and on a mismatched error type.
 
 ## Copy expressions
 
