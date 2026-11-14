@@ -15,9 +15,7 @@ use stdlib::rss::lrucache;
 | Type | Description |
 | --- | --- |
 | [`LruCacheState`](#lrucachestate) | Opaque cache state passed to and returned by cache operations. |
-| [`LruPeekResult`](#lrupeekresult) | Result of a non-promoting cache lookup. |
-| [`LruGetResult`](#lrugetresult) | Result of a promoting cache lookup, including the updated cache state. |
-| [`LruEntryReport`](#lruentryreport) | Optional oldest or newest cache entry. |
+| [`LruGetResult`](#lrugetresult) | Result of a promoting cache lookup: the updated cache state and an optional payload. |
 | [`LruEntryRow`](#lruentryrow) | Key-value row returned by `entries`. |
 
 ## Data type details
@@ -38,40 +36,16 @@ struct LruCacheState<K, V> {
 
 Opaque cache state passed to and returned by cache operations.
 
-### `LruPeekResult`
-
-```rss
-struct LruPeekResult<V> {
-    found: bool,
-    value: V
-}
-```
-
-Result of a non-promoting cache lookup.
-
 ### `LruGetResult`
 
 ```rss
 struct LruGetResult<K, V> {
     cache: LruCacheState<K, V>,
-    found: bool,
-    value: V
+    value: Option<V>
 }
 ```
 
-Result of a promoting cache lookup, including the updated cache state.
-
-### `LruEntryReport`
-
-```rss
-struct LruEntryReport<K, V> {
-    found: bool,
-    key: K,
-    value: V
-}
-```
-
-Optional oldest or newest cache entry.
+Result of a promoting cache lookup: the updated cache state and an optional payload.
 
 ### `LruEntryRow`
 
@@ -93,8 +67,8 @@ Key-value row returned by `entries`.
 | [`len`](#len) | Returns the number of cached entries. |
 | [`is_empty`](#is-empty) | Returns whether the cache is empty. |
 | [`has`](#has) | Returns whether the cache contains a key. |
-| [`peek`](#peek) | Returns the cached value without updating recency. |
-| [`get`](#get) | Returns the cached value and promotes it to the most recently used position. |
+| [`peek`](#peek) | Returns the cached value without updating recency, or `Option::None` when the key is absent. |
+| [`get`](#get) | Promotes the key to the most recently used position and returns the updated cache state with `value: Option<V>`; a missing key yields `Option::None` and leaves the state unchanged. |
 | [`put`](#put) | Inserts or updates a cache entry and returns the next cache state. |
 | [`touch`](#touch) | Promotes a key to the most recently used position if it exists. |
 | [`remove`](#remove) | Removes a cache entry by key. |
@@ -102,8 +76,8 @@ Key-value row returned by `entries`.
 | [`keys`](#keys) | Returns cache keys from oldest to newest. |
 | [`values`](#values) | Returns cache values from oldest to newest. |
 | [`entries`](#entries) | Returns cache entries from oldest to newest. |
-| [`oldest`](#oldest) | Returns the oldest cache entry report. |
-| [`newest`](#newest) | Returns the newest cache entry report. |
+| [`oldest`](#oldest) | Returns the oldest cache entry, or `Option::None` when the cache is empty. |
+| [`newest`](#newest) | Returns the newest cache entry, or `Option::None` when the cache is empty. |
 
 ## Function details
 
@@ -150,10 +124,10 @@ Returns whether the cache contains a key.
 ### `peek`
 
 ```rss
-pub fn peek<K, V>(cache: LruCacheState<K, V>, key: K) -> LruPeekResult<V>
+pub fn peek<K, V>(cache: LruCacheState<K, V>, key: K) -> Option<V>
 ```
 
-Returns the cached value without updating recency.
+Returns the cached value without updating recency, or `Option::None` when the key is absent.
 
 ### `get`
 
@@ -161,7 +135,7 @@ Returns the cached value without updating recency.
 pub fn get<K, V>(cache: LruCacheState<K, V>, key: K) -> LruGetResult<K, V>
 ```
 
-Returns the cached value and promotes it to the most recently used position.
+Promotes the key to the most recently used position and returns the updated cache state with `value: Option<V>`; a missing key yields `Option::None` and leaves the state unchanged.
 
 ### `put`
 
@@ -222,15 +196,15 @@ Returns cache entries from oldest to newest.
 ### `oldest`
 
 ```rss
-pub fn oldest<K, V>(cache: LruCacheState<K, V>) -> LruEntryReport<K, V>
+pub fn oldest<K, V>(cache: LruCacheState<K, V>) -> Option<LruEntryRow<K, V>>
 ```
 
-Returns the oldest cache entry report.
+Returns the oldest cache entry, or `Option::None` when the cache is empty.
 
 ### `newest`
 
 ```rss
-pub fn newest<K, V>(cache: LruCacheState<K, V>) -> LruEntryReport<K, V>
+pub fn newest<K, V>(cache: LruCacheState<K, V>) -> Option<LruEntryRow<K, V>>
 ```
 
-Returns the newest cache entry report.
+Returns the newest cache entry, or `Option::None` when the cache is empty.

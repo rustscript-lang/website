@@ -23,7 +23,7 @@ A `Program` carries the executable and its runtime metadata:
 - `operand_types: HashMap<usize, (ValueType, ValueType)>`
 - `local_types: Vec<ValueType>`
 
-`operand_types` is keyed by bytecode offset and records inferred operand pairs for binary operations and comparisons. `local_types` is a post-lowering local-slot summary. Compiler-inserted `null` clears and hidden frame slots can widen entries to `Unknown` or `Null`, so it is not a source-level binding table.
+`operand_types` is keyed by bytecode offset and records inferred operand pairs for binary operations and comparisons. `local_types` is a post-lowering local-slot summary. Compiler-inserted clears of the internal Null carrier (also the physical carrier of Unit values) and hidden frame slots can widen entries to `Unknown` or `Null`, so it is not a source-level binding table.
 
 ## Instruction encoding
 

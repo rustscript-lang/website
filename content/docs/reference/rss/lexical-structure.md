@@ -39,20 +39,21 @@ final_result;
 Reserved words introduce declarations and control flow. Type names such as `int` and `string` are schema identifiers interpreted in type position.
 
 ```rss
-pub fn choose(value: int?) -> int {
+pub fn choose(value: Option<int>) -> int {
     match value {
-        Some(found) => found,
-        None => 0,
-        _ => 0,
+        Option::Some(found) => found,
+        Option::None => 0,
     }
 }
-let mut result = choose(42);
+let mut result = choose(Option::Some(42));
 result;
 ```
 
 | Declarations | Control flow | Literals and bindings |
 |---|---|---|
-| `pub`, `fn`, `struct`, `use`, `as` | `if`, `else`, `while`, `for`, `in`, `match`, `break`, `continue` | `let`, `true`, `false`, `null` |
+| `pub`, `fn`, `struct`, `use`, `as` | `if`, `else`, `while`, `for`, `in`, `match`, `break`, `continue` | `let`, `true`, `false` |
+
+`null` is neither a keyword nor a literal. Absence is written `Option::None`, and "no value produced" is the Unit value `()`. `Option`, `Result`, `Some`, `None`, `Ok`, and `Err` are built-in type and constructor names rather than reserved words, so the lexer reads them as ordinary identifiers and paths.
 
 ## Integer literals
 
@@ -99,7 +100,7 @@ header.length + control.length;
 
 ## Delimiters and punctuation
 
-Parentheses group expressions and calls, braces delimit blocks and maps, brackets delimit arrays and indexes, commas separate items, colons attach schemas or values, and `::` selects namespace members.
+Parentheses group expressions and calls, braces delimit blocks and maps, brackets delimit arrays and indexes, commas separate items, colons attach schemas or values, and `::` selects namespace members. An empty `(` `)` pair spells both the Unit type and the Unit value, and the punctuator list also includes the two distinct postfix operators `?` (propagation) and `?.` (fallible projection), which follow their operand with no intervening token.
 
 ```rss
 use math;

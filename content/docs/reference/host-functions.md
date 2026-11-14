@@ -151,6 +151,22 @@ pub fn get_config(vm: &mut Vm) -> VmResult<JitConfig> {
 
 The generated descriptor emits the full `Named { name, fields }` schema, and the module catalog derives the named struct from it. Do not model public host request, result, or event values as `Map(unknown)` or `unknown`.
 
+## Unit, Option, and Result in host schemas
+
+The guest schema is part of the catalog fingerprint, so a host function cannot leave "no value" or "no result" implicit. `HostTypeSchema` names the three contract shapes explicitly:
+
+| Rust return | Guest schema | Guest spelling |
+|---|---|---|
+| `()` or no return type | `HostTypeSchema::Unit` | `()` |
+| `GuestOption<T>` | `HostTypeSchema::Option(inner)` | `Option<T>` |
+| `GuestResult<T, E>` | `HostTypeSchema::Result { ok, err }` | `Result<T, E>` |
+
+`VmResult<...>` stays the outer channel: a guest `Option::None` or `Result::Err` is a normal returned value, while a fatal VM or host error remains a `VmResult` error and no guest value is produced. `GuestOption<T>` and `GuestResult<T, E>` are the guest unions; both encode a Boolean `tag` plus the active `payload`, so `Option::Some(0)`, `Option::Some(false)`, `Option::Some("")`, `Option::Some(())`, and `Option::None` stay distinct and payload truthiness never selects a variant.
+
+Use the `Result` channel for a *recoverable* outcome and a fatal error for a programming or configuration mistake. The `io` builtin follows that split: `io::open`, `io::popen`, `io::read_all`, `io::read_line`, `io::write`, `io::flush`, and `io::close` return `Result<..., string>` for operating-system failures, while an invalid or closed handle, a policy denial, a size limit, and an unsupported mode stay fatal errors. `io::read_line` shows why the two unions compose — end of file is `Result::Ok(Option::None)`, and a present but empty line is `Result::Ok(Option::Some(""))`.
+
+The `HostTypeSchema::Null` and `HostTypeSchema::Optional` variants remain for the compatibility window and for schemas declared through the retired nullable surface. Do not add them to a new host function: nullable absence is not part of the current guest contract, and a new declaration should publish `Unit`, `Option<T>`, or `Result<T, E>` instead.
+
 ## Runtime-specific namespaces
 
 | Runtime | Example namespaces |
@@ -160,6 +176,21 @@ The generated descriptor emits the full `Named { name, fields }` schema, and the
 | micro-rustscript | `gpio`, `i2c`, `mcu`, `serial`, `wifi`, `bluetooth` |
 | IronRust | typed `System::...` imports |
 | Flint | `flint::cli`, `flint::runtime`, `flint::llama`, `flint::tensor` and related namespaces |
+
+## Runtime migration status
+
+The Unit, Option, and Result contract is implemented in the core runtime. Consumers reach it through different dependency shapes, so the same contract implies different amounts of remaining work. This table records only what each consumer's manifest and source state today; it is not a migration promise.
+
+| Consumer | Core dependency | Status |
+|---|---|---|
+| Core RustScript | in tree | Implements the contract. Builtin `io`, `re`, and `json` schemas plus the `bytes`, `collections`, `io`, `iter`, `lrucache`, and `parse` stdlib modules publish `Unit`, `Option`, or `Result` returns, and this reference and the generated API pages describe that state. |
+| pd-edge | in-repository `pd-edge-abi` with `ABI_VERSION = 24` | Not migrated. The ABI revision has not been raised for the contract, so its host signatures still describe the earlier surface. |
+| IronRust | pinned core revision consumed by its CLR compiler | Not migrated. The CLR VMBC reader accepts VMBC version 10 and the checked-in WinForms example still spells `-> null`, both of which predate the contract. |
+| micro-rustscript | pinned core revision plus its own toolchain pin | Not migrated. Firmware images and the VMBC compiler binary are built from that pin, not from the core checkout that implements the contract. |
+| ngx-rustscript | pinned core revision | Not migrated. It already installs host functions through descriptors, but its pin precedes the contract, so its catalogs advertise the earlier surface. |
+| Flint, Pingora gateway, Bevy gameplay, egui UI, GPUI notepad | path dependencies on a local core checkout | Compile against whatever core checkout is present, so they pick up the contract without a version bump, but no migration is claimed here: their host bridges and example scripts must be re-verified against the contract before they are described as migrated. |
+
+When a consumer migrates, the visible change is in its catalog: `Option<T>` and `Result<T, E>` replace nullable returns, `()` replaces "no value", and recoverable failures move from a fatal error into the `Result` error payload. A consumer that still documents `T?`, a `null` literal, or a sentinel value has not migrated.
 
 ## Host functions as callable values
 

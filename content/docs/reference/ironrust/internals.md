@@ -66,11 +66,11 @@ The current metadata scanner exposes:
 
 Generic members, `out` parameters, pointers, by-reference types, and byref-like types are omitted.
 
-Schema conversion is defined by `TryGetSchema`:
+Schema conversion is defined by `TryGetSchema`. IronRust maps a CLR `void` to the internal Null carrier, which is how its pinned core revision represented "no value" before the logical Unit type existed; the current core spells that contract `()`.
 
 | CLR shape | RustScript schema |
 | --- | --- |
-| `void` | `null` |
+| `void` | internal Null carrier (Unit in the current core) |
 | `string`, `char`, enum | `string` |
 | `bool` | `bool` |
 | `byte[]` | `bytes` |

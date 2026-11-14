@@ -18,7 +18,7 @@ use stdlib::rss::bytes;
 | [`equal`](#equal) | Returns whether two byte sequences are equal. |
 | [`starts_with`](#starts-with) | Returns whether buf starts with prefix. |
 | [`ends_with`](#ends-with) | Returns whether buf ends with suffix. |
-| [`index_of`](#index-of) | Returns the first index of needle in buf, or -1 when it is absent. |
+| [`index_of`](#index-of) | Returns the first index of needle in buf as `Option<int>`, or `Option::None` when it is absent. |
 | [`push_u8`](#push-u8) | Appends a single u8 value to a byte sequence. |
 | [`read_u8`](#read-u8) | Reads a u8 value at the given offset. |
 | [`read_u16_be`](#read-u16-be) | Reads a big-endian u16 at the given offset. |
@@ -63,10 +63,10 @@ Returns whether buf ends with suffix.
 ### `index_of`
 
 ```rss
-pub fn index_of(buf: bytes, needle: bytes) -> int
+pub fn index_of(buf: bytes, needle: bytes) -> Option<int>
 ```
 
-Returns the first index of needle in buf, or -1 when it is absent.
+Returns the first index of needle in buf as `Option<int>`, or `Option::None` when it is absent.
 
 ### `push_u8`
 

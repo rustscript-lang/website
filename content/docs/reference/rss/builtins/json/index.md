@@ -16,8 +16,8 @@ use json;
 
 | Function | Description |
 | --- | --- |
-| [`encode`](#encode) | Encodes a `Value` into a JSON string. |
-| [`decode`](#decode) | Decodes a JSON string into a `Value`. |
+| [`encode`](#encode) | Encodes the value as a JSON string. The `::<T>` form encodes through the named schema `T`. |
+| [`decode`](#decode) | Decodes a JSON document. The `::<T>` form projects the decoded tree onto the named schema `T`. Duplicate object keys are rejected. A malformed document is a fatal host error rather than a `Result`, so callers cannot branch on decode failure yet. |
 
 ## Function details
 
@@ -27,7 +27,11 @@ use json;
 fn encode(value: any) -> string
 ```
 
-Encodes a `Value` into a JSON string.
+```rss
+fn encode::<T>(value: T) -> string
+```
+
+Encodes the value as a JSON string. The `::<T>` form encodes through the named schema `T`.
 
 ### `decode`
 
@@ -35,6 +39,8 @@ Encodes a `Value` into a JSON string.
 fn decode(text: string) -> unknown
 ```
 
-Decodes a JSON string into a `Value`.
-Note: This function enforces a strict unique-keys contract for JSON objects.
-If the JSON string contains duplicate keys, it will return an error instead of letting the last key win.
+```rss
+fn decode::<T>(text: string) -> T
+```
+
+Decodes a JSON document. The `::<T>` form projects the decoded tree onto the named schema `T`. Duplicate object keys are rejected. A malformed document is a fatal host error rather than a `Result`, so callers cannot branch on decode failure yet.

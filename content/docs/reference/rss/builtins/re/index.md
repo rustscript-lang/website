@@ -17,10 +17,10 @@ use re;
 | Function | Description |
 | --- | --- |
 | [`match`](#match) | Returns whether a regular expression matches the input text. |
-| [`find`](#find) | Returns the first substring matched by a regular expression. |
+| [`find`](#find) | Returns the first substring matched by a regular expression as `Option<string>`. A missing match is `Option::None`; an empty match stays `Option::Some("")`. |
 | [`replace`](#replace) | Replaces all regular-expression matches in a string. |
 | [`split`](#split) | Splits a string on regular-expression matches. |
-| [`captures`](#captures) | Returns the capture groups produced by the first regular-expression match. |
+| [`captures`](#captures) | Returns the capture groups of the first match. Group 0 and every participating group are `Option::Some`; an unmatched optional group is `Option::None`, and a missing match is an empty array. |
 
 ## Function details
 
@@ -35,14 +35,10 @@ Returns whether a regular expression matches the input text.
 ### `find`
 
 ```rss
-fn find(pattern: string, text: string) -> string
+fn find(pattern: string, text: string) -> Option<string>
 ```
 
-```rss
-null
-```
-
-Returns the first substring matched by a regular expression.
+Returns the first substring matched by a regular expression as `Option<string>`. A missing match is `Option::None`; an empty match stays `Option::Some("")`.
 
 ### `replace`
 
@@ -55,7 +51,7 @@ Replaces all regular-expression matches in a string.
 ### `split`
 
 ```rss
-fn split(pattern: string, text: string) -> array
+fn split(pattern: string, text: string) -> [string]
 ```
 
 Splits a string on regular-expression matches.
@@ -63,7 +59,7 @@ Splits a string on regular-expression matches.
 ### `captures`
 
 ```rss
-fn captures(pattern: string, text: string) -> array
+fn captures(pattern: string, text: string) -> [Option<string>]
 ```
 
-Returns the capture groups produced by the first regular-expression match.
+Returns the capture groups of the first match. Group 0 and every participating group are `Option::Some`; an unmatched optional group is `Option::None`, and a missing match is an empty array.

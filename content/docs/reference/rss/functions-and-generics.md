@@ -24,14 +24,37 @@ square(6);
 
 ## Parameters and return schemas
 
-Parameters use `name: Schema`; a result schema follows `->`.
+Parameters use `name: Schema`; a result schema follows `->`. A function with no `->` clause has the Unit return type `()`, and `-> ()` states that type explicitly.
 
 ```rss
-fn describe(name: string, score: int) -> string {
-    name + ":" + score
+fn describe(name: string, score: int) -> [string, int] {
+    [name, score]
 }
-describe("Ada", 42);
+let row: [string, int] = describe("Ada", 42);
+row[0].length + row[1];
 ```
+
+## Unit results and Unit callables
+
+A Unit-returning function still has a value: calling it produces `()`, which can be bound, passed, and returned like any other value. A callable schema spells that contract as `fn() -> ()`.
+
+```rss
+fn tick() {}
+
+fn apply_times(step: fn() -> (), times: int) -> () {
+    let mut done = 0;
+    while done < times {
+        step();
+        done += 1;
+    }
+    ()
+}
+
+let completed: () = apply_times(tick, 3);
+completed;
+```
+
+Unit is a distinct logical type even though the VM carries it in its internal Null slot, so a Unit result is not "no value" and is not `Option::None`. Use `Option<T>` when a call may legitimately have nothing to return.
 
 ## Public functions
 

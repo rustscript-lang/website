@@ -16,13 +16,13 @@ These functions are available directly; no `use` declaration is required.
 | [`array_new`](#array-new) | Create an empty array. |
 | [`array_push`](#array-push) | Append a value to an array and return the updated array. |
 | [`map_new`](#map-new) | Create an empty map. |
-| [`get`](#get) | Read a string entry. |
-| [`has`](#has) | Check whether an array contains a valid index. |
+| [`get`](#get) | Read a string, array, byte, or map entry. An absent map key or an out-of-range index is a fatal runtime error, not an absent value; test presence with `has` or project with `?.[]`. |
+| [`has`](#has) | Check whether an array, byte sequence, or map contains a valid index or key. |
 | [`type`](#type) | Return the runtime type name of a value. |
 | [`set`](#set) | Update an array entry and return the updated array. |
 | [`keys`](#keys) | Return an array of container keys or indices. |
 | [`count`](#count) | Return the number of entries in an array or map. |
-| [`assert`](#assert) | Abort execution if the condition is false. |
+| [`assert`](#assert) | Aborts execution when the condition is false. The call yields no usable value and is written as a statement, not bound to a variable. |
 | [`string_contains`](#string-contains) | Return true when `needle` is found within `text`. |
 | [`string_replace_literal`](#string-replace-literal) | Replace non-overlapping literal `needle` matches in `text`. |
 | [`string_lower_ascii`](#string-lower-ascii) | Lower ASCII `A`-`Z` bytes in `text` while preserving UTF-8. |
@@ -126,7 +126,7 @@ fn get(items: bytes, index: int) -> int
 fn get(entries: map, key: any) -> unknown
 ```
 
-Read a string entry.
+Read a string, array, byte, or map entry. An absent map key or an out-of-range index is a fatal runtime error, not an absent value; test presence with `has` or project with `?.[]`.
 
 ### `has`
 
@@ -142,7 +142,7 @@ fn has(items: bytes, index: int) -> bool
 fn has(entries: map, key: any) -> bool
 ```
 
-Check whether an array contains a valid index.
+Check whether an array, byte sequence, or map contains a valid index or key.
 
 ### `type`
 
@@ -191,10 +191,10 @@ Return the number of entries in an array or map.
 ### `assert`
 
 ```rss
-fn assert(condition: bool) -> null
+fn assert(condition: bool) -> unknown
 ```
 
-Abort execution if the condition is false.
+Aborts execution when the condition is false. The call yields no usable value and is written as a statement, not bound to a variable.
 
 ### `string_contains`
 
