@@ -109,7 +109,7 @@ values[1] + fallback;
 
 ## Fallible projection
 
-`receiver?.field` and `receiver?.[index]` are fallible projection. They evaluate to an `Option` of the projected value: a missing map key, an out-of-range array or string index, or a receiver that is already `Option::None` produces `Option::None` instead of failing. Neither form propagates out of the enclosing function.
+`receiver?.field` and `receiver?.[index]` are fallible projection. They evaluate to an `Option` of the projected value: a missing map key, an out-of-range array or string index, or a receiver that is already `None` produces `None` instead of failing. Neither form propagates out of the enclosing function.
 
 ```rss
 struct State {
@@ -119,8 +119,8 @@ let state: State = {values: [41]};
 let present: Option<int> = state?.values?.[0];
 let missing: Option<int> = state?.values?.[5];
 let answered: int = match present {
-    Option::Some(value) => value,
-    Option::None => 0,
+    Some(value) => value,
+    None => 0,
 };
 answered + missing.unwrap_or(-1);
 ```
@@ -129,7 +129,7 @@ The receiver set is narrow: field projection admits a struct schema or a declare
 
 ## Propagation
 
-`?` is postfix propagation, not a type suffix. On an `Option` operand it passes a `Some` payload through and exits the current `Option`-returning function on `Option::None`; on a `Result` operand it passes an `Ok` payload through and returns the original `Err`. Error types must match exactly — use `map_err` or `ok_or` for an explicit conversion, because no implicit error conversion is inserted.
+`?` is postfix propagation, not a type suffix. On an `Option` operand it passes a `Some` payload through and exits the current `Option`-returning function on `None`; on a `Result` operand it passes an `Ok` payload through and returns the original `Err`. Error types must match exactly — use `map_err` or `ok_or` for an explicit conversion, because no implicit error conversion is inserted.
 
 ```rss
 fn parse_number(text: string) -> Result<int, string> {

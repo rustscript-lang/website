@@ -41,11 +41,11 @@ Reserved words introduce declarations and control flow. Type names such as `int`
 ```rss
 pub fn choose(value: Option<int>) -> int {
     match value {
-        Option::Some(found) => found,
-        Option::None => 0,
+        Some(found) => found,
+        None => 0,
     }
 }
-let mut result = choose(Option::Some(42));
+let mut result = choose(Some(42));
 result;
 ```
 
@@ -53,7 +53,7 @@ result;
 |---|---|---|
 | `pub`, `fn`, `struct`, `use`, `as` | `if`, `else`, `while`, `for`, `in`, `match`, `break`, `continue` | `let`, `true`, `false` |
 
-`null` is neither a keyword nor a literal. Absence is written `Option::None`, and "no value produced" is the Unit value `()`. `Option`, `Result`, `Some`, `None`, `Ok`, and `Err` are built-in type and constructor names rather than reserved words, so the lexer reads them as ordinary identifiers and paths.
+`null` is neither a keyword nor a literal. Absence is written `None`, and "no value produced" is the Unit value `()`. `Option` and `Result` are built-in type names. In RSS, `Some` and `None` are reserved constructor names in expressions and patterns, so they cannot be used as local variable names; the lexer still reads them as identifiers. Field names such as `obj.None` and quoted map keys such as `{"None": 1}` remain valid. `Result::Ok` and `Result::Err` retain their qualified spelling.
 
 ## Integer literals
 

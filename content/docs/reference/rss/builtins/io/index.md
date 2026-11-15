@@ -19,7 +19,7 @@ use io;
 | [`open`](#open) | Opens a file handle as an `io.file` resource, or returns the OS error text. |
 | [`popen`](#popen) | Starts a child process and returns a process-backed `io.file` resource, or the OS error text. |
 | [`read_all`](#read-all) | Reads all remaining text from an I/O handle, or returns the OS error text. |
-| [`read_line`](#read-line) | Reads a single line from an I/O handle. End of file is `Result::Ok(Option::None)`; a present but empty line is `Result::Ok(Option::Some(""))`. |
+| [`read_line`](#read-line) | Reads a single line from an I/O handle. End of file is `Result::Ok(None)`; a present but empty line is `Result::Ok(Some(""))`. |
 | [`write`](#write) | Writes text to an I/O handle and returns the number of bytes written, or the OS error text. |
 | [`flush`](#flush) | Flushes buffered output for an I/O handle, or returns the OS error text. |
 | [`close`](#close) | Closes an I/O handle, consuming the resource, or returns the OS error text. A close failure is reported instead of being swallowed. |
@@ -57,7 +57,7 @@ Reads all remaining text from an I/O handle, or returns the OS error text.
 fn read_line(handle: io.file) -> Result<Option<string>, string>
 ```
 
-Reads a single line from an I/O handle. End of file is `Result::Ok(Option::None)`; a present but empty line is `Result::Ok(Option::Some(""))`.
+Reads a single line from an I/O handle. End of file is `Result::Ok(None)`; a present but empty line is `Result::Ok(Some(""))`.
 
 ### `write`
 

@@ -416,6 +416,46 @@ test("Syntax Cheatsheet is split into complete highlighted RSS topic pages", asy
   window.close();
 });
 
+test("RSS Option reference renders bare constructors and match patterns", async () => {
+  run("node", ["scripts/generate-api-reference.mjs"]);
+  run("node", ["scripts/build-docs.mjs"]);
+  const routes = [
+    "learn/getting-started",
+    "reference/host-functions",
+    "reference/rustscript/compiler",
+    "reference/rss/lexical-structure",
+    "reference/rss/primitive-types",
+    "reference/rss/type-inference",
+    "reference/rss/collections-and-structs",
+    "reference/rss/expressions-and-operators",
+    "reference/rss/control-flow",
+    "reference/rss/functions-and-generics",
+    "reference/rss/builtins/io",
+    "reference/rss/builtins/re",
+    "reference/rss/stdlibs/bytes",
+    "reference/rss/stdlibs/collections",
+    "reference/rss/stdlibs/lrucache",
+    "reference/rss/stdlibs/parse",
+  ];
+  for (const route of routes) {
+    const html = await readFile(new URL(`../public/docs/${route}/index.html`, import.meta.url), "utf8");
+    const window = new Window();
+    window.document.write(html);
+    const article = window.document.querySelector("article");
+    assert.ok(article, route);
+    const text = article.textContent;
+    if (route !== "reference/rss/control-flow") {
+      assert.doesNotMatch(text, /Option::(?:Some|None)/, route);
+    }
+    assert.match(text, /\b(?:Some\(|None\b)/, route);
+    window.close();
+  }
+  const control = await readFile(new URL("../content/docs/reference/rss/control-flow.md", import.meta.url), "utf8");
+  assert.match(control, /Some\(value\) => value \+ 1,/);
+  assert.match(control, /None => 0,/);
+  assert.doesNotMatch(control, /Some\(String\) =>/);
+});
+
 test("API reference covers every catalog entry and renders nested module navigation", async () => {
   run("node", ["scripts/generate-api-reference.mjs"]);
   const catalog = JSON.parse(await readFile(new URL("_meta/runtime-api.json", content), "utf8"));

@@ -48,7 +48,7 @@ answer;
 
 ## Literal and wildcard patterns
 
-`match` supports integer, string, and bytes literals plus the `_` wildcard. There is no `null` literal or `null` pattern: absence is matched with `Option::None`, and a value match still requires a trailing `_` arm.
+`match` supports integer, string, and bytes literals plus the `_` wildcard. There is no `null` literal or `null` pattern: absence is matched with `None`, and a value match still requires a trailing `_` arm.
 
 ```rss
 let code = 2;
@@ -62,20 +62,20 @@ label;
 
 ## `Option` constructor patterns
 
-`Option::Some(name)` binds a present payload and `Option::None` matches the absent variant. Those two arms make an `Option` match exhaustive, so no wildcard is required.
+`Some(name)` binds a present payload and `None` matches the absent variant. Those two arms make an `Option` match exhaustive, so no wildcard is required.
 
 ```rss
-let candidate: Option<int> = Option::Some(41);
+let candidate: Option<int> = Some(41);
 let answer = match candidate {
-    Option::Some(value) => value + 1,
-    Option::None => 0,
+    Some(value) => value + 1,
+    None => 0,
 };
 answer;
 ```
 
-The identifier inside `Option::Some(...)` is always a binding name, never a payload type test: `Option::Some(int)` binds a name spelled `int` and matches any present payload. `Option::Some(_)` accepts a wildcard, while `Option::None(x)` is rejected because `None` carries no payload. Nested constructor patterns such as `Option::Some(Option::None)` are rejected; match the inner value in a second `match` instead.
+The identifier inside `Some(...)` is always a binding name, never a payload type test: `Some(TypeName)` binds a name spelled `TypeName` and matches any present payload. `Some(_)` accepts a wildcard, while `None(x)` is rejected because `None` carries no payload. Nested constructor patterns such as `Some(None)` are rejected; match the inner value in a second `match` instead.
 
-Bare `Some(name)` and `None` belong to a retired optional-slot mechanism rather than to the `Option` type. A logical `Option` value is not an optional slot, so a match that writes `Some(value)` or `None` over one fails with `Some(...) and None match patterns require an optional value` instead of falling back to value matching.
+Bare `Some(name)` and `None` match logical `Option` values.
 
 ## `Result` constructor patterns
 
@@ -102,20 +102,6 @@ let failure: string = match parse_flag(false) {
 ```
 
 `Result` and `Option` constructor arms cannot be mixed in one `match`, and neither can be mixed with literal arms; match the inner value in a second `match` when both channels need inspection.
-
-## Type patterns
-
-`Some(String)`, `Some(Number)`, and the other supported type constructors compare the receiver's runtime type name. They are the retired optional-slot type patterns rather than payload type tests, they still require the trailing `_` arm, and they cannot be mixed with `Option` or `Result` constructor arms in the same `match`.
-
-```rss
-let value = "rss";
-let category = match value {
-    Some(String) => "text",
-    Some(Number) => "number",
-    _ => "other",
-};
-category;
-```
 
 ## `while` loops
 
