@@ -17,6 +17,11 @@ function firstParagraph(value) {
   return value.split("\n")[0];
 }
 
+function currentOptionSyntax(value) {
+  // The catalog is generated separately; keep published prose in sync with RSS syntax.
+  return value.replaceAll("Option::Some", "Some").replaceAll("Option::None", "None");
+}
+
 function modulePath(section, module) {
   return section === "builtins" ? module.qualified : `stdlib::rss::${module.slug}`;
 }
@@ -44,12 +49,12 @@ function typeReference(types = []) {
 
 function functionReference(functions) {
   const rows = functions
-    .map((callable) => `| [\`${callable.name}\`](#${callable.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "")}) | ${tableCell(firstParagraph(callable.description))} |`)
+    .map((callable) => `| [\`${callable.name}\`](#${callable.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "")}) | ${tableCell(firstParagraph(currentOptionSyntax(callable.description)))} |`)
     .join("\n");
   const details = functions
     .map((callable) => {
       const signatures = callable.signatures.map((signature) => `\`\`\`rss\n${signature}\n\`\`\``).join("\n\n");
-      return `### \`${callable.name}\`\n\n${signatures}\n\n${callable.description}`;
+      return `### \`${callable.name}\`\n\n${signatures}\n\n${currentOptionSyntax(callable.description)}`;
     })
     .join("\n\n");
   return `## Functions\n\n| Function | Description |\n| --- | --- |\n${rows}\n\n## Function details\n\n${details}`;

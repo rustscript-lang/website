@@ -74,17 +74,17 @@ An `Option<T>`, `Result<T, E>`, or bare `()` annotation fixes a schema that infe
 ```rss
 fn describe(candidate: Option<int>) -> string {
     match candidate {
-        Option::Some(value) => "present " + value,
-        Option::None => "absent",
+        Some(value) => "present " + value,
+        None => "absent",
     }
 }
-let present: Option<int> = Option::Some(41);
-let absent: Option<int> = Option::None;
+let present: Option<int> = Some(41);
+let absent: Option<int> = None;
 let promoted: Option<int> = present.map(|value| value + 1);
 describe(promoted) + describe(absent);
 ```
 
-`Option::Some` infers its payload schema from the payload it carries, but `Option::None` has no payload to infer from, so it needs an annotation or another contextual type; a bare `Result::Ok(7)` is in the same position. Missing type arguments are rejected rather than invented as `unknown`.
+`Some` infers its payload schema from the payload it carries, but `None` has no payload to infer from, so it needs an annotation or another contextual type; a bare `Result::Ok(7)` is in the same position. Missing type arguments are rejected rather than invented as `unknown`.
 
 ```rss
 let failure: Result<int, string> = Result::Err("missing field");

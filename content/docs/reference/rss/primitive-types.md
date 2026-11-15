@@ -82,25 +82,25 @@ let from_explicit_body: () = acknowledged();
 literal;
 ```
 
-Unit is a logical type, not a source-level null. The VM carries it in the same slot as its internal Null value, but RSS has no `null` literal and no `null` type: `null` in source is a rejected form rather than Unit or `Option::None`. A Unit value is therefore a real value — it can be bound, passed, and returned — while "no value is absent" is expressed with `Option::None`.
+Unit is a logical type, not a source-level null. The VM carries it in the same slot as its internal Null value, but RSS has no `null` literal and no `null` type. A Unit value is therefore a real value — it can be bound, passed, and returned — while absence is expressed with `None`.
 
 ## `Option<T>` and `Result<T, E>`
 
-`Option<T>` is a present payload or nothing: `Option::Some(value)` or `Option::None`. `Result<T, E>` is a success payload or an error payload: `Result::Ok(value)` or `Result::Err(error)`. Both are compiler built-ins, both require their type arguments, and neither is spelled with a `?` type suffix.
+`Option<T>` is a present payload or nothing: `Some(value)` or `None`. `Result<T, E>` is a success payload or an error payload: `Result::Ok(value)` or `Result::Err(error)`. Both are compiler built-ins, both require their type arguments, and neither is spelled with a `?` type suffix.
 
 ```rss
 fn score(value: Option<int>, fallback: int) -> int {
     match value {
-        Option::Some(inner) => inner,
-        Option::None => fallback,
+        Some(inner) => inner,
+        None => fallback,
     }
 }
-let present: Option<int> = Option::Some(42);
-let absent: Option<int> = Option::None;
+let present: Option<int> = Some(42);
+let absent: Option<int> = None;
 score(present, 0) + score(absent, 1);
 ```
 
-`Option::Some` can infer its payload type from the payload, while `Option::None` and a bare `Result::Ok(7)` need an annotation or another contextual type. The variants are selected by a carrier tag, never by payload truthiness, so `Option::Some(0)`, `Option::Some(false)`, `Option::Some("")`, and `Option::None` are four different values.
+`Some` can infer its payload type from the payload, while `None` and a bare `Result::Ok(7)` need an annotation or another contextual type. The variants are selected by a carrier tag, never by payload truthiness, so `Some(0)`, `Some(false)`, `Some("")`, and `None` are four different values.
 
 ## Primitive schema table
 
@@ -122,5 +122,5 @@ classify(7, 1.25, true, "rss", b"ok");
 | `string` | UTF-8 strings |
 | `bytes` | Byte sequences |
 | `()` | The Unit value |
-| `Option<T>` | `Option::Some(T)` or `Option::None` |
+| `Option<T>` | `Some(T)` or `None` |
 | `Result<T, E>` | `Result::Ok(T)` or `Result::Err(E)` |

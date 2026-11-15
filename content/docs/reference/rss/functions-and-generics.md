@@ -54,7 +54,7 @@ let completed: () = apply_times(tick, 3);
 completed;
 ```
 
-Unit is a distinct logical type even though the VM carries it in its internal Null slot, so a Unit result is not "no value" and is not `Option::None`. Use `Option<T>` when a call may legitimately have nothing to return.
+Unit is a distinct logical type even though the VM carries it in its internal Null slot, so a Unit result is not "no value" and is not `None`. Use `Option<T>` when a call may legitimately have nothing to return.
 
 ## Public functions
 

@@ -121,10 +121,10 @@ RustScript's type rules interact with its ownership model:
 
 - `let` bindings are immutable by default; `let mut` is required for reassignment.
 - `if`-expression branches with conflicting concrete types are rejected at compile time.
-- Optional chaining (`a?.b?.c`) requires the container to come from a user-declared schema, and the result stays optional until handled with `.unwrap_or(...)`, a `!= null` refinement, or a `match Some(name)` arm.
+- Optional chaining (`a?.b?.c`) requires the container to come from a user-declared schema, and the result stays optional until handled with `.unwrap_or(...)` or a `match Some(name)` arm.
 - `+` with a known-string operand infers string concatenation and treats local reads as copy-like to preserve ergonomics.
 
-*Note added later: the requirement that the container carry a user-declared schema still holds, but `null` and the bare `Some(name)` pattern were removed in a subsequent version. A fallible projection now yields `Option<T>`, is handled with `match` on `Option::Some(name)` or `Option::None`, or with `.unwrap_or(...)`, and `?` propagates the absent case out of the enclosing function.*
+*Note added later: the container carries a user-declared schema. A fallible projection yields `Option<T>`, handled with `match` on `Some(name)` or `None`, or with `.unwrap_or(...)`; `?` propagates the absent case out of the enclosing function.*
 
 These are all DX-layer decisions. They catch mistakes before bytecode is generated without adding runtime cost.
 

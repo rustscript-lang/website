@@ -57,21 +57,21 @@ selected + count;
 
 ## Map keys, presence, and absence
 
-A map stores entries. A key that was never written is absent, which is not a stored value: indexing a missing key with `map[key]` is a fatal runtime error rather than an absent or `null` value. Test presence with `has`, supply a default with `get_or`, or use fallible projection (`?.[]`, covered below) to turn a missing key into `Option::None`.
+A map stores entries. A key that was never written is absent, which is not a stored value: indexing a missing key with `map[key]` is a fatal runtime error rather than an absent or `null` value. Test presence with `has`, supply a default with `get_or`, or use fallible projection (`?.[]`, covered below) to turn a missing key into `None`.
 
-An omitted key and a key whose stored value is `Option::None` are different facts. Omitting the key removes the entry; storing `Option::None` keeps the entry with an absent payload. `map<V>` describes values, so a map may hold `Option<V>` values and still have every key present.
+An omitted key and a key whose stored value is `None` are different facts. Omitting the key removes the entry; storing `None` keeps the entry with an absent payload. `map<V>` describes values, so a map may hold `Option<V>` values and still have every key present.
 
 ```rss
 let scores: map<int> = {alice: 10, bob: 12};
-let ratings: map<Option<int>> = {carol: Option::None};
+let ratings: map<Option<int>> = {carol: None};
 let has_carol = scores.has("carol");
 let has_bob = scores.has("bob");
 let alice = scores["alice"];
 let bob = if has_bob => { scores["bob"] } else => { 0 };
 let carol_rating: Option<int> = ratings["carol"];
 let carol_is_none = match carol_rating {
-    Option::Some(inner) => false,
-    Option::None => true,
+    Some(inner) => false,
+    None => true,
 };
 has_carol == false && carol_is_none && alice + bob > 0;
 ```
@@ -103,7 +103,7 @@ boxed.value;
 
 ## `Option` values
 
-`Option<T>` holds either `Option::Some(value)` or `Option::None`, and both spellings are namespace-qualified constructors. `Option<T>` offers `map`, `and_then`, `or_else`, `unwrap_or`, `unwrap_or_else`, `ok_or`, and `ok_or_else`; `unwrap` is rejected, so absence is always handled explicitly. `Option` values can appear inside arrays, maps, structs, generic types, callables, and each other.
+`Option<T>` holds either `Some(value)` or `None`; both constructors are written without a namespace prefix. `Option<T>` offers `map`, `and_then`, `or_else`, `unwrap_or`, `unwrap_or_else`, `ok_or`, and `ok_or_else`; `unwrap` is rejected, so absence is always handled explicitly. `Option` values can appear inside arrays, maps, structs, generic types, callables, and each other.
 
 ```rss
 struct Entry {
@@ -113,18 +113,18 @@ struct Entry {
 
 fn reads(entry: Option<Entry>, fallback: int) -> int {
     match entry {
-        Option::Some(item) => item.reads,
-        Option::None => fallback,
+        Some(item) => item.reads,
+        None => fallback,
     }
 }
 
-let hit: Option<Entry> = Option::Some({topic: "markets", reads: 7});
-let absent: Option<Entry> = Option::None;
+let hit: Option<Entry> = Some({topic: "markets", reads: 7});
+let absent: Option<Entry> = None;
 let promoted: Option<int> = hit.map(|item| item.reads + 1);
 reads(hit, 0) + reads(absent, 5) + promoted.unwrap_or(0);
 ```
 
-`Option::Some` infers its payload schema when the payload is fully known, while `Option::None` needs an annotation or another contextual type. The variant comes from a carrier tag rather than payload truthiness, so `Option::Some(0)`, `Option::Some(false)`, `Option::Some("")`, `Option::Some(())`, and `Option::None` are all distinct.
+`Some` infers its payload schema when the payload is fully known, while `None` needs an annotation or another contextual type. The variant comes from a carrier tag rather than payload truthiness, so `Some(0)`, `Some(false)`, `Some("")`, `Some(())`, and `None` are all distinct.
 
 ## `Result` values
 
@@ -143,15 +143,15 @@ let loaded: Result<int, string> = load("known");
 let value: int = loaded.unwrap_or(-1);
 let as_option: Option<int> = load("missing").ok();
 let error_text: string = match load("missing").err() {
-    Option::Some(reason) => reason,
-    Option::None => "no error",
+    Some(reason) => reason,
+    None => "no error",
 };
 value + as_option.unwrap_or(0) + error_text.length;
 ```
 
 ## Fallible field and index projection
 
-`receiver?.field` and `receiver?.[index]` are fallible projection: they evaluate to an `Option` of the projected value instead of failing. A missing map key, an index outside a declared array, an out-of-range string index, or a receiver that is already `Option::None` becomes `Option::None`; a present value becomes `Option::Some`, including `Option::Some(0)`, `Option::Some(false)`, and `Option::Some("")`.
+`receiver?.field` and `receiver?.[index]` are fallible projection: they evaluate to an `Option` of the projected value instead of failing. A missing map key, an index outside a declared array, an out-of-range string index, or a receiver that is already `None` becomes `None`; a present value becomes `Some`, including `Some(0)`, `Some(false)`, and `Some("")`.
 
 ```rss
 struct Feed {
@@ -174,7 +174,7 @@ let outside: Option<string> = headline?.[9];
 
 The receiver must have a declared schema: a struct type, a declared `map<T>`, or — for the index form — a declared array, `string`, or `bytes`, and a projection chain rooted in such a local is admitted exactly like the local. A value whose type was never declared is rejected with `optional access requires a user-declared schema in RustScript`, so annotate the binding (`let feed: Feed = make();`) when the type comes from a call. `int`, `number`, a `Result`, and an unresolved generic parameter are refused rather than projected.
 
-`bytes` is the one shape that type-checks but does not project at runtime: the runtime dispatch covers `map`, `array`, and `string`, so a `bytes` receiver lowers to `Option::None` even for an in-range index. Use slice or index access on a `bytes` value that must yield a byte. On an `Option` receiver, `?.` consumes exactly one optional layer, so projecting through `Option<int>` yields `Option<Option<int>>` rather than flattening arbitrarily.
+`bytes` is the one shape that type-checks but does not project at runtime: the runtime dispatch covers `map`, `array`, and `string`, so a `bytes` receiver lowers to `None` even for an in-range index. Use slice or index access on a `bytes` value that must yield a byte. On an `Option` receiver, `?.` consumes exactly one optional layer, so projecting through `Option<int>` yields `Option<Option<int>>` rather than flattening arbitrarily.
 
 ## Slices
 

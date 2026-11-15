@@ -17,10 +17,10 @@ use re;
 | Function | Description |
 | --- | --- |
 | [`match`](#match) | Returns whether a regular expression matches the input text. |
-| [`find`](#find) | Returns the first substring matched by a regular expression as `Option<string>`. A missing match is `Option::None`; an empty match stays `Option::Some("")`. |
+| [`find`](#find) | Returns the first substring matched by a regular expression as `Option<string>`. A missing match is `None`; an empty match stays `Some("")`. |
 | [`replace`](#replace) | Replaces all regular-expression matches in a string. |
 | [`split`](#split) | Splits a string on regular-expression matches. |
-| [`captures`](#captures) | Returns the capture groups of the first match. Group 0 and every participating group are `Option::Some`; an unmatched optional group is `Option::None`, and a missing match is an empty array. |
+| [`captures`](#captures) | Returns the capture groups of the first match. Group 0 and every participating group are `Some`; an unmatched optional group is `None`, and a missing match is an empty array. |
 
 ## Function details
 
@@ -38,7 +38,7 @@ Returns whether a regular expression matches the input text.
 fn find(pattern: string, text: string) -> Option<string>
 ```
 
-Returns the first substring matched by a regular expression as `Option<string>`. A missing match is `Option::None`; an empty match stays `Option::Some("")`.
+Returns the first substring matched by a regular expression as `Option<string>`. A missing match is `None`; an empty match stays `Some("")`.
 
 ### `replace`
 
@@ -62,4 +62,4 @@ Splits a string on regular-expression matches.
 fn captures(pattern: string, text: string) -> [Option<string>]
 ```
 
-Returns the capture groups of the first match. Group 0 and every participating group are `Option::Some`; an unmatched optional group is `Option::None`, and a missing match is an empty array.
+Returns the capture groups of the first match. Group 0 and every participating group are `Some`; an unmatched optional group is `None`, and a missing match is an empty array.

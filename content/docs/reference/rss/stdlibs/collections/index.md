@@ -14,7 +14,7 @@ use stdlib::rss::collections;
 
 | Function | Description |
 | --- | --- |
-| [`index_of`](#index-of) | Returns the first index of a value in an array as `Option<int>`, or `Option::None` when it is absent. |
+| [`index_of`](#index-of) | Returns the first index of a value in an array as `Option<int>`, or `None` when it is absent. |
 | [`contains`](#contains) | Returns whether an array contains a value. |
 | [`reverse`](#reverse) | Returns a reversed copy of an array. |
 | [`dedup`](#dedup) | Returns an array with duplicate values removed. |
@@ -32,7 +32,7 @@ use stdlib::rss::collections;
 pub fn index_of<T>(values: [T], needle: T) -> Option<int>
 ```
 
-Returns the first index of a value in an array as `Option<int>`, or `Option::None` when it is absent.
+Returns the first index of a value in an array as `Option<int>`, or `None` when it is absent.
 
 ### `contains`
 
