@@ -21,7 +21,7 @@ Infrastructure isolation and runtime governance solve different problems. RustSc
 | MicroVM | A separate kernel plus snapshot, resume, or fork of an execution environment | Typed call meaning, receipts, tool-version pins, and state-compatible rollback |
 | RustScript Agent | Typed calls, admitted authority, managed effects, receipts, run pins, and recovery | It still relies on deployment isolation for kernel and tenant boundaries |
 
-The distinction is visible in the current implementation: file and process tools are confined beneath an admitted workspace and token-scoped owner, while the project documentation explicitly calls that *application confinement*, not an OS sandbox.
+File-path confinement and managed-process confinement are separate. File tools resolve paths beneath the admitted workspace. Managed process confinement binds handles to a token-scoped owner and constrains the working directory and environment supplied at spawn. A spawned process is not chrooted: its host path and network access still depend on OS, container, or other deployment policy.
 
 The missing layer is a protocol. It must bind a model proposal to one run, one authority snapshot, one tool graph, and one durable outcome without letting generated text become a permission proof.
 
@@ -92,7 +92,7 @@ Suppose Run A and Run B both capture H0. A prepares `race.txt = first`; B prepar
 
 The compare-and-swap rule prevents a stale writer from silently replacing a newer head. One result commits and one conflicts; both candidates remain identifiable. Repeating Run A's completed attempt reads its receipt and canonical result rather than performing the filesystem mutation again.
 
-Restore is also explicit. A checkpoint covers a managed file-tree root, declared plugin-state roots, and a history high-water mark. Restoring it creates a new branch and a new run with fresh admission, deadline, and native authority. It does not rewind audit history, revive old handles, or resume an old process.
+Restore is also explicit. A checkpoint captures a frozen managed tree and history prefix, a captured tool-graph reference, public execution config, and the supported plugin-state roots. External high-water and boundary facts remain separate; the history prefix does not claim to settle or rewind those external systems. Restore creates a new branch and run, issues fresh native authority, and uses the checkpoint-selected graph and config. It does not rewind audit history, revive old handles, or resume an old process.
 
 ## Tool Graphs That Evolve Without Rewriting Live Runs
 
@@ -117,7 +117,7 @@ Rollback selects a retained, authorized graph and activates it as a new generati
 
 Durability gives recovery facts, not magical exactly-once delivery. Events have stable identities and per-run sequence numbers, while subscribers may receive a durable event more than once after reconnecting. Completed provider steps and committed tool results replay from durable records without issuing the underlying work again. Retry-safe pending provider work may retry; unsafe or effectful unknown work becomes a typed interruption.
 
-A live worker can temporarily hold a completed run in observable `terminal_pending` state and retry the exact terminal commit for a bounded window. That retry payload and bookkeeping are process-local. **Restart repair reconciles durable state rather than resuming the process-local terminal retry.** Startup repairs interrupted runs, reconciles pending effect records, interrupts open tokens and owned children, and reloads the repaired state.
+A live worker can temporarily hold a completed run in observable `terminal_pending` state and retry the exact terminal commit for a bounded window. That retry payload and bookkeeping are process-local. **Restart repair reconciles durable state rather than resuming the process-local terminal retry.** A graceful live stop or shutdown can revoke owned process-local capability tokens and reap owned child processes while their maps and tables still exist. After process termination, the token maps and process tables are gone. Startup repairs durable run records and effect records; it does not guarantee termination of surviving external processes.
 
 Publication remains its own authorized operation. Managed writes target a private branch; a publication transition advances the visible managed pointer through an expected-head check. Before publication, rollback can abandon private runtime-owned state. After publication, changing the visible head is a new authorized history event, not a hidden filesystem undo.
 
