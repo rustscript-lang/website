@@ -1,9 +1,26 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
+import { Window } from "happy-dom";
 
 const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
 const css = await readFile(new URL("../src/styles.css", import.meta.url), "utf8");
+
+const window = new Window({ url: "https://rustscript.org/" });
+window.document.write(html);
+
+test("ecosystem lists RustScript Agent as a safe external link", () => {
+  const link = window.document.querySelector('.repo-list a[href="https://agent.rustscript.org/"]');
+
+  assert.ok(link, "RustScript Agent project link must exist");
+  assert.equal(link.querySelector("strong")?.textContent, "RustScript Agent");
+  assert.equal(
+    link.querySelector("span")?.textContent,
+    "Durable, reviewable agent runtime powered by RustScript",
+  );
+  assert.equal(link.getAttribute("target"), "_blank");
+  assert.deepEqual(new Set(link.getAttribute("rel")?.split(/\s+/)), new Set(["noopener", "noreferrer"]));
+});
 
 test("homepage links and labels the CLR runtime as IronRust", () => {
   const legacyRepo = ["rustscript", "clr", "vm"].join("-");
